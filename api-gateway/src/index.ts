@@ -1,43 +1,58 @@
-import express, { Application } from "express"
-import {config} from 'dotenv'
-import { createProxyMiddleware } from "http-proxy-middleware"
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
-config()
+import express, { Application } from "express";
+import { config } from "dotenv";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
-console.log("hello")
+config();
 
-const app: Application = express()
+const app: Application = express();
 
-const {
-    PORT,
-    FRONTEND_URL,
-    AUTH_URL
-} = process.env
-console.log(PORT,FRONTEND_URL)
+const { PORT, FRONTEND_URL, AUTH_URL } = process.env;
 
-
+console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL });
 
 const corsOptions = {
-    origin: String(FRONTEND_URL),
+    origin: FRONTEND_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
 };
 
-
-app.use(express.json())
-app.use(cors(corsOptions))
-app.use(express.urlencoded({extended:true}))
-app.use(cookieParser())
-
+app.use(express.json());
+app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const services = [
     {
+        path: AUTH_URL, // Target service URL
+        context: "/auth", // Route on your gateway
+    },
+];
+app.use("/igate", (req, res) => {
+    console.log("hello igate");
+    res.send("Hello from /igate"); // Send a response to the client
+});
 
-        path: AUTH_URL,
-
+// Setup proxies
+services.forEach(({ context, path }) => {
+    if (!path || !context) {
+        console.error("Invalid service configuration:", { context, path });
+        return;
     }
-]
-app.listen(PORT,()=>{
-    console.log(`project running at http://localhost:${PORT}`)
-})
+
+    console.log(`Setting up proxy: ${context} -> ${path}`);
+
+    app.use(
+        context,
+        createProxyMiddleware({
+            target: path,
+            changeOrigin: true,
+            // logLevel: "debug", // Enable detailed logs for debugging
+        })
+    );
+});
+
+app.listen(PORT, () => {
+    console.log(`API Gateway running at http://localhost:${PORT}`);
+});
