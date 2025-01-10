@@ -1,8 +1,9 @@
-import express, { Application } from "express";
+import express, { Application ,Request ,Response ,NextFunction } from "express";
 import { config } from "dotenv";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+
 
 config();
 
@@ -18,8 +19,8 @@ const corsOptions = {
     credentials: true,
 };
 
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -48,9 +49,12 @@ services.forEach(({ context, path }) => {
         createProxyMiddleware({
             target: path,
             changeOrigin: true,
-            // logLevel: "debug", // Enable detailed logs for debugging
         })
     );
+});
+app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
+    console.error("Error:", err.message);
+    res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(PORT, () => {

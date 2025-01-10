@@ -11,17 +11,27 @@ const registerUserUseCase = new RegisterUserUseCase(userRepository, hashService)
 export class UserController {
 
     constructor(
-        private userUseCase : RegisterUserUseCase
+        private registerUserUseCase : RegisterUserUseCase
     ){
 
     }
-  async register(req: Request, res: Response, next : NextFunction): Promise<void> {
-    try {
-      const { name, email, password } = req.body;
-      const user = await registerUserUseCase.execute({name, email, password});
-      res.status(201).json({ message: "User registered successfully", user });
-    } catch (error) {
-      res.status(400).json({ error });
+    async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const { email, password } = req.body;
+        const user = await registerUserUseCase.execute({ email, password });
+    
+        res.status(201).json({
+          success: true,
+          message: "User registered successfully",
+          data: user,
+        });
+      } catch (error: any) {
+        console.error("Error caught in controller:", error.message); // Debug log
+        res.status(400).json({
+          success: false,
+          message: error.message || "An error occurred",
+        });
+      }
     }
-  }
+    
 }

@@ -17,6 +17,7 @@ const router = express.Router();
 export function userRoute(): Router {
 
     const router = express.Router();
+    console.log("inside route")
     router.post('/register', (req: Request, res: Response, next: NextFunction) => {
         userController.register(req, res, next);
     });
