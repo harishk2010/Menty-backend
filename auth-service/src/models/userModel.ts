@@ -21,7 +21,6 @@ const UserSchema: Schema<IUser> = new Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, default: null },
   profilePicUrl: { type: String, required: true, default: 'No Picture' },
   studiedHours: { type: Number, required: true, default: 0 },
   isVerified: { type: Boolean, required: true, default: false },

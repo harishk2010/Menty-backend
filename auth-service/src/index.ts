@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import connectDB from "./config/db";
 import cors from 'cors'
+import instructorRoutes from "./routes/instructorRoutes";
 config()
 
 let app:Application=express()
@@ -21,7 +22,7 @@ app.use(cookieParser());
 
 
 
-// app.use('/auth',userRoute() )
+app.use('/auth',instructorRoutes )
 
 app.get('/', (req, res)=> {
     res.json('authentication service.....')
