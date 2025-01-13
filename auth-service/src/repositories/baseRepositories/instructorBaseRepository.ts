@@ -11,4 +11,8 @@ export default class InstructorBaseRepository<T extends Document>{
     async findByEmail(email:string):Promise<IInstructor|null >{
         return await this.model.findOne({email:email})
     }
+    async createInstructor(email:string,password:string):Promise<null>{
+        return null
+
+    }
 }
