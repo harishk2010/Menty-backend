@@ -12,4 +12,12 @@ export class otpRespository{
         const response = await this.baseOtpRepository.saveOtp(email,otp)
         return response
     }
+    public async findOtp(email:string){
+        const response=await this.baseOtpRepository.findOtp(email)
+        return response
+    }
+    public async deleteOtp(email:string){
+        const response=await this.baseOtpRepository.deleteOtp(email)
+        return response
+    }
 }

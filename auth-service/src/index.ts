@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 
 
-app.use('/auth',instructorRoutes )
+app.use('/auth/instructor',instructorRoutes )
 
 app.get('/', (req, res)=> {
     res.json('authentication service.....')

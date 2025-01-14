@@ -18,16 +18,16 @@ export interface IInstructor extends Document {
 }
 
 const InstructorSchema: Schema<IInstructor> = new Schema({
-  username: { type: String, required: true },
+  username: { type: String, required: false },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true },
-  expertise: { type: String, required: true },
-  skills: { type: String, required: true },
+  phone: { type: String, required: false },
+  expertise: { type: String, required: false },
+  skills: { type: String, required: false },
   password: { type: String, required: true },
-  role: { type: String, required: true, default: null },
-  profilePicUrl: { type: String, required: true, default: 'img not provided' },
-  isVerified: { type: Boolean, required: true, default: false },
-  isBlocked: { type: Boolean, required: true, default: false },
+  role: { type: String, required: false, default: null },
+  profilePicUrl: { type: String, required: false, default: 'img not provided' },
+  isVerified: { type: Boolean, required: false, default: false },
+  isBlocked: { type: Boolean, required: false, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 },

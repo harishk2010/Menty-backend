@@ -1,3 +1,4 @@
+import { IInstructor } from "@/models/instructorModel"
 import { InstructorRepository } from "../repositories/instructorRepository"
 
 export class InstructorServices{
@@ -14,8 +15,9 @@ export class InstructorServices{
         return response
     }
 
-    public async signUp(email:string,password:string){
-        const response=await this.instructorRepository.createInstructor(email,password)
+
+    public async createUser(userData:any){
+        const response=await this.instructorRepository.createUser(userData)
         return response
     }
 }

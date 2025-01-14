@@ -32,4 +32,27 @@ export default class baseOtpRepository<T extends Document> {
       throw error;
     }
   }
+
+  async findOtp(email:string):Promise<Iotp | null >{
+    try {
+      const response= await otpModel.findOne({email:email})
+      console.log(email,response,"Found OTP")
+      return response
+      
+    } catch (error) {
+      throw error
+      
+    }
+  }
+  async deleteOtp(email:string):Promise<Iotp | null >{
+    try {
+      const response= await otpModel.findOneAndDelete({email:email})
+      console.log(email,response,"deleted OTP")
+      return response
+      
+    } catch (error) {
+      throw error
+      
+    }
+  }
 }

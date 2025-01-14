@@ -1,4 +1,5 @@
-import { IInstructor } from "../../models/instructorModel"
+
+import InstructorModel, { IInstructor } from "../../models/instructorModel"
 import { Document , Model } from "mongoose"
 export default class InstructorBaseRepository<T extends Document>{
     private model:Model<T>
@@ -11,8 +12,16 @@ export default class InstructorBaseRepository<T extends Document>{
     async findByEmail(email:string):Promise<IInstructor|null >{
         return await this.model.findOne({email:email})
     }
-    async createInstructor(email:string,password:string):Promise<null>{
-        return null
+    async createInstructor(userData:any):Promise<IInstructor |null>{
+        try {
+            const user=await InstructorModel.create(userData)
+            await user.save()
+            return user
+        } catch (error) {
+            throw error
+            
+        }
+
 
     }
 }

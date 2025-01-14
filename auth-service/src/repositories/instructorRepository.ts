@@ -14,8 +14,9 @@ export class InstructorRepository{
         return response
     }
 
-    async createInstructor(email:string,password:string){
-        const response= await this.baseRepository.createInstructor(email,password)
+    async createUser(userData:any) {
+        const response= await this.baseRepository.createInstructor(userData)
         return response
     }
+    
 }
