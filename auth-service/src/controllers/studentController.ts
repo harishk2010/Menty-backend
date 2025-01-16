@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { InstructorServices } from "../services/instructorServices";
+import { StudentServices } from "../services/studentServices";
 import { OtpGenerate } from "../utils/otpGenerator";
 import { otpService } from "../services/otpService";
 import { SentEmail } from "../utils/senEmail";
 import { JwtService } from "../utils/jwt";
-import { IInstructor } from "@/models/instructorModel";
+import { IUser } from "@/models/userModel";
 import {
   access_token_options,
   refresh_token_options,
@@ -14,8 +14,8 @@ import { SentForgotEmail } from "../utils/sendForgotPasswordEmail";
 import { NextFunction } from "http-proxy-middleware/dist/types";
 // import  from '../utils/jwt'
 
-export class InstructorController {
-  private instructorService: InstructorServices;
+export class StudentController {
+  private studentService: StudentServices;
   private otpService: otpService;
   private otpGenerator: OtpGenerate;
   private sendEmail: SentEmail;
@@ -23,7 +23,7 @@ export class InstructorController {
   private SentForgotEmail:SentForgotEmail
 
   constructor() {
-    this.instructorService = new InstructorServices();
+    this.studentService = new StudentServices();
     this.otpService = new otpService();
     this.otpGenerator = new OtpGenerate();
     this.sendEmail = new SentEmail();
@@ -31,7 +31,7 @@ export class InstructorController {
     this.JWT = new JwtService();
   }
 
-  public async instructorSignUp(req: Request, res: Response): Promise<any> {
+  public async studentSignUp(req: Request, res: Response): Promise<any> {
     try {
       let { email, password } = req.body;
       console.log(email, password);
@@ -40,17 +40,17 @@ export class InstructorController {
       const hashedPassword = await bcrypt.hash(password, saltRound);
       password = hashedPassword;
 
-      const ExistingInstructor = await this.instructorService.findByEmail(
+      const ExistingStudent = await this.studentService.findByEmail(
         email
       );
 
-      console.log(ExistingInstructor, "ExistingInstructor");
+      console.log(ExistingStudent, "ExistingStudent");
 
-      if (ExistingInstructor) {
+      if (ExistingStudent) {
         return res.json({
           success: false,
           message: "Existing user",
-          user: ExistingInstructor,
+          user: ExistingStudent,
         });
         throw new Error("errorr");
       } else {
@@ -63,23 +63,16 @@ export class InstructorController {
         const token = await JWT.createToken({
           email,
           password,
-          role: "instructor",
+          role: "student",
         });
 
-        //   res.cookie('verification_token', 'token', {
-        //     httpOnly: true,
-        //     sameSite: 'none',
-        //     expires: new Date(Date.now() + 300 * 60 * 1000)
-        // })
+      
         return res.status(201).json({
           success: true,
           message: "Signup successful, OTP sent to email",
           token,
         });
-        // const token=await this.instructorService.signUp({email,password})
-        // return res.status(200).json({
-        //   success:true
-        // })
+      
       }
     } catch (error: any) {
       console.error(error);
@@ -125,7 +118,7 @@ export class InstructorController {
         throw new Error();
       }
       const decode = await this.JWT.verifyToken(token);
-      console.log(decode, "decode");
+      console.log(decode, "decode student token");
       if (!decode) {
         return new Error("token has expired, register again");
       }
@@ -134,7 +127,7 @@ export class InstructorController {
       if (resultOtp?.otp === otp) {
         console.log("matched");
 
-        const user = await this.instructorService.createUser(decode);
+        const user = await this.studentService.createUser(decode);
         if (user) {
           await this.otpService.deleteOtp(user.email);
 
@@ -165,11 +158,11 @@ export class InstructorController {
       const { email, password } = req.body;
       console.log("Login request:", email);
 
-      // Check if the instructor exists in the database
-      const instructor = await this.instructorService.findByEmail(email);
-      console.log(instructor, "instructor");
+      // Check if the student exists in the database
+      const student = await this.studentService.findByEmail(email);
+      console.log(student, "student");
 
-      if (!instructor) {
+      if (!student) {
         return res.json({
           success: false,
           message: "invalid email id",
@@ -179,7 +172,7 @@ export class InstructorController {
       // Compare the password with the hashed password in the database
       const isPasswordValid = await bcrypt.compare(
         password,
-        instructor.password
+        student.password
       );
       console.log(isPasswordValid, "isPasswordValid");
 
@@ -189,7 +182,7 @@ export class InstructorController {
           message: "Invalid Password",
         });
       }
-      let role = instructor.role;
+      let role = student.role;
       // Generate a JWT token if credentials are correct
       const accesstoken = await this.JWT.accessToken({ email, role });
       const refreshToken = await this.JWT.refreshToken({ email, role });
@@ -206,7 +199,7 @@ export class InstructorController {
           .send({
             success: true,
             message: "User Logged Successfully",
-            user: instructor,
+            user: student,
           })
       );
     } catch (error: any) {
@@ -221,7 +214,7 @@ export class InstructorController {
 
   async logout(req: Request, res: Response) {
     try {
-      console.log("user logged out");
+      console.log("Student logged out");
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
@@ -233,8 +226,8 @@ export class InstructorController {
   async verifyEmail(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      let existingUser = await this.instructorService.findByEmail(email);
-      console.log(existingUser,"existingUser")
+      let existingUser = await this.studentService.findByEmail(email);
+      console.log(existingUser,"existingStudent")
       if (existingUser) {
         const otp = await this.otpGenerator.createOtpDigit();
         await this.otpService.createOtp(email, otp);
@@ -325,7 +318,7 @@ export class InstructorController {
         throw new Error("Token expired retry reset password")
       }
       console.log(data.email)
-      const passwordReset= await this.instructorService.resetPassword(data.email,hashedPassword)
+      const passwordReset= await this.studentService.resetPassword(data.email,hashedPassword)
       if(passwordReset){
         res.clearCookie('forgotToken')
         res.status(200).json({
@@ -358,7 +351,7 @@ export class InstructorController {
 
         const { name, email, password } = req.body;
 
-        const user: any = await this.instructorService.googleLogin(name, email, password);
+        const user: any = await this.studentService.googleLogin(name, email, password);
         console.log(user, "User after creation in controller Google");
 
         if (user) {

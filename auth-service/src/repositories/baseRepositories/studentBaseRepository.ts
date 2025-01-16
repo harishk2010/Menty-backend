@@ -1,9 +1,9 @@
 
 import { NextFunction } from "http-proxy-middleware/dist/types"
-import InstructorModel, { IInstructor } from "../../models/instructorModel"
 import { Document , Model } from "mongoose"
 import bcrypt from "bcrypt";
-export default class InstructorBaseRepository<T extends Document>{
+import UserModel,{ IUser } from "../../models/userModel";
+export default class StudentBaseRepository<T extends Document>{
     private model:Model<T>
 
     constructor(model:Model<T>){
@@ -11,12 +11,13 @@ export default class InstructorBaseRepository<T extends Document>{
 
     }
     
-    async findByEmail(email:string):Promise<IInstructor|null >{
-        return await this.model.findOne({email:email})
+    async findByEmail(email:string):Promise<IUser|null >{
+        console.log("student")
+        return await UserModel.findOne({email:email})
     }
-    async createInstructor(userData:any):Promise<IInstructor |null>{
+    async createStudent(userData:any):Promise<IUser |null>{
         try {
-            const user=await InstructorModel.create(userData)
+            const user=await UserModel.create(userData)
             await user.save()
             return user
         } catch (error) {
@@ -27,9 +28,9 @@ export default class InstructorBaseRepository<T extends Document>{
 
     }
     
-    async resetPassword(email:string,password:string):Promise<IInstructor|null >{
+    async resetPassword(email:string,password:string):Promise<IUser|null >{
         try {
-            const updatedUser = await InstructorModel.findOneAndUpdate(
+            const updatedUser = await UserModel.findOneAndUpdate(
                 { email: email }, 
                 { password: password },
                 { new: true } 
@@ -48,7 +49,7 @@ export default class InstructorBaseRepository<T extends Document>{
         email: string,
         password: string,
         
-    ): Promise<IInstructor | void> {
+    ): Promise<IUser | void> {
         try {
             const user = await this.findByEmail(email);
     
@@ -57,7 +58,7 @@ export default class InstructorBaseRepository<T extends Document>{
                 const hashedPassword = await bcrypt.hash(password, 10);
     
                 // Create a new user
-                const newUser = await this.createInstructor({
+                const newUser = await this.createStudent({
                     name,
                     email,
                     password: hashedPassword,

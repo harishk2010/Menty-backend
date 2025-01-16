@@ -20,4 +20,19 @@ export class InstructorServices{
         const response=await this.instructorRepository.createUser(userData)
         return response
     }
+    public async resetPassword(email:string,password:string){
+        const response=await this.instructorRepository.resetPassword(email,password)
+        return response
+    }
+    
+    public async googleLogin(name: string, email: string, password: string): Promise<object | void> {
+        try {
+            const response = await this.instructorRepository.googleLogin(name, email, password);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    
 }

@@ -17,14 +17,15 @@ export interface IUser extends Document {
 }
 
 const UserSchema: Schema<IUser> = new Schema({
-  username: { type: String, required: true },
+  username: { type: String, required: false },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true, unique: true },
+  phone: { type: String, required: false, unique: true },
   password: { type: String, required: true },
-  profilePicUrl: { type: String, required: true, default: 'No Picture' },
-  studiedHours: { type: Number, required: true, default: 0 },
-  isVerified: { type: Boolean, required: true, default: false },
-  isBlocked: { type: Boolean, required: true, default: false }
+  role: { type: String, required: false, default: 'student' },
+  profilePicUrl: { type: String, required: false, default: 'No Picture' },
+  studiedHours: { type: Number, required: false, default: 0 },
+  isVerified: { type: Boolean, required: false, default: false },
+  isBlocked: { type: Boolean, required: false, default: false }
 },
 {
   timestamps: true

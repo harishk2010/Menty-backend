@@ -24,7 +24,7 @@ const InstructorSchema: Schema<IInstructor> = new Schema({
   expertise: { type: String, required: false },
   skills: { type: String, required: false },
   password: { type: String, required: true },
-  role: { type: String, required: false, default: null },
+  role: { type: String, required: false, default: "instructor" },
   profilePicUrl: { type: String, required: false, default: 'img not provided' },
   isVerified: { type: Boolean, required: false, default: false },
   isBlocked: { type: Boolean, required: false, default: false },

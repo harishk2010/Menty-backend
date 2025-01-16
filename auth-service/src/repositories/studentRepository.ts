@@ -1,12 +1,13 @@
 import { NextFunction } from "express";
-import InstructorModel, { IInstructor } from "../models/instructorModel";
-import InstructorBaseRepository from "./baseRepositories/instructorBaseRepository";
+
+import StudentBaseRepository from "./baseRepositories/studentBaseRepository";
+import UserModel,{ IUser } from "../models/userModel";
 
 
-export class InstructorRepository{
-    private baseRepository:InstructorBaseRepository<IInstructor>
+export class StudentRepository{
+    private baseRepository:StudentBaseRepository<IUser>
     constructor(){
-        this.baseRepository=new InstructorBaseRepository(InstructorModel)
+        this.baseRepository=new StudentBaseRepository(UserModel)
 
     }
     
@@ -16,7 +17,7 @@ export class InstructorRepository{
     }
 
     async createUser(userData:any) {
-        const response= await this.baseRepository.createInstructor(userData)
+        const response= await this.baseRepository.createStudent(userData)
         return response
     }
     

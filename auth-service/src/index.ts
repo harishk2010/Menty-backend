@@ -4,6 +4,8 @@ import { config } from 'dotenv';
 import connectDB from "./config/db";
 import cors from 'cors'
 import instructorRoutes from "./routes/instructorRoutes";
+import authenticateToken from "./middlewares/AuthenticatedRoutes";
+import studentRoutes from "./routes/studentRoutes";
 config()
 
 let app:Application=express()
@@ -20,13 +22,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-
+// app.use(authenticateToken);
 
 app.use('/auth/instructor',instructorRoutes )
 
-app.get('/', (req, res)=> {
-    res.json('authentication service.....')
-})
+app.use('/auth/student', studentRoutes)
 
 
 const start = async() => {
