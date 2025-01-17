@@ -5,7 +5,7 @@ export interface IUser extends Document {
   _id: ObjectId,
   username: string,
   email: string,
-  phone: string,
+  phone: string ,
   password: string,
   role?: string,
   profilePicUrl?: string,
@@ -19,7 +19,7 @@ export interface IUser extends Document {
 const UserSchema: Schema<IUser> = new Schema({
   username: { type: String, required: false },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: false, unique: true },
+  phone: { type: String, required: false },
   password: { type: String, required: true },
   role: { type: String, required: false, default: 'student' },
   profilePicUrl: { type: String, required: false, default: 'No Picture' },

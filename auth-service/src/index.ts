@@ -6,6 +6,7 @@ import cors from 'cors'
 import instructorRoutes from "./routes/instructorRoutes";
 import authenticateToken from "./middlewares/AuthenticatedRoutes";
 import studentRoutes from "./routes/studentRoutes";
+import adminRoutes from "./routes/adminRoutes";
 config()
 
 let app:Application=express()
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth/instructor',instructorRoutes )
 
 app.use('/auth/student', studentRoutes)
+app.use('/auth/admin', adminRoutes)
 
 
 const start = async() => {

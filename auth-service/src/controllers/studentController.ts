@@ -38,7 +38,8 @@ export class StudentController {
 
       const saltRound = 10;
       const hashedPassword = await bcrypt.hash(password, saltRound);
-      password = hashedPassword;
+      password=hashedPassword
+     
 
       const ExistingStudent = await this.studentService.findByEmail(
         email
@@ -52,12 +53,17 @@ export class StudentController {
           message: "Existing user",
           user: ExistingStudent,
         });
-        throw new Error("errorr");
+        // throw new Error("errorr");
       } else {
         const otp = await this.otpGenerator.createOtpDigit();
-        await this.otpService.createOtp(email, otp);
+        await Promise.all(
+          [
+             this.otpService.createOtp(email, otp),
 
-        await this.sendEmail.sentEmailVerification(email, otp);
+             this.sendEmail.sentEmailVerification(email, otp)
+          ]
+        )
+        
 
         const JWT = new JwtService();
         const token = await JWT.createToken({
@@ -87,45 +93,44 @@ export class StudentController {
   public async resendOtp(req: Request, res: Response): Promise<any> {
     try {
       let { email } = req.body;
-      console.log(email, "emaillllll");
 
       const otp = await this.otpGenerator.createOtpDigit();
-      await this.otpService.createOtp(email, otp);
+      await Promise.all(
+        [
+           this.otpService.createOtp(email, otp),
 
-      await this.sendEmail.sentEmailVerification(email, otp);
+           this.sendEmail.sentEmailVerification(email, otp)
+        ]
+      )
 
       res.status(200).json({
         success: true,
         message: "Otp Sent to Email Succesfully!",
       });
     } catch (error: any) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error
     }
   }
 
   public async createUser(req: Request, res: Response): Promise<any> {
     try {
       const { otp } = req.body;
-      console.log(req.headers, "headersssss");
+      // console.log(otp,"otppp student")
+      // console.log(req.headers, "headersssss");
       const token = req.headers["the-verify-token"] || "";
-      console.log(token, "token");
+      // console.log(token, "token");
       if (typeof token != "string") {
         throw new Error();
       }
       const decode = await this.JWT.verifyToken(token);
-      console.log(decode, "decode student token");
+      // console.log(decode, "decode student token");
       if (!decode) {
         return new Error("token has expired, register again");
       }
       const resultOtp = await this.otpService.findOtp(decode.email);
       console.log(resultOtp?.otp, "<>", otp);
       if (resultOtp?.otp === otp) {
-        console.log("matched");
+        // console.log("matched");
 
         const user = await this.studentService.createUser(decode);
         if (user) {
@@ -156,9 +161,7 @@ export class StudentController {
   public async login(req: Request, res: Response): Promise<any> {
     try {
       const { email, password } = req.body;
-      console.log("Login request:", email);
 
-      // Check if the student exists in the database
       const student = await this.studentService.findByEmail(email);
       console.log(student, "student");
 
@@ -169,12 +172,10 @@ export class StudentController {
         });
       }
 
-      // Compare the password with the hashed password in the database
       const isPasswordValid = await bcrypt.compare(
         password,
         student.password
       );
-      console.log(isPasswordValid, "isPasswordValid");
 
       if (!isPasswordValid) {
         return res.json({
@@ -183,7 +184,6 @@ export class StudentController {
         });
       }
       let role = student.role;
-      // Generate a JWT token if credentials are correct
       const accesstoken = await this.JWT.accessToken({ email, role });
       const refreshToken = await this.JWT.refreshToken({ email, role });
 
@@ -193,9 +193,6 @@ export class StudentController {
           .status(200)
           .cookie("accessToken", accesstoken,{ httpOnly: true })
           .cookie("refreshToken", refreshToken,{ httpOnly: true })
-          // .cookie('refreshToken', userRefreshToken, {
-          //     httpOnly: true
-          // })
           .send({
             success: true,
             message: "User Logged Successfully",

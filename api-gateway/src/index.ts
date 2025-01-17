@@ -20,10 +20,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const services = [
@@ -32,10 +30,6 @@ const services = [
         context: "/auth", // Route on your gateway
     },
 ];
-app.use("/igate", (req, res) => {
-    console.log("hello igate");
-    res.send("Hello from /igate"); // Send a response to the client
-});
 
 // Setup proxies
 services.forEach(({ context, path }) => {

@@ -14,6 +14,7 @@ export class otpRespository{
     }
     public async findOtp(email:string){
         const response=await this.baseOtpRepository.findOtp(email)
+        console.log(response,"otprepo")
         return response
     }
     public async deleteOtp(email:string){
