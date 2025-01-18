@@ -35,7 +35,7 @@ const authenticateToken = async (
 
     try {
       const refreshPayload = await jwtService.verifyToken(refreshToken);
-    //   console.log("refreshedPayload:", refreshPayload);
+      console.log("refreshedPayload:", refreshPayload);
 
       if (!refreshPayload) {
         return res.status(401).send({
@@ -47,8 +47,8 @@ const authenticateToken = async (
         email: refreshPayload.email,
         role: refreshPayload.role,
       });
-    //   console.log(newAccessToken,"Generated new access token");
-    //   console.log(req.user,"reqqqqqqqqqqqqq")
+      console.log(newAccessToken,"Generated new access token");
+      console.log(req.user,"reqqqqqqqqqqqqq")
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Make sure to set this flag appropriately
@@ -59,7 +59,8 @@ const authenticateToken = async (
 
       req.user = refreshPayload;
       console.log(req.user,"reqqqqqqqqqqqqq22")
-      return next();
+      res.send({})
+      // return next()
     } catch (refreshErr: any) {
       console.error("Error verifying refresh token:", refreshErr);
       return res.status(401).send({

@@ -65,8 +65,8 @@ export class StudentController {
         )
         
 
-        const JWT = new JwtService();
-        const token = await JWT.createToken({
+
+        const token = await this.JWT.createToken({
           email,
           password,
           role: "student",

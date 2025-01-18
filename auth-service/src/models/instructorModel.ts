@@ -6,7 +6,7 @@ export interface IInstructor extends Document {
     username: string,
     email: string,
     password: string,
-    phone: string,
+    mobile: string,
     expertise: string,
     skills: string,
     profilePicUrl?: string,
@@ -20,7 +20,7 @@ export interface IInstructor extends Document {
 const InstructorSchema: Schema<IInstructor> = new Schema({
   username: { type: String, required: false },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: false },
+  mobile: { type: String, required: false },
   expertise: { type: String, required: false },
   skills: { type: String, required: false },
   password: { type: String, required: true },
