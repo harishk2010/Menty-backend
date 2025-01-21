@@ -59,8 +59,8 @@ const authenticateToken = async (
 
       req.user = refreshPayload;
       console.log(req.user,"reqqqqqqqqqqqqq22")
-      res.send({})
-      // return next()
+      // res.send({})
+      return next()
     } catch (refreshErr: any) {
       console.error("Error verifying refresh token:", refreshErr);
       return res.status(401).send({

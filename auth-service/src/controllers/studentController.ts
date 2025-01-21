@@ -12,6 +12,7 @@ import {
 } from "../utils/tokenOptions";
 import { SentForgotEmail } from "../utils/sendForgotPasswordEmail";
 import { NextFunction } from "http-proxy-middleware/dist/types";
+import produce from "../config/kafka/producer";
 // import  from '../utils/jwt'
 
 export class StudentController {
@@ -133,7 +134,9 @@ export class StudentController {
         // console.log("matched");
 
         const user = await this.studentService.createUser(decode);
+        
         if (user) {
+         await produce('add-student',user)
           await this.otpService.deleteOtp(user.email);
 
           return res.status(201).json({
@@ -347,11 +350,16 @@ export class StudentController {
         console.log("Google login in controller", req.body);
 
         const { name, email, password } = req.body;
+        const existingStudent=await this.studentService.findByEmail(email)
+        if(!existingStudent){
+
+        
 
         const user: any = await this.studentService.googleLogin(name, email, password);
         console.log(user, "User after creation in controller Google");
 
         if (user) {
+          await produce('add-student',user)
             console.log(user.token, "User token");
             const role=user.role
             const accesstoken = await this.JWT.accessToken({ email, role });
@@ -369,6 +377,24 @@ export class StudentController {
               
             });
         }
+      }else{
+        const role=existingStudent.role
+            const accesstoken = await this.JWT.accessToken({ email, role });
+      const refreshToken = await this.JWT.refreshToken({ email, role });
+      console.log(accesstoken,"-----",refreshToken)
+      
+
+            res.status(200)
+            .cookie("accessToken", accesstoken,{ httpOnly: true })
+            .cookie("refreshToken", refreshToken,{ httpOnly: true })
+            .json({
+              success:true,
+              message:"Logging in with GOOOOGLE",
+              user:existingStudent
+              
+            });
+
+      }
        
     } catch (error: any) {
         throw error;
