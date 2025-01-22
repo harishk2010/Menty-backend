@@ -20,4 +20,25 @@ export class StudentBaseRepository<T extends Document>{
             
         }
     }
+    
+    async getStudentData(email:string):Promise<IUser|null>{
+        try {
+            const studentData=await UserModel.findOne({email:email})
+            return studentData
+            
+        } catch (error) {
+            throw error
+            
+        }
+    }
+    async updateProfile(id:string,data:object):Promise<IUser|null>{
+        try {
+            const studentData=await UserModel.findByIdAndUpdate(id,data, { new: true })
+            return studentData
+            
+        } catch (error) {
+            throw error
+            
+        }
+    }
 }

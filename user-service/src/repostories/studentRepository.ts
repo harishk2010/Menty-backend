@@ -11,11 +11,31 @@ export class StudentRepository{
     }
     async createStudent(payload:any){
         try {
-            const resposne=await this.studentBaseRepository.createStudent(payload)
+            const response=await this.studentBaseRepository.createStudent(payload)
+            
             
         } catch (error) {
             
         }
     }
+    async getStudentData(email:string){
+        try {
+            const response=await this.studentBaseRepository.getStudentData(email)
+            return response
+            
+        } catch (error) {
+            
+        }
+    }
+    async updateProfile(id:string,data:object){
+        try {
+            const response=await this.studentBaseRepository.updateProfile(id,data)
+            return response
+            
+        } catch (error) {
+            
+        }
+    }
+    
     
 }

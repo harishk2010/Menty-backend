@@ -4,7 +4,8 @@ import { Router } from "express";
 const router=Router()
 let studentController=new StudentController()
 
-// router.get('/',studentController.setUser.bind(studentController))
+router.get('/:email',studentController.getStudent.bind(studentController))
+router.patch('/updateProfile',studentController.updateProfile.bind(studentController))
 
 
 const studentRoutes=router

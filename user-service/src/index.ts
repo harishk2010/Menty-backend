@@ -29,6 +29,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/student', studentRoutes)
 // app.use('/auth/admin', adminRoutes)
 consume()
+app.use((req, res, next) => {
+    console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
+    next(); 
+});
 
 
 const start = async() => {

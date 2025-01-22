@@ -21,30 +21,27 @@ export class StudentController {
   private otpGenerator: OtpGenerate;
   private sendEmail: SentEmail;
   private JWT: JwtService;
-  private SentForgotEmail:SentForgotEmail
+  private SentForgotEmail: SentForgotEmail;
 
   constructor() {
     this.studentService = new StudentServices();
     this.otpService = new otpService();
     this.otpGenerator = new OtpGenerate();
     this.sendEmail = new SentEmail();
-    this.SentForgotEmail=new SentForgotEmail()
+    this.SentForgotEmail = new SentForgotEmail();
     this.JWT = new JwtService();
   }
 
   public async studentSignUp(req: Request, res: Response): Promise<any> {
     try {
-      let { email, password } = req.body;
+      let { email, password, username } = req.body;
       console.log(email, password);
 
       const saltRound = 10;
       const hashedPassword = await bcrypt.hash(password, saltRound);
-      password=hashedPassword
-     
+      password = hashedPassword;
 
-      const ExistingStudent = await this.studentService.findByEmail(
-        email
-      );
+      const ExistingStudent = await this.studentService.findByEmail(email);
 
       console.log(ExistingStudent, "ExistingStudent");
 
@@ -57,29 +54,24 @@ export class StudentController {
         // throw new Error("errorr");
       } else {
         const otp = await this.otpGenerator.createOtpDigit();
-        await Promise.all(
-          [
-             this.otpService.createOtp(email, otp),
+        await Promise.all([
+          this.otpService.createOtp(email, otp),
 
-             this.sendEmail.sentEmailVerification(email, otp)
-          ]
-        )
-        
-
+          this.sendEmail.sentEmailVerification(email, otp),
+        ]);
 
         const token = await this.JWT.createToken({
           email,
           password,
+          username,
           role: "student",
         });
 
-      
         return res.status(201).json({
           success: true,
           message: "Signup successful, OTP sent to email",
           token,
         });
-      
       }
     } catch (error: any) {
       console.error(error);
@@ -90,26 +82,24 @@ export class StudentController {
       });
     }
   }
- 
+
   public async resendOtp(req: Request, res: Response): Promise<any> {
     try {
       let { email } = req.body;
 
       const otp = await this.otpGenerator.createOtpDigit();
-      await Promise.all(
-        [
-           this.otpService.createOtp(email, otp),
+      await Promise.all([
+        this.otpService.createOtp(email, otp),
 
-           this.sendEmail.sentEmailVerification(email, otp)
-        ]
-      )
+        this.sendEmail.sentEmailVerification(email, otp),
+      ]);
 
       res.status(200).json({
         success: true,
         message: "Otp Sent to Email Succesfully!",
       });
     } catch (error: any) {
-      throw error
+      throw error;
     }
   }
 
@@ -134,9 +124,9 @@ export class StudentController {
         // console.log("matched");
 
         const user = await this.studentService.createUser(decode);
-        
+
         if (user) {
-         await produce('add-student',user)
+          await produce("add-student", user);
           await this.otpService.deleteOtp(user.email);
 
           return res.status(201).json({
@@ -164,7 +154,7 @@ export class StudentController {
   public async login(req: Request, res: Response): Promise<any> {
     try {
       const { email, password } = req.body;
-
+      console.log(req.body);
       const student = await this.studentService.findByEmail(email);
       console.log(student, "student");
 
@@ -175,10 +165,7 @@ export class StudentController {
         });
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        student.password
-      );
+      const isPasswordValid = await bcrypt.compare(password, student.password);
 
       if (!isPasswordValid) {
         return res.json({
@@ -191,17 +178,15 @@ export class StudentController {
       const refreshToken = await this.JWT.refreshToken({ email, role });
 
       // Return the token in the response
-      return (
-        res
-          .status(200)
-          .cookie("accessToken", accesstoken,{ httpOnly: true })
-          .cookie("refreshToken", refreshToken,{ httpOnly: true })
-          .send({
-            success: true,
-            message: "User Logged Successfully",
-            user: student,
-          })
-      );
+      return res
+        .status(200)
+        .cookie("accessToken", accesstoken, { httpOnly: true })
+        .cookie("refreshToken", refreshToken, { httpOnly: true })
+        .send({
+          success: true,
+          message: "User Logged Successfully",
+          user: student,
+        });
     } catch (error: any) {
       console.error(error);
       return res.status(500).json({
@@ -227,7 +212,7 @@ export class StudentController {
     try {
       const { email } = req.body;
       let existingUser = await this.studentService.findByEmail(email);
-      console.log(existingUser,"existingStudent")
+      console.log(existingUser, "existingStudent");
       if (existingUser) {
         const otp = await this.otpGenerator.createOtpDigit();
         await this.otpService.createOtp(email, otp);
@@ -236,52 +221,42 @@ export class StudentController {
         res.send({
           success: true,
           message: "Rediercting To OTP Page",
-          data:existingUser
+          data: existingUser,
         });
-        
-      }else{
+      } else {
         res.send({
           success: false,
           message: "No User Found",
         });
-
       }
-
-      
     } catch (error: any) {
       throw error;
     }
   }
 
-  async verifyResetOtp(req:Request,res:Response){
+  async verifyResetOtp(req: Request, res: Response) {
     try {
-      const { email, otp }=req.body
+      const { email, otp } = req.body;
       const resultOtp = await this.otpService.findOtp(email);
       console.log(resultOtp?.otp, "<>", otp);
       if (resultOtp?.otp === otp) {
         console.log("matched");
-        let token= await this.JWT.createToken({email})
-         res.status(200)
-        .cookie("forgotToken",token)
-        .json({
-          success:true,
-          message:"Redirecting to Reset Password Page",
-        })
-      }else{
-         res.json({
-          success:false,
-          message:"Otp didn't match"
-        })
+        let token = await this.JWT.createToken({ email });
+        res.status(200).cookie("forgotToken", token).json({
+          success: true,
+          message: "Redirecting to Reset Password Page",
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Otp didn't match",
+        });
       }
-
-      
     } catch (error) {
-      throw error
-      
+      throw error;
     }
   }
 
-  
   public async forgotResendOtp(req: Request, res: Response): Promise<any> {
     try {
       let { email } = req.body;
@@ -306,102 +281,95 @@ export class StudentController {
     }
   }
 
-  async resetPassword(req:Request,res:Response){
+  async resetPassword(req: Request, res: Response) {
     try {
-      const { password }=req.body
-      const hashedPassword= await bcrypt.hash(password,10)
-      console.log(hashedPassword)
+      const { password } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log(hashedPassword);
       // console.log(req.cookies.forgotToken)
-      const token=req.cookies.forgotToken
-      let data=await this.JWT.verifyToken(token)
-      if(!data){
-        throw new Error("Token expired retry reset password")
+      const token = req.cookies.forgotToken;
+      let data = await this.JWT.verifyToken(token);
+      if (!data) {
+        throw new Error("Token expired retry reset password");
       }
-      console.log(data.email)
-      const passwordReset= await this.studentService.resetPassword(data.email,hashedPassword)
-      if(passwordReset){
-        res.clearCookie('forgotToken')
+      console.log(data.email);
+      const passwordReset = await this.studentService.resetPassword(
+        data.email,
+        hashedPassword
+      );
+      if (passwordReset) {
+        res.clearCookie("forgotToken");
         res.status(200).json({
-          success:true,
-          message:"Password changed !",
-        })
+          success: true,
+          message: "Password changed !",
+        });
       }
-      
     } catch (error) {
-      throw error
-      
+      throw error;
     }
   }
 
-  async test(req:Request,res:Response){
+  async test(req: Request, res: Response) {
     try {
-      console.log("testing.............")
-      const acc=await this.JWT.verifyToken(req.cookies["accessToken"])
-      console.log(acc,"tester access")
-      res.send({success:true})
-      
+      console.log("testing.............");
+      const acc = await this.JWT.verifyToken(req.cookies["accessToken"]);
+      console.log(acc, "tester access");
+      res.send({ success: true });
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-  async doGoogleLogin(req:Request,res:Response) {
+  async doGoogleLogin(req: Request, res: Response) {
     try {
-        console.log("Google login in controller", req.body);
+      console.log("Google login in controller", req.body);
 
-        const { name, email, password } = req.body;
-        const existingStudent=await this.studentService.findByEmail(email)
-        if(!existingStudent){
-
-        
-
-        const user: any = await this.studentService.googleLogin(name, email, password);
+      const { name, email, password } = req.body;
+      const existingStudent = await this.studentService.findByEmail(email);
+      if (!existingStudent) {
+        const user: any = await this.studentService.googleLogin(
+          name,
+          email,
+          password
+        );
         console.log(user, "User after creation in controller Google");
 
         if (user) {
-          await produce('add-student',user)
-            console.log(user.token, "User token");
-            const role=user.role
-            const accesstoken = await this.JWT.accessToken({ email, role });
-      const refreshToken = await this.JWT.refreshToken({ email, role });
-      console.log(accesstoken,"-----",refreshToken)
-      
+          await produce("add-student", user);
+          console.log(user.token, "User token");
+          const role = user.role;
+          const accesstoken = await this.JWT.accessToken({ email, role });
+          const refreshToken = await this.JWT.refreshToken({ email, role });
+          console.log(accesstoken, "-----", refreshToken);
 
-            res.status(200)
-            .cookie("accessToken", accesstoken,{ httpOnly: true })
-            .cookie("refreshToken", refreshToken,{ httpOnly: true })
+          res
+            .status(200)
+            .cookie("accessToken", accesstoken, { httpOnly: true })
+            .cookie("refreshToken", refreshToken, { httpOnly: true })
             .json({
-              success:true,
-              message:"Logging in with GOOOOGLE",
-              user:user
-              
+              success: true,
+              message: "Logging in with GOOOOGLE",
+              user: user,
             });
         }
-      }else{
-        const role=existingStudent.role
-            const accesstoken = await this.JWT.accessToken({ email, role });
-      const refreshToken = await this.JWT.refreshToken({ email, role });
-      console.log(accesstoken,"-----",refreshToken)
-      
+      } else {
+        const role = existingStudent.role;
+        const accesstoken = await this.JWT.accessToken({ email, role });
+        const refreshToken = await this.JWT.refreshToken({ email, role });
+        console.log(accesstoken, "-----", refreshToken);
 
-            res.status(200)
-            .cookie("accessToken", accesstoken,{ httpOnly: true })
-            .cookie("refreshToken", refreshToken,{ httpOnly: true })
-            .json({
-              success:true,
-              message:"Logging in with GOOOOGLE",
-              user:existingStudent
-              
-            });
-
+        res
+          .status(200)
+          .cookie("accessToken", accesstoken, { httpOnly: true })
+          .cookie("refreshToken", refreshToken, { httpOnly: true })
+          .json({
+            success: true,
+            message: "Logging in with GOOOOGLE",
+            user: existingStudent,
+          });
       }
-       
     } catch (error: any) {
-        throw error;
+      throw error;
     }
-}
-
-  
-
-  
+  }
 }

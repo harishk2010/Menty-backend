@@ -7,6 +7,7 @@ import instructorRoutes from "./routes/instructorRoutes";
 import authenticateToken from "./middlewares/AuthenticatedRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import proxy = require("http-proxy-middleware");
 config()
 
 let app:Application=express()
@@ -25,11 +26,21 @@ app.use(express.urlencoded({ extended: true }));
 
 // app.use(authenticateToken);
 
-app.use('/auth/instructor',instructorRoutes )
+app.use((req, res, next) => {
+    console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
+    next(); 
+});
 
-app.use('/auth/student', studentRoutes)
-app.use('/auth/admin', adminRoutes)
 
+app.use('/instructor',instructorRoutes )
+
+app.use('/student', studentRoutes)
+
+app.use('/admin', adminRoutes)
+
+app.get('/', (req, res) => {
+    res.json('auth service is running ')
+})
 
 const start = async() => {
     await connectDB()

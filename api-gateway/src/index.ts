@@ -4,6 +4,8 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from 'body-parser'
+//import proxy = require("express-http-proxy");
+import proxy from 'express-http-proxy'
 
 config();
 
@@ -24,6 +26,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+    console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}   , baseurl ${req.baseUrl}  `);
+    next(); 
+});
+
+
 const services = [
     {
         path: AUTH_URL, // Target service URL
@@ -36,22 +44,37 @@ const services = [
 ];
 
 // Setup proxies
-services.forEach(({ context, path }) => {
-    if (!path || !context) {
-        console.error("Invalid service configuration:", { context, path });
-        return;
-    }
+// services.forEach(({ context, path }) => {
+//     if (!path || !context) {
+//         console.error("Invalid service configuration:", { context, path });
+//         return;
+//     }
 
-    console.log(`Setting up proxy: ${context} -> ${path}`);
+//     console.log(`Setting up proxy: ${context} -> ${path}`);
 
-    app.use(
-        context,
-        createProxyMiddleware({
-            target: path,
-            changeOrigin: true,
-        })
-    );
-});
+//     app.use(
+//         context,
+//         createProxyMiddleware({
+//             target: path,
+//             changeOrigin: true,
+//         })
+//     );
+// });
+
+services.forEach((services: any)=> {
+    app.use(services?.context , proxy(services?.path))
+
+})
+
+// services.forEach((service) => {
+//     app.use(service?.context, createProxyMiddleware({
+//         target: service?.path,
+//     }))
+// })
+
+// app.use('/auth' , createProxyMiddleware({target: 'http://localhost:5001',  changeOrigin: true,}))
+//app.use('/auth' , proxy('http://localhost:5001'))
+
 app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
     console.error("Error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });

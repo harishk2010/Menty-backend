@@ -15,4 +15,23 @@ export class studentServices{
             
         }
     }
+    public async getStudentData(email:string){
+        try {
+            const response=await this.studentRepository.getStudentData(email)
+            return response
+        } catch (error) {
+            console.log(error)
+            
+        }
+    }
+    public async updateProfile(id:string,data:object){
+        try {
+            const response=await this.studentRepository.updateProfile(id,data)
+            return response
+        } catch (error) {
+            console.log(error)
+            
+        }
+    }
+    
 }
