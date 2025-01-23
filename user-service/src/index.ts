@@ -3,10 +3,9 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import connectDB from "./config/db";
 import cors from 'cors'
-// import instructorRoutes from "./routes/instructorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import consume from "./config/kafka/consumer";
-// import adminRoutes from "./routes/adminRoutes";
+
 config()
 
 let app:Application=express()
@@ -25,14 +24,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // app.use(authenticateToken);
 
-// app.use('/auth/instructor',instructorRoutes )
+
 app.use('/student', studentRoutes)
-// app.use('/auth/admin', adminRoutes)
+
 consume()
-app.use((req, res, next) => {
-    console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
-    next(); 
-});
+// app.use((req, res, next) => {
+//     console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
+//     next(); 
+// });
 
 
 const start = async() => {
