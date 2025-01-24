@@ -174,8 +174,9 @@ export class StudentController {
         });
       }
       let role = student.role;
-      const accesstoken = await this.JWT.accessToken({ email, role });
-      const refreshToken = await this.JWT.refreshToken({ email, role });
+      let id = student._id;
+      const accesstoken = await this.JWT.accessToken({ id, email, role });
+      const refreshToken = await this.JWT.refreshToken({ id, email, role });
 
       // Return the token in the response
       return res
@@ -298,6 +299,7 @@ export class StudentController {
         hashedPassword
       );
       if (passwordReset) {
+        await produce('password-reset-student',passwordReset)
         res.clearCookie("forgotToken");
         res.status(200).json({
           success: true,
@@ -354,8 +356,9 @@ export class StudentController {
         }
       } else {
         const role = existingStudent.role;
-        const accesstoken = await this.JWT.accessToken({ email, role });
-        const refreshToken = await this.JWT.refreshToken({ email, role });
+        const id = existingStudent._id;
+        const accesstoken = await this.JWT.accessToken({ id, email, role });
+        const refreshToken = await this.JWT.refreshToken({ id, email, role });
         console.log(accesstoken, "-----", refreshToken);
 
         res
@@ -370,6 +373,29 @@ export class StudentController {
       }
     } catch (error: any) {
       throw error;
+    }
+  }
+
+  //consumed kafka codes
+  async updatePassword(data: { email: string; password: string }) {
+    try {
+      console.log(data.email, data.password, "consumeeeeee");
+      const passwordReset = await this.studentService.resetPassword(
+        data.email,
+        data.password
+      );
+      return passwordReset;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateProfile(data: any) {
+    try {
+      console.log(data, "consumeeee");
+      const response=await this.studentService.updateProfile(data)
+    } catch (error) {
+      console.log(error);
     }
   }
 }

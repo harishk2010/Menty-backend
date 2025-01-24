@@ -25,13 +25,17 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(authenticateToken);
 
 
-app.use('/student', studentRoutes)
+app.use('/student/', studentRoutes)
+// app.use('/student/getStudents', (req,res)=>{
+//     res.json("hello")
+// })
 
-consume()
-// app.use((req, res, next) => {
-//     console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
-//     next(); 
-// });
+// consume()
+
+app.use((req, res, next) => {
+    console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
+    next(); 
+});
 
 
 const start = async() => {

@@ -8,6 +8,7 @@ import authenticateToken from "./middlewares/AuthenticatedRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import proxy = require("http-proxy-middleware");
+import consume from "./config/kafka/consumer";
 config()
 
 let app:Application=express()
@@ -31,12 +32,12 @@ app.use((req, res, next) => {
     next(); 
 });
 
-
 app.use('/instructor',instructorRoutes )
 
 app.use('/student', studentRoutes)
 
 app.use('/admin', adminRoutes)
+consume()
 
 app.get('/', (req, res) => {
     res.json('auth service is running ')

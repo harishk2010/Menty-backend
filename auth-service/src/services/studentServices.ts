@@ -33,6 +33,14 @@ export class StudentServices{
             throw error;
         }
     }
+    public async updateProfile(data:any): Promise<object | void> {
+        try {
+            const response = await this.studentRepository.updateProfile(data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
     
     
 }

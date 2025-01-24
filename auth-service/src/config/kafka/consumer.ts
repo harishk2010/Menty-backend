@@ -3,14 +3,14 @@ import { StudentController } from "../../controllers/studentController";
 
 async function consume() {
   const studentController = new StudentController();
-  const consumer = kafka.consumer({ groupId: "user-service" });
+  const consumer = kafka.consumer({ groupId: "auth-service" });
 
   try {
     console.log("Connecting to User-Service Consumer...");
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: ["add-student", "password-reset-student"],
+      topics: ["update-password-student", "update-profile-student"],
       fromBeginning: true,
     });
 
@@ -28,13 +28,13 @@ async function consume() {
           }
 
           switch (topic) {
-            case "add-student":
-              await studentController.addStudent(messageValue);
+            case "update-password-student":
+              await studentController.updatePassword(messageValue);
               console.log("Processed add-student event:", messageValue);
               break;
 
-            case "password-reset-student":
-              await studentController.passwordReset(messageValue);
+            case "update-profile-student":
+              await studentController.updateProfile(messageValue)
               console.log("Processing add-instructor event:", messageValue);
               break;
 

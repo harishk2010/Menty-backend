@@ -33,9 +33,33 @@ export class StudentRepository{
             return response
             
         } catch (error) {
+            console.log(error)
             
         }
     }
+    
+    async updatePassword(email:string,password:string){
+        try {
+            const response=await this.studentBaseRepository.updatePassword(email,password)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            
+        }
+    }
+    async getStudents(){
+        try {
+            const response=await this.studentBaseRepository.findAllStudents()
+            console.log(response,"repo students allll")
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            
+        }
+    }
+    
     
     
 }
