@@ -80,17 +80,16 @@ export default class StudentBaseRepository<T extends Document> {
     }
   }
 
-  async updateProfile(data: any) {
+  async updateProfile(email:string,data: any) {
     try {
-      const { email, username, profilePicUrl } = data;
+      
       const response = await UserModel.findOneAndUpdate(
         { email },
         {
-          $set: {
-            profilePicUrl,
-            username,
+          $set: 
+            data
             
-          },
+          ,
         },
         {
           new: true,

@@ -1,24 +1,24 @@
 import { ObjectId } from "mongoose"
-import { StudentRepository } from "../repostories/studentRepository"
+import { InstructorRepository } from "../repostories/instructorRepository"
 
-export class studentServices{
-    private studentRepository:StudentRepository
+export class instructorServices{
+    private instructorRepository:InstructorRepository
     constructor(){
-        this.studentRepository=new StudentRepository()
+        this.instructorRepository=new InstructorRepository()
 
     }
-    public async createStudent(payload:object){
+    public async createInstructor(payload:object){
         try {
-            const response=await this.studentRepository.createStudent(payload)
+            const response=await this.instructorRepository.createInstructor(payload)
             return response
         } catch (error) {
             console.log(error)
             
         }
     }
-    public async getStudentData(email:string){
+    public async getInstructorData(email:string){
         try {
-            const response=await this.studentRepository.getStudentData(email)
+            const response=await this.instructorRepository.getInstructorData(email)
             return response
         } catch (error) {
             console.log(error)
@@ -27,7 +27,7 @@ export class studentServices{
     }
     public async updateProfile(id:any,data:object){
         try {
-            const response=await this.studentRepository.updateProfile(id,data)
+            const response=await this.instructorRepository.updateProfile(id,data)
             return response
         } catch (error) {
             console.log(error)
@@ -36,15 +36,15 @@ export class studentServices{
     }
     public async updatePassword(email:string,password:string){
         try {
-            const response=await this.studentRepository.updatePassword(email,password)
+            const response=await this.instructorRepository.updatePassword(email,password)
             return response
         } catch (error) {
             console.log(error)
         }
     }
-    public async getStudents(){
+    public async getInstructors(){
         try {
-            const response=await this.studentRepository.getStudents()
+            const response=await this.instructorRepository.getInstructors()
             return response
         } catch (error) {
             console.log(error)

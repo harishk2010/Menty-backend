@@ -1,26 +1,26 @@
 import UserModel, { IUser } from "../models/userModel";
-import { StudentBaseRepository } from "./baseRepository/studentBaseRepository";
+import { InstructorBaseRepository } from "./baseRepository/instructorBaseRepository";
 import { Model } from "mongoose";
 
 
-export class StudentRepository{
-    private studentBaseRepository:StudentBaseRepository<IUser>
+export class InstructorRepository{
+    private instructorBaseRepository:InstructorBaseRepository<IUser>
     constructor(){
-        this.studentBaseRepository=new StudentBaseRepository(UserModel)
+        this.instructorBaseRepository=new InstructorBaseRepository(UserModel)
 
     }
-    async createStudent(payload:any){
+    async createInstructor(payload:any){
         try {
-            const response=await this.studentBaseRepository.createStudent(payload)
+            const response=await this.instructorBaseRepository.createInstructor(payload)
             
             
         } catch (error) {
             
         }
     }
-    async getStudentData(email:string){
+    async getInstructorData(email:string){
         try {
-            const response=await this.studentBaseRepository.getStudentData(email)
+            const response=await this.instructorBaseRepository.getInstructorData(email)
             return response
             
         } catch (error) {
@@ -29,7 +29,7 @@ export class StudentRepository{
     }
     async updateProfile(id:any,data:object){
         try {
-            const response=await this.studentBaseRepository.updateProfile(id,data)
+            const response=await this.instructorBaseRepository.updateProfile(id,data)
             return response
             
         } catch (error) {
@@ -40,7 +40,7 @@ export class StudentRepository{
     
     async updatePassword(email:string,password:string){
         try {
-            const response=await this.studentBaseRepository.updatePassword(email,password)
+            const response=await this.instructorBaseRepository.updatePassword(email,password)
             return response
             
         } catch (error) {
@@ -48,9 +48,9 @@ export class StudentRepository{
             
         }
     }
-    async getStudents(){
+    async getInstructors(){
         try {
-            const response=await this.studentBaseRepository.findAllStudents()
+            const response=await this.instructorBaseRepository.findAllInstructors()
             return response
             
         } catch (error) {

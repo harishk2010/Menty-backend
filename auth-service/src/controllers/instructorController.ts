@@ -5,13 +5,14 @@ import { OtpGenerate } from "../utils/otpGenerator";
 import { otpService } from "../services/otpService";
 import { SentEmail } from "../utils/senEmail";
 import { JwtService } from "../utils/jwt";
-import { IInstructor } from "@/models/instructorModel";
+import { IInstructor } from "../models/instructorModel";
 import {
   access_token_options,
   refresh_token_options,
 } from "../utils/tokenOptions";
 import { SentForgotEmail } from "../utils/sendForgotPasswordEmail";
 import { NextFunction } from "http-proxy-middleware/dist/types";
+import produce from "../config/kafka/producer";
 // import  from '../utils/jwt'
 
 export class InstructorController {
@@ -33,7 +34,7 @@ export class InstructorController {
 
   public async instructorSignUp(req: Request, res: Response): Promise<any> {
     try {
-      let { email, password } = req.body;
+      let { email, password ,username } = req.body;
       console.log(email, password);
 
       const saltRound = 10;
@@ -63,6 +64,7 @@ export class InstructorController {
         const token = await JWT.createToken({
           email,
           password,
+          username,
           role: "instructor",
         });
 
@@ -97,21 +99,17 @@ export class InstructorController {
       console.log(email, "emaillllll");
 
       const otp = await this.otpGenerator.createOtpDigit();
-      await this.otpService.createOtp(email, otp);
+      await Promise.all([
+        this.otpService.createOtp(email, otp),
 
-      await this.sendEmail.sentEmailVerification(email, otp);
-
+        this.sendEmail.sentEmailVerification(email, otp),
+      ]);
       res.status(200).json({
         success: true,
         message: "Otp Sent to Email Succesfully!",
       });
     } catch (error: any) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error;
     }
   }
 
@@ -136,6 +134,7 @@ export class InstructorController {
 
         const user = await this.instructorService.createUser(decode);
         if (user) {
+          await produce("add-instructor", user);
           await this.otpService.deleteOtp(user.email);
 
           return res.status(201).json({
@@ -181,7 +180,7 @@ export class InstructorController {
         password,
         instructor.password
       );
-      console.log(isPasswordValid, "isPasswordValid");
+      
 
       if (!isPasswordValid) {
         return res.json({
@@ -189,6 +188,13 @@ export class InstructorController {
           message: "Invalid Password",
         });
       }
+      if(instructor.isBlocked){
+        return res.json({
+         success:false,
+         message:"instructor Blocked"
+       })
+       
+     }
       let role = instructor.role;
       // Generate a JWT token if credentials are correct
       const accesstoken = await this.JWT.accessToken({ email, role });
@@ -355,36 +361,100 @@ export class InstructorController {
   async doGoogleLogin(req:Request,res:Response) {
     try {
         console.log("Google login in controller", req.body);
-
+        
         const { name, email, password } = req.body;
-
+      const ExistingInstructor=await this.instructorService.findByEmail(email)
+      if (!ExistingInstructor) {
         const user: any = await this.instructorService.googleLogin(name, email, password);
         console.log(user, "User after creation in controller Google");
-
+        
         if (user) {
-            console.log(user.token, "User token");
-            const role=user.role
-            const accesstoken = await this.JWT.accessToken({ email, role });
-      const refreshToken = await this.JWT.refreshToken({ email, role });
-      console.log(accesstoken,"-----",refreshToken)
-      
-
-            res.status(200)
-            .cookie("accessToken", accesstoken,{ httpOnly: true })
-            .cookie("refreshToken", refreshToken,{ httpOnly: true })
-            .json({
-              success:true,
-              message:"Logging in with GOOOOGLE",
-              user:user
-              
-            });
+          await produce("add-instructor", user);
+          console.log(user.token, "User token");
+          const role=user.role
+          const accesstoken = await this.JWT.accessToken({ email, role });
+          const refreshToken = await this.JWT.refreshToken({ email, role });
+          console.log(accesstoken,"-----",refreshToken)
+          
+          
+          res.status(200)
+          .cookie("accessToken", accesstoken,{ httpOnly: true })
+          .cookie("refreshToken", refreshToken,{ httpOnly: true })
+          .json({
+            success:true,
+            message:"Logging in with GOOOOGLE",
+            user:user
+            
+          });
         }
+      }else{
+        if(!ExistingInstructor.isBlocked){
+
+        
+          const role = ExistingInstructor.role;
+          const id = ExistingInstructor._id;
+          const accesstoken = await this.JWT.accessToken({ id, email, role });
+          const refreshToken = await this.JWT.refreshToken({ id, email, role });
+          console.log(accesstoken, "-----", refreshToken);
+  
+          res
+            .status(200)
+            .cookie("accessToken", accesstoken, { httpOnly: true })
+            .cookie("refreshToken", refreshToken, { httpOnly: true })
+            .json({
+              success: true,
+              message: "Logging in with GOOOOGLE",
+              user: ExistingInstructor,
+            });
+          }else{
+            res
+            .status(200)
+            
+            .json({
+              success: false,
+              message: "User Blocked",
+              user: ExistingInstructor,
+            });
+          }
+
+      }
+      
        
     } catch (error: any) {
         throw error;
     }
 }
+async updatePassword(data: { email: string; password: string }) {
+  try {
+    console.log(data.email, data.password, "consumeeeeee");
+    const passwordReset = await this.instructorService.resetPassword(
+      data.email,
+      data.password
+    );
+    return passwordReset;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
+async updateProfile(data: any) {
+  try {
+    const { email ,username, profilePicUrl} = data;
+    console.log(data, "consumeeee");
+    const response=await this.instructorService.updateProfile(email,{username, profilePicUrl})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async blockInstructor(data:any){
+  try {
+    const {email,isBlocked}=data
+    const response=await this.instructorService.updateProfile(email,{isBlocked})
+  } catch (error) {
+    console.log(error)
+  }
+}
   
 
   

@@ -33,9 +33,9 @@ export class StudentRepository{
             throw error;
         }
     }
-    public async updateProfile(data:any): Promise<any> {
+    public async updateProfile(email:string,data:any): Promise<any> {
         try {
-            const response = await this.baseRepository.updateProfile(data);
+            const response = await this.baseRepository.updateProfile(email,data);
             return response;
         } catch (error) {
             throw error;

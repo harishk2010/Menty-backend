@@ -5,6 +5,7 @@ import connectDB from "./config/db";
 import cors from 'cors'
 import studentRoutes from "./routes/studentRoutes";
 import consume from "./config/kafka/consumer";
+import instructorRoutes from "./routes/instructorRoutes";
 
 config()
 
@@ -25,12 +26,13 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(authenticateToken);
 
 
-app.use('/student/', studentRoutes)
+app.use('/student', studentRoutes)
+app.use('/instructors',instructorRoutes)
 // app.use('/student/getStudents', (req,res)=>{
 //     res.json("hello")
 // })
 
-// consume()
+consume()
 
 app.use((req, res, next) => {
     console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);

@@ -32,6 +32,14 @@ export class InstructorRepository{
             throw error;
         }
     }
+    public async updateProfile(email:string,data:any): Promise<any> {
+        try {
+            const response = await this.baseRepository.updateProfile(email,data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
     
     
     

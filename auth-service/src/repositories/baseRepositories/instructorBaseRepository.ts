@@ -86,6 +86,26 @@ export default class InstructorBaseRepository<T extends Document>{
             throw (error);
         }
     }
+    async updateProfile(email:string,data: any) {
+        try {
+          
+          const response = await InstructorModel.findOneAndUpdate(
+            { email },
+            {
+              $set: 
+                data
+                
+              ,
+            },
+            {
+              new: true,
+            }
+          );
+          return response
+        } catch (error) {
+          console.log(error);
+        }
+      }
     
     
 }

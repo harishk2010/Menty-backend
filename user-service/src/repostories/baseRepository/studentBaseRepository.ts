@@ -25,7 +25,7 @@ export class StudentBaseRepository<T extends Document> {
       throw error;
     }
   }
-  async updateProfile(id: string, data: object): Promise<IUser | null> {
+  async updateProfile(id: any, data: object): Promise<IUser | null> {
     try {
       const studentData = await UserModel.findByIdAndUpdate(id, data, {
         new: true,
@@ -56,7 +56,6 @@ export class StudentBaseRepository<T extends Document> {
   async findAllStudents(){
     try {
         const response=await UserModel.find()
-        console.log(response,"getall students")
         return response
         
     } catch (error) {

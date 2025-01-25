@@ -33,9 +33,9 @@ export class StudentServices{
             throw error;
         }
     }
-    public async updateProfile(data:any): Promise<object | void> {
+    public async updateProfile(email:string,data:any): Promise<object | void> {
         try {
-            const response = await this.studentRepository.updateProfile(data);
+            const response = await this.studentRepository.updateProfile(email,data);
             return response;
         } catch (error) {
             throw error;

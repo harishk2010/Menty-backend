@@ -1,8 +1,10 @@
 import kafka from "./kafkaConfig";
 import { StudentController } from "../../controllers/studentController";
+import { InstructorController } from "../../controllers/instructorController";
 
 async function consume() {
   const studentController = new StudentController();
+  const instructorController=new InstructorController()
   const consumer = kafka.consumer({ groupId: "auth-service" });
 
   try {
@@ -10,7 +12,14 @@ async function consume() {
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: ["update-password-student", "update-profile-student"],
+      topics: [
+        "update-password-student",
+        "update-profile-student",
+        "block-student",
+        "update-password-instructor",
+        "update-profile-instructor",
+        "block-instructor",
+      ],
       fromBeginning: true,
     });
 
@@ -34,14 +43,33 @@ async function consume() {
               break;
 
             case "update-profile-student":
-              await studentController.updateProfile(messageValue)
+              await studentController.updateProfile(messageValue);
+              console.log("Processing add-instructor event:", messageValue);
+              break;
+            case "block-student":
+              await studentController.blockStudent(messageValue);
+              console.log("Processing add-instructor event:", messageValue);
+              break;
+
+              //instructor
+            case "update-password-instructor":
+              await instructorController.updatePassword(messageValue);
+              console.log("Processed add-student event:", messageValue);
+              break;
+
+            case "update-profile-instructor":
+              await instructorController.updateProfile(messageValue);
+              console.log("Processing add-instructor event:", messageValue);
+              break;
+            case "block-instructor":
+              await instructorController.blockInstructor(messageValue);
               console.log("Processing add-instructor event:", messageValue);
               break;
 
             default:
               console.warn(`No handler for topic: ${topic}`);
           }
-        } catch (error:any) {
+        } catch (error: any) {
           console.error(
             `Error processing message from topic ${topic}:`,
             error.message
@@ -49,8 +77,12 @@ async function consume() {
         }
       },
     });
-  } catch (error:any) {
-    console.error("Error in User-Service Consumer:", error.message, error.stack);
+  } catch (error: any) {
+    console.error(
+      "Error in User-Service Consumer:",
+      error.message,
+      error.stack
+    );
   }
 }
 

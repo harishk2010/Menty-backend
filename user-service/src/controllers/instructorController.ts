@@ -1,30 +1,30 @@
 import { IUser } from "../models/userModel";
 import { Request, Response } from "express";
-import { studentServices } from "../services/studentServices";
+import { instructorServices } from "../services/instructorServices";
 import { uploadToS3Bucket } from "../utils/s3Bucket";
 import bcrypt from "bcrypt";
 import verifyToken from "../utils/jwt";
 import produce from "../config/kafka/producer";
 import mongoose from "mongoose";
 
-export class StudentController {
-  private studentService: studentServices;
+export class InstructorController {
+  private instructorService: instructorServices;
   constructor() {
-    this.studentService = new studentServices();
+    this.instructorService = new instructorServices();
   }
 
-  public async addStudent(payload: IUser): Promise<any> {
+  public async addInstructor(payload: IUser): Promise<any> {
     try {
-      let response = await this.studentService.createStudent(payload);
+      let response = await this.instructorService.createInstructor(payload);
     } catch (error) {
       console.log(error);
     }
   }
-  public async getStudent(req: Request, res: Response): Promise<any> {
+  public async getInstructor(req: Request, res: Response): Promise<any> {
     try {
       const { email } = req.params;
-      // console.log(email,"get Student Data")
-      let response = await this.studentService.getStudentData(email);
+      // console.log(email,"get Instructor Data")
+      let response = await this.instructorService.getInstructorData(email);
       // console.log(response)
       res.json(response);
     } catch (error) {
@@ -35,31 +35,31 @@ export class StudentController {
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {
       const { _id, username, mobile } = req.body;
-      console.log(req.body, "update Student Data");
-      console.log(req.file, "update Student Data");
+      console.log(req.body, "update Instructor Data");
+      console.log(req.file, "update Instructor Data");
 
       let profilePicUrl = "No Picture";
       let response;
       
       if (req.file) {
         console.log("with profile pic")
-        profilePicUrl = await uploadToS3Bucket(req.file, "students");
+        profilePicUrl = await uploadToS3Bucket(req.file, "Instructors");
         
-        response = await this.studentService.updateProfile(_id, {
+        response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
           profilePicUrl,
         });
       } else {
         console.log("without profile pic")
-        response = await this.studentService.updateProfile(_id, {
+        response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
         });
       }
 
       if (response) {
-        await produce("update-profile-student",response)
+        await produce("update-profile-instructor",response)
         res.status(200).json({
           success: true,
           message: "Profile Updated!",
@@ -84,7 +84,7 @@ export class StudentController {
         throw new Error("Token expiered!");
       }
       let email = tokenData.email;
-      const response = await this.studentService.getStudentData(email);
+      const response = await this.instructorService.getInstructorData(email);
       if (!response) {
         throw new Error("No user Found");
       }
@@ -94,12 +94,12 @@ export class StudentController {
       const result = await bcrypt.compare(currentPassword, oldPassword);
       if (result) {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        const response = await this.studentService.updatePassword(
+        const response = await this.instructorService.updatePassword(
           email,
           hashedPassword
         );
         if (response) {
-          await produce("update-password-student",{email,password:hashedPassword})
+          await produce("update-password-instructor",{email,password:hashedPassword})
           res.status(200).json({
             success: true,
             message: "Password Updated",
@@ -121,43 +121,44 @@ export class StudentController {
     }
   }
 
-  public async getStudents(req:Request,res:Response){
+  public async getInstructors(req:Request,res:Response){
     try {
     
-      const students=await this.studentService.getStudents()
-      console.log(students,"students allll")
+      const Instructors=await this.instructorService.getInstructors()
+      console.log(Instructors,"Instructors allll")
        res.status(200).json({
-        users:students
+        users:Instructors
       })
     } catch (error) {
       console.log(error);
       
     }
   }
-  public async blockStudent(req:Request,res:Response){
+  public async blockInstructor(req:Request,res:Response){
     try {
       const { email }=req.params
+      console.log(email,"instructorrrrrr")
 
-      const studentData=await this.studentService.getStudentData(email)
+      const InstructorData=await this.instructorService.getInstructorData(email)
 
-      if(!studentData){
+      if(!InstructorData){
         throw new Error("No user found")
       }
-      const id=studentData._id
-      const isBlocked=!studentData?.isBlocked
+      const id=InstructorData._id
+      const isBlocked=!InstructorData?.isBlocked
 
-      const studentStatus=await this.studentService.updateProfile(id,{isBlocked})
-      await produce("block-student",{email,isBlocked})
+      const InstructorStatus=await this.instructorService.updateProfile(id,{isBlocked})
+      await produce("block-instructor",{email,isBlocked})
 
-      if(studentStatus?.isBlocked){
+      if(InstructorStatus?.isBlocked){
         res.status(200).json({
           success:true,
-          message:"Student Blocked"
+          message:"Instructor Blocked"
         })
       }else{
         res.status(200).json({
           success:true,
-          message:"Student UnBlocked"
+          message:"Instructor UnBlocked"
         })
 
       }
@@ -173,7 +174,7 @@ export class StudentController {
   async passwordReset(data:any){
     try {
       const {password,email}=data
-      const response = await this.studentService.updatePassword(
+      const response = await this.instructorService.updatePassword(
         email,
         password
       );

@@ -37,8 +37,8 @@ app.use('/instructor',instructorRoutes )
 app.use('/student', studentRoutes)
 
 app.use('/admin', adminRoutes)
-consume()
 
+consume()
 app.get('/', (req, res) => {
     res.json('auth service is running ')
 })

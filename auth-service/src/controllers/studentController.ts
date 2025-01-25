@@ -151,33 +151,97 @@ export class StudentController {
     }
   }
 
+  // public async login(req: Request, res: Response): Promise<any> {
+  //   try {
+  //     const { email, password } = req.body;
+  //     console.log(req.body);
+  //     const student = await this.studentService.findByEmail(email);
+  //     console.log(student, "student");
+
+  //     if (!student) {
+  //       return res.json({
+  //         success: false,
+  //         message: "invalid email id",
+  //       });
+  //     }
+
+  //     const isPasswordValid = await bcrypt.compare(password, student.password);
+
+  //     if (!isPasswordValid) {
+  //       return res.json({
+  //         success: false,
+  //         message: "Invalid Password",
+  //       });
+  //     }
+  //     if(student.isBlocked){
+  //        res.json({
+  //         success:false,
+  //         message:"User Blocked"
+  //       })
+        
+  //     }else{
+
+      
+  //     let role = student.role;
+  //     let id = student._id;
+  //     const accesstoken = await this.JWT.accessToken({ id, email, role });
+  //     const refreshToken = await this.JWT.refreshToken({ id, email, role });
+
+  //     // Return the token in the response
+  //     return res
+  //       .status(200)
+  //       .cookie("accessToken", accesstoken, { httpOnly: true })
+  //       .cookie("refreshToken", refreshToken, { httpOnly: true })
+  //       .send({
+  //         success: true,
+  //         message: "User Logged Successfully",
+  //         user: student,
+  //       });
+  //     }
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     return res.status(500).json({
+  //       success: false,
+  //       message: "Internal Server Error",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
   public async login(req: Request, res: Response): Promise<any> {
     try {
       const { email, password } = req.body;
       console.log(req.body);
       const student = await this.studentService.findByEmail(email);
       console.log(student, "student");
-
+  
       if (!student) {
         return res.json({
           success: false,
-          message: "invalid email id",
+          message: "Invalid email ID",
         });
       }
-
+  
       const isPasswordValid = await bcrypt.compare(password, student.password);
-
+  
       if (!isPasswordValid) {
         return res.json({
           success: false,
           message: "Invalid Password",
         });
       }
+  
+      if (student.isBlocked) {
+        return res.json({
+          success: false,
+          message: "User Blocked",
+        });
+      }
+  
       let role = student.role;
       let id = student._id;
       const accesstoken = await this.JWT.accessToken({ id, email, role });
       const refreshToken = await this.JWT.refreshToken({ id, email, role });
-
+  
       // Return the token in the response
       return res
         .status(200)
@@ -197,6 +261,7 @@ export class StudentController {
       });
     }
   }
+  
 
   async logout(req: Request, res: Response) {
     try {
@@ -355,6 +420,9 @@ export class StudentController {
             });
         }
       } else {
+        if(!existingStudent.isBlocked){
+
+        
         const role = existingStudent.role;
         const id = existingStudent._id;
         const accesstoken = await this.JWT.accessToken({ id, email, role });
@@ -370,6 +438,16 @@ export class StudentController {
             message: "Logging in with GOOOOGLE",
             user: existingStudent,
           });
+        }else{
+          res
+          .status(200)
+          
+          .json({
+            success: false,
+            message: "User Blocked",
+            user: existingStudent,
+          });
+        }
       }
     } catch (error: any) {
       throw error;
@@ -392,10 +470,20 @@ export class StudentController {
 
   async updateProfile(data: any) {
     try {
+      const { email ,username, profilePicUrl} = data;
       console.log(data, "consumeeee");
-      const response=await this.studentService.updateProfile(data)
+      const response=await this.studentService.updateProfile(email,{username, profilePicUrl})
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async blockStudent(data:any){
+    try {
+      const {email,isBlocked}=data
+      const response=await this.studentService.updateProfile(email,{isBlocked})
+    } catch (error) {
+      console.log(error)
     }
   }
 }
