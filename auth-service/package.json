@@ -1,5 +1,5 @@
 {
-  "name": "auth-gateway",
+  "name": "auth-service",
   "version": "1.0.0",
   "description": "auth-service for menty",
   "license": "ISC",

@@ -34,7 +34,7 @@ export class InstructorController {
 
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {
-      const { _id, username, mobile } = req.body;
+      const { _id, username, mobile ,expertise,skills} = req.body;
       console.log(req.body, "update Instructor Data");
       console.log(req.file, "update Instructor Data");
 
@@ -55,6 +55,8 @@ export class InstructorController {
         response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
+          expertise,
+          skills
         });
       }
 

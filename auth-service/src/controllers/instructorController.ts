@@ -53,12 +53,12 @@ export class InstructorController {
           message: "Existing user",
           user: ExistingInstructor,
         });
-        throw new Error("errorr");
+        
       } else {
         const otp = await this.otpGenerator.createOtpDigit();
         await this.otpService.createOtp(email, otp);
 
-        await this.sendEmail.sentEmailVerification(email, otp);
+        produce('send-otp-email',{name:username,email,otp})
 
         const JWT = new JwtService();
         const token = await JWT.createToken({
@@ -95,14 +95,14 @@ export class InstructorController {
  
   public async resendOtp(req: Request, res: Response): Promise<any> {
     try {
-      let { email } = req.body;
+      let { email ,username} = req.body;
       console.log(email, "emaillllll");
 
       const otp = await this.otpGenerator.createOtpDigit();
       await Promise.all([
         this.otpService.createOtp(email, otp),
 
-        this.sendEmail.sentEmailVerification(email, otp),
+        produce('send-otp-email',{name:username,email,otp})
       ]);
       res.status(200).json({
         success: true,
@@ -245,7 +245,7 @@ export class InstructorController {
         const otp = await this.otpGenerator.createOtpDigit();
         await this.otpService.createOtp(email, otp);
 
-        await this.SentForgotEmail.sentEmailVerification(email, otp);
+        produce('send-forgotPassword-email',{email,otp})
         res.send({
           success: true,
           message: "Rediercting To OTP Page",
@@ -303,7 +303,7 @@ export class InstructorController {
       const otp = await this.otpGenerator.createOtpDigit();
       await this.otpService.createOtp(email, otp);
 
-      await this.SentForgotEmail.sentEmailVerification(email, otp);
+      produce('send-forgotPassword-email',{email,otp})
 
       res.status(200).json({
         success: true,
@@ -330,7 +330,7 @@ export class InstructorController {
       if(!data){
         throw new Error("Token expired retry reset password")
       }
-      console.log(data.email)
+ 
       const passwordReset= await this.instructorService.resetPassword(data.email,hashedPassword)
       if(passwordReset){
         res.clearCookie('forgotToken')

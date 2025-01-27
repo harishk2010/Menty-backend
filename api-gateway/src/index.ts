@@ -34,7 +34,7 @@ const services = [
     },
     {
         path: USER_URL, // Target service URL
-        context: "/user/", // Route on your gateway
+        context: "/user", // Route on your gateway
     },
 ];
 

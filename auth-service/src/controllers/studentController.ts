@@ -54,11 +54,11 @@ export class StudentController {
         // throw new Error("errorr");
       } else {
         const otp = await this.otpGenerator.createOtpDigit();
-        await Promise.all([
-          this.otpService.createOtp(email, otp),
+        
+          await  this.otpService.createOtp(email, otp),
 
-          this.sendEmail.sentEmailVerification(email, otp),
-        ]);
+          produce('send-otp-email',{name:username,email,otp})
+       
 
         const token = await this.JWT.createToken({
           email,
@@ -85,14 +85,13 @@ export class StudentController {
 
   public async resendOtp(req: Request, res: Response): Promise<any> {
     try {
-      let { email } = req.body;
+      let { email ,username} = req.body;
 
       const otp = await this.otpGenerator.createOtpDigit();
-      await Promise.all([
-        this.otpService.createOtp(email, otp),
+      await  this.otpService.createOtp(email, otp),
 
-        this.sendEmail.sentEmailVerification(email, otp),
-      ]);
+          produce('send-otp-email',{name:username,email,otp})
+       
 
       res.status(200).json({
         success: true,
@@ -151,62 +150,7 @@ export class StudentController {
     }
   }
 
-  // public async login(req: Request, res: Response): Promise<any> {
-  //   try {
-  //     const { email, password } = req.body;
-  //     console.log(req.body);
-  //     const student = await this.studentService.findByEmail(email);
-  //     console.log(student, "student");
 
-  //     if (!student) {
-  //       return res.json({
-  //         success: false,
-  //         message: "invalid email id",
-  //       });
-  //     }
-
-  //     const isPasswordValid = await bcrypt.compare(password, student.password);
-
-  //     if (!isPasswordValid) {
-  //       return res.json({
-  //         success: false,
-  //         message: "Invalid Password",
-  //       });
-  //     }
-  //     if(student.isBlocked){
-  //        res.json({
-  //         success:false,
-  //         message:"User Blocked"
-  //       })
-        
-  //     }else{
-
-      
-  //     let role = student.role;
-  //     let id = student._id;
-  //     const accesstoken = await this.JWT.accessToken({ id, email, role });
-  //     const refreshToken = await this.JWT.refreshToken({ id, email, role });
-
-  //     // Return the token in the response
-  //     return res
-  //       .status(200)
-  //       .cookie("accessToken", accesstoken, { httpOnly: true })
-  //       .cookie("refreshToken", refreshToken, { httpOnly: true })
-  //       .send({
-  //         success: true,
-  //         message: "User Logged Successfully",
-  //         user: student,
-  //       });
-  //     }
-  //   } catch (error: any) {
-  //     console.error(error);
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: "Internal Server Error",
-  //       error: error.message,
-  //     });
-  //   }
-  // }
   public async login(req: Request, res: Response): Promise<any> {
     try {
       const { email, password } = req.body;
@@ -283,7 +227,8 @@ export class StudentController {
         const otp = await this.otpGenerator.createOtpDigit();
         await this.otpService.createOtp(email, otp);
 
-        await this.SentForgotEmail.sentEmailVerification(email, otp);
+        // await this.SentForgotEmail.sentEmailVerification(email, otp);
+        produce('send-forgotPassword-email',{email,otp})
         res.send({
           success: true,
           message: "Rediercting To OTP Page",
@@ -331,7 +276,7 @@ export class StudentController {
       const otp = await this.otpGenerator.createOtpDigit();
       await this.otpService.createOtp(email, otp);
 
-      await this.SentForgotEmail.sentEmailVerification(email, otp);
+      produce('send-forgotPassword-email',{email,otp})
 
       res.status(200).json({
         success: true,
@@ -358,7 +303,7 @@ export class StudentController {
       if (!data) {
         throw new Error("Token expired retry reset password");
       }
-      console.log(data.email);
+
       const passwordReset = await this.studentService.resetPassword(
         data.email,
         hashedPassword
