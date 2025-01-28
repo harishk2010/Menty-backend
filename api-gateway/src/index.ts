@@ -9,9 +9,9 @@ config();
 
 const app: Application = express();
 
-const { PORT, FRONTEND_URL, AUTH_URL , USER_URL} = process.env;
+const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , VERIFICATION_URL ,NOTIFICATION_URL} = process.env;
 
-console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL });
+console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,NOTIFICATION_URL , VERIFICATION_URL});
 
 const corsOptions = {
     origin: FRONTEND_URL,
@@ -35,6 +35,14 @@ const services = [
     {
         path: USER_URL, // Target service URL
         context: "/user", // Route on your gateway
+    },
+    {
+        path: NOTIFICATION_URL, // Target service URL
+        context: "/notification", // Route on your gateway
+    },
+    {
+        path: VERIFICATION_URL, // Target service URL
+        context: "/verification", // Route on your gateway
     },
 ];
 
