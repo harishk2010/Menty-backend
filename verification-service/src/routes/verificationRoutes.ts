@@ -15,6 +15,7 @@ router.post(
 
 router.get("/request/:email",verificationController.getRequestData.bind(verificationController))
 router.get("/requests",verificationController.getAllRequests.bind(verificationController))
+router.post("/approveRequest",verificationController.approveRequest.bind(verificationController))
 
 const verificationRoutes = router;
 export default verificationRoutes;

@@ -42,4 +42,16 @@ export class VerificationService implements IVerificationService{
             
         }
     }
+    async approveRequest(email:string,status:string):Promise<IVerificationModel | null>{
+        try {
+            console.log(email,"verificationnnn serviceee")
+            const response=await this.verificationRepository.approveRequest(email,status)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
 }

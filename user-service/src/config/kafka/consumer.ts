@@ -5,7 +5,7 @@ import { InstructorController } from "../../controllers/instructorController";
 async function consume() {
   const studentController = new StudentController();
   const instructorController = new InstructorController();
-  const consumer = kafka.consumer({ groupId: "user-service" });
+  const consumer = kafka.consumer({ groupId: "users-service" });
 
   try {
     console.log("Connecting to User-Service Consumer...");
@@ -18,6 +18,7 @@ async function consume() {
         "add-instructor",
         "password-reset-instructor",
         "verification-request",
+        "approve-reject-request",
       ],
       fromBeginning: true,
     });
@@ -34,6 +35,7 @@ async function consume() {
             console.warn(`Empty message received on topic: ${topic}`);
             return;
           }
+          console.log("=====> ",topic," <===========")
 
           switch (topic) {
             case "add-student":
@@ -59,7 +61,18 @@ async function consume() {
             //verification
             case "verification-request":
               await instructorController.updateVerifyStatus(messageValue);
-              console.log("Processing verification-request event:", messageValue);
+              console.log(
+                "Processing verification-request event:",
+                messageValue
+              );
+              break;
+            case "approve-reject-request":
+              console.log("ap-rej-req")
+              await instructorController.approveRequest(messageValue);
+              console.log(
+                "Processing req-approve-request event:",
+                messageValue
+              );
               break;
 
             default:

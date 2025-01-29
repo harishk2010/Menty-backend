@@ -80,6 +80,8 @@ export class VerificationContoller implements IVerificationControllers {
         res.json(requestData)
       }
     } catch (error) {
+      console.log(error)
+
       throw new Error("Error ")
       
     }
@@ -97,7 +99,43 @@ export class VerificationContoller implements IVerificationControllers {
         res.json(requestData)
       }
     } catch (error) {
+      console.log(error)
+
       throw new Error("Error ")
+      
+    }
+  }
+
+  async approveRequest(req:Request , res:Response):Promise<void>{
+    try {
+      const { email ,status}=req.body
+
+      const approvedRequest=await this.verificationService.approveRequest(email,status)
+      if(approvedRequest){
+        produce("approve-reject-request",{emailID:email,status:approvedRequest.status})
+        console.log("kafka-produces")
+        if(approvedRequest.status=="approved"){
+          res.status(200).json({
+            success: true,
+            message: "Verified Instructor",
+            data:approvedRequest
+          })
+        }else{
+          res.status(200).json({
+            success: false,
+            message: "Rejected Instructor",
+            data:approvedRequest
+          })
+        }
+        
+      }else{
+        res.json(approvedRequest)
+      }
+      
+    } catch (error) {
+      console.log(error)
+
+      throw new Error("Error in controller ")
       
     }
   }

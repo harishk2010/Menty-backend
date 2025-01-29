@@ -47,4 +47,22 @@ export class VerificationBaseRepository implements IVerificationBaseRepository{
             
         }
     }
+    async approveRequest(email:string,status:string):Promise<IVerificationModel | null>{
+        try {
+            const requestData=await VerificationModel.findOneAndUpdate(
+                {email},
+                {status},
+                { new: true}
+            )
+            if(!requestData){
+                return null
+            }
+          
+            return requestData
+        } catch (error) {
+           throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
 }

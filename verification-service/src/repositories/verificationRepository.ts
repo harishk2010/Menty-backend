@@ -37,4 +37,15 @@ export class VerificationRepository implements IVerificationRepository {
             
         }
     }
+    async approveRequest(email:string,status:string):Promise<IVerificationModel | null>{
+        try {
+            const response=await this.verificationBaseRepository.approveRequest(email,status)
+
+            return response 
+        } catch (error) {
+            console.log(error)
+            throw new Error("Verify Request Document failed Creation")
+            
+        }
+    }
 }

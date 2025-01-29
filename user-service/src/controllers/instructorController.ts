@@ -192,8 +192,38 @@ export class InstructorController {
       
       console.log(email,status)
       const instructorData= await this.instructorService.getInstructorData(email)
-      console.log(instructorData,"insdta")
-      const response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
+      let response
+      if(status==="approved"){
+        const isVerified=true
+         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
+      }else{
+
+         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
+      }
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  async approveRequest(data:any){
+    try {
+      let email=data.emailID
+      let status=data.status
+      
+      console.log(email,status)
+      const instructorData= await this.instructorService.getInstructorData(email)
+      let response
+      if(status==="approved"){
+        const isVerified=true
+         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
+      }else if(status==="rejected"){
+        const isVerified=false
+
+         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
+        }else{
+        response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
+
+      }
       return response
     } catch (error) {
       console.log(error)
