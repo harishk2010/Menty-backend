@@ -13,6 +13,35 @@ export class VerificationBaseRepository implements IVerificationBaseRepository{
             await verifyRequest.save()
             return verifyRequest
         } catch (error) {
+            console.log(error)
+           throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
+    async getRequestDataByEmail(email:string):Promise<IVerificationModel | null>{
+        try {
+            const requestData=await VerificationModel.findOne({email})
+            if(!requestData){
+                return null
+            }
+          
+            return requestData
+        } catch (error) {
+           throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
+    async getAllRequests():Promise<IVerificationModel[] | null>{
+        try {
+            const requestData=await VerificationModel.find({})
+            if(!requestData){
+                return null
+            }
+          
+            return requestData
+        } catch (error) {
            throw new Error("Verify Request Document failed Creation")
             
             

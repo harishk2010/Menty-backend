@@ -7,4 +7,9 @@ export interface IVerificationBaseRepository{
         degreeCertificateUrl:string,
         resumeUrl:string
     ):Promise<IVerificationModel >
+
+    getRequestDataByEmail(       
+        email:string,        
+    ):Promise<IVerificationModel | null >
+    getAllRequests():Promise<IVerificationModel[] | null >
 }

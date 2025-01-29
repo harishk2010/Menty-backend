@@ -58,7 +58,7 @@ export default class InstructorBaseRepository<T extends Document>{
     
                 // Create a new user
                 const newUser = await this.createInstructor({
-                    name,
+                    username:name,
                     email,
                     password: hashedPassword,
                 });

@@ -12,6 +12,29 @@ export class VerificationService implements IVerificationService{
         try {
             console.log(username,email,degreeCertificateUrl,resumeUrl,"verificationnnn serviceee")
             const response=await this.verificationRepository.sendVerifyRequest(username,email,degreeCertificateUrl,resumeUrl)
+            console.log("verification...serviceeee")
+            return response
+        } catch (error) {
+            throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
+    async getRequestData(email:string):Promise<IVerificationModel | null>{
+        try {
+            console.log(email,"verificationnnn serviceee")
+            const response=await this.verificationRepository.getRequestDataByEmail(email)
+            return response
+        } catch (error) {
+            throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
+    async getAllRequests():Promise<IVerificationModel[] | null>{
+        try {
+            console.log("getAllRequests verificationnnn serviceee")
+            const response=await this.verificationRepository.getAllRequests()
             return response
         } catch (error) {
             throw new Error("Verify Request Document failed Creation")

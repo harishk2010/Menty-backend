@@ -18,7 +18,7 @@ const verificationRequestSchema = new mongoose.Schema(
     email: { type: String, required: true },
     resumeUrl: { type: String, required: true }, 
     degreeCertificateUrl: { type: String, required: true }, 
-    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
     submittedAt: { type: Date, default: Date.now },
     reviewedAt: { type: Date },
     comments: { type: String },

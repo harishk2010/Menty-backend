@@ -8,10 +8,30 @@ export class VerificationRepository implements IVerificationRepository {
     constructor(verificationBaseRepository:IVerificationBaseRepository){
         this.verificationBaseRepository=verificationBaseRepository
     }
-    async sendVerifyRequest(username:string,email:string,degreeCertificateUrl:string,resumeUrl:string):Promise<IVerificationModel>{
+    async sendVerifyRequest(username:string,email:string,degreeCertificateUrl:string,resumeUrl:string):Promise<IVerificationModel >{
         try {
             const response=await this.verificationBaseRepository.createRequest(username,email,degreeCertificateUrl,resumeUrl)
             return response
+        } catch (error) {
+            throw new Error("Verify Request Document failed Creation")
+            
+        }
+    }
+    async getRequestDataByEmail(email:string):Promise<IVerificationModel | null>{
+        try {
+            const response=await this.verificationBaseRepository.getRequestDataByEmail(email)
+
+            return response 
+        } catch (error) {
+            throw new Error("Verify Request Document failed Creation")
+            
+        }
+    }
+    async getAllRequests():Promise<IVerificationModel[] | null>{
+        try {
+            const response=await this.verificationBaseRepository.getAllRequests()
+
+            return response 
         } catch (error) {
             throw new Error("Verify Request Document failed Creation")
             

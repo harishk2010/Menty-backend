@@ -24,7 +24,7 @@ async function produce(topic: string, value: object): Promise<void> {
     console.error("Error in Auth-Producer:", error.message, error.stack);
   } finally {
     await producer.disconnect();
-    console.log("Auth-Producer disconnected.");
+    console.log("verification-Producer disconnected.");
   }
 }
 

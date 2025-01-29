@@ -4,7 +4,7 @@ import { InstructorController } from "../../controllers/instructorController";
 
 async function consume() {
   const studentController = new StudentController();
-  const instructorController=new InstructorController()
+  const instructorController = new InstructorController();
   const consumer = kafka.consumer({ groupId: "user-service" });
 
   try {
@@ -17,6 +17,7 @@ async function consume() {
         "password-reset-student",
         "add-instructor",
         "password-reset-instructor",
+        "verification-request",
       ],
       fromBeginning: true,
     });
@@ -45,7 +46,7 @@ async function consume() {
               console.log("Processing add-instructor event:", messageValue);
               break;
 
-              //instructor
+            //instructor
             case "add-instructor":
               await instructorController.addInstructor(messageValue);
               console.log("Processed add-student event:", messageValue);
@@ -53,7 +54,12 @@ async function consume() {
 
             case "password-reset-instructor":
               await instructorController.passwordReset(messageValue);
-              console.log("Processing add-instructor event:", messageValue);
+              console.log("Processing password-reset event:", messageValue);
+              break;
+            //verification
+            case "verification-request":
+              await instructorController.updateVerifyStatus(messageValue);
+              console.log("Processing verification-request event:", messageValue);
               break;
 
             default:

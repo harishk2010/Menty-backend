@@ -185,4 +185,18 @@ export class InstructorController {
       console.log(error)
     }
   }
+  async updateVerifyStatus(data:any){
+    try {
+      let email=data.emailID
+      let status=data.status
+      
+      console.log(email,status)
+      const instructorData= await this.instructorService.getInstructorData(email)
+      console.log(instructorData,"insdta")
+      const response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }

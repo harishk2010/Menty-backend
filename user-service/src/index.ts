@@ -28,9 +28,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/student', studentRoutes)
 app.use('/instructors',instructorRoutes)
-// app.use('/student/getStudents', (req,res)=>{
-//     res.json("hello")
-// })
 
 consume()
 
