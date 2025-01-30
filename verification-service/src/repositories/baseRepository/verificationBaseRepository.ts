@@ -1,3 +1,4 @@
+import { updateRequestType } from "@/Types/updateRequestType";
 import VerificationModel, { IVerificationModel } from "../../models/verificationModel";
 import { IVerificationBaseRepository } from "./IVerificationBaseRepository";
 
@@ -61,6 +62,26 @@ export class VerificationBaseRepository implements IVerificationBaseRepository{
             return requestData
         } catch (error) {
            throw new Error("Verify Request Document failed Creation")
+            
+            
+        }
+    }
+    async updateRequest(email:string,data:updateRequestType):Promise<IVerificationModel | null>{
+        try {
+            console.log("before>>",email,data)
+            const requestData=await VerificationModel.findOneAndUpdate(
+                {email},
+                data,
+                { new: true}
+            )
+            console.log("after>>",requestData)
+            if(!requestData){
+                return null
+            }
+          
+            return requestData
+        } catch (error) {
+           throw new Error("updateRequest Document failed Creation")
             
             
         }

@@ -1,3 +1,4 @@
+import { updateRequestType } from '../Types/updateRequestType'
 import { IVerificationModel } from '../models/verificationModel'
 
 
@@ -6,4 +7,5 @@ export interface IVerificationService{
     getRequestData(email:string):Promise<IVerificationModel | null>
     approveRequest(email:string,status:string):Promise<IVerificationModel | null>
     getAllRequests():Promise<IVerificationModel[] | null>
+    updateRequest(email:string,data:updateRequestType):Promise<IVerificationModel | null>
 }

@@ -12,6 +12,14 @@ router.post(
   ]),
   verificationController.submitRequest.bind(verificationController)
 );
+router.post(
+  "/reVerifyRequest",
+  upload.fields([
+    { name: "degreeCertificate", maxCount: 1 },
+    { name: "resume", maxCount: 1 },
+  ]),
+  verificationController.reVerifyRequest.bind(verificationController)
+);
 
 router.get("/request/:email",verificationController.getRequestData.bind(verificationController))
 router.get("/requests",verificationController.getAllRequests.bind(verificationController))

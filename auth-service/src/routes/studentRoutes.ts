@@ -1,4 +1,4 @@
-import authenticateToken from "../middlewares/AuthenticatedRoutes";
+import  authenticateToken  from "../middlewares/AuthenticatedRoutes";
 import { StudentController } from "../controllers/studentController";
 import { Router } from "express";
 

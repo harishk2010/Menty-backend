@@ -1,4 +1,4 @@
-import authenticateToken from "../middlewares/AuthenticatedRoutes";
+import  authenticateToken  from "../middlewares/AuthenticatedRoutes";
 import { AdminController } from "../controllers/adminController";
 import { Router } from "express";
 

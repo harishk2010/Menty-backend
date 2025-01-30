@@ -213,6 +213,7 @@ export class InstructorController {
             success: true,
             message: "User Logged Successfully",
             user: instructor,
+            token:{accesstoken,refreshToken}
           })
       );
     } catch (error: any) {
