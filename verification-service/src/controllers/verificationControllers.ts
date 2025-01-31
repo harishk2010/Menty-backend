@@ -67,24 +67,32 @@ export class VerificationContoller implements IVerificationControllers {
   async reVerifyRequest(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, degreeCertificate, resume } = req.body;
-      console.log({ username, email, degreeCertificate, resume }, "=>form Body");
-  
+      console.log(
+        { username, email, degreeCertificate, resume },
+        "=>form Body"
+      );
+
       // Type assertion for `req.files`
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+      const files = req.files as
+        | { [fieldname: string]: Express.Multer.File[] }
+        | undefined;
       console.log(files, "==> Files received from request");
-  
+
       // Use existing URLs if no new files are uploaded
       let degreeCertificateUrl = degreeCertificate || ""; // Ensure it's not undefined
       let resumeUrl = resume || "";
-  
+
       const uploadPromises = [];
-  
+
       if (files) {
         const degreeCertificateFile = files.degreeCertificate?.[0];
         const resumeFile = files.resume?.[0];
-  
-        console.log({ degreeCertificateFile, resumeFile }, "==> Extracted Files");
-  
+
+        console.log(
+          { degreeCertificateFile, resumeFile },
+          "==> Extracted Files"
+        );
+
         if (degreeCertificateFile) {
           uploadPromises.push(
             uploadToS3Bucket(degreeCertificateFile, "degreeCertificate").then(
@@ -92,19 +100,21 @@ export class VerificationContoller implements IVerificationControllers {
             )
           );
         }
-  
+
         if (resumeFile) {
           uploadPromises.push(
-            uploadToS3Bucket(resumeFile, "resume").then((url) => (resumeUrl = url))
+            uploadToS3Bucket(resumeFile, "resume").then(
+              (url) => (resumeUrl = url)
+            )
           );
         }
       }
-  
+
       // Wait for all file uploads to complete
       await Promise.all(uploadPromises);
-  
+
       const status = "pending";
-  
+
       // Call the verification service with updated URLs
       const response = await this.verificationService.updateRequest(email, {
         username,
@@ -112,27 +122,25 @@ export class VerificationContoller implements IVerificationControllers {
         resumeUrl,
         status,
       });
-  
+
       console.log(response, "response reverify");
-  
+
       if (response) {
         const emailID = response.email;
         await produce("verification-request", { emailID, status });
-  
-         res.status(200).send({
+
+        res.status(200).send({
           success: true,
           message: "Re-Verify Request Sent!",
           data: response,
         });
-      }else{
-
-        
+      } else {
         res.status(500).send({
           success: false,
           message: "Failed to process verification request",
         });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error in reVerifyRequest:", error);
       res.status(500).send({
         success: false,
@@ -141,7 +149,6 @@ export class VerificationContoller implements IVerificationControllers {
       });
     }
   }
-  
 
   async getRequestData(req: Request, res: Response): Promise<void> {
     try {
@@ -192,14 +199,19 @@ export class VerificationContoller implements IVerificationControllers {
         });
         console.log("kafka-produces");
         if (approvedRequest.status == "approved") {
+          let email = approvedRequest.email;
+          let username = approvedRequest.username;
+
+          produce("verified-Instructor-email", { email, username });
+
           res.status(200).json({
             success: true,
             message: "Verified Instructor",
             data: approvedRequest,
           });
-        } else {
+        } else if (approvedRequest.status === "rejected") {
           res.status(200).json({
-            success: false,
+            success: true,
             message: "Rejected Instructor",
             data: approvedRequest,
           });

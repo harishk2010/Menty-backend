@@ -350,9 +350,10 @@ export class InstructorController {
   async test(req:Request,res:Response){
     try {
       console.log("testing.............")
+      
       const acc=await this.JWT.verifyToken(req.cookies["accessToken"])
       console.log(acc,"tester access")
-      res.send({success:true})
+      res.status(200).send({success:true,message:"hey instructor"})
       
     } catch (error) {
       throw error

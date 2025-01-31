@@ -1,6 +1,7 @@
 import upload from "../utils/multer";
 import { verificationController } from "../config/dependencyInjector";
 import express, { Request, Response, Router } from "express";
+import { isAdmin, isAdminOrInstructor, isInstructor } from "../middlewares/roleAuth";
 
 const router = Router();
 
@@ -10,6 +11,7 @@ router.post(
     { name: "degreeCertificate", maxCount: 1 },
     { name: "resume", maxCount: 1 },
   ]),
+  isInstructor,
   verificationController.submitRequest.bind(verificationController)
 );
 router.post(
@@ -18,12 +20,13 @@ router.post(
     { name: "degreeCertificate", maxCount: 1 },
     { name: "resume", maxCount: 1 },
   ]),
+  isInstructor,
   verificationController.reVerifyRequest.bind(verificationController)
 );
 
-router.get("/request/:email",verificationController.getRequestData.bind(verificationController))
-router.get("/requests",verificationController.getAllRequests.bind(verificationController))
-router.post("/approveRequest",verificationController.approveRequest.bind(verificationController))
+router.get("/request/:email",isAdminOrInstructor,verificationController.getRequestData.bind(verificationController))
+router.get("/requests",isAdminOrInstructor,verificationController.getAllRequests.bind(verificationController))
+router.post("/approveRequest",isAdmin,verificationController.approveRequest.bind(verificationController))
 
 const verificationRoutes = router;
 export default verificationRoutes;

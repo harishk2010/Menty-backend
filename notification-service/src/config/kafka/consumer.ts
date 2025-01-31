@@ -13,6 +13,7 @@ async function consume() {
       topics: [
         "send-otp-email",
         "send-forgotPassword-email",
+        "verified-Instructor-email"
       ],
       fromBeginning: true,
     });
@@ -39,6 +40,10 @@ async function consume() {
             case "send-forgotPassword-email":
               await notificatinController.sendForgotEmail(messageValue);
               console.log("Processing send-forgotPassword-email event:", messageValue);
+              break;
+            case "verified-Instructor-email":
+              await notificatinController.sendVerifiedInstructorEmail(messageValue);
+              console.log("Processing verified-Instructor-email event:", messageValue);
               break;
             
 

@@ -30,7 +30,7 @@ export class JwtService {
 
         // Sign the token with the validated secret
         const verifyToken =await jwt.sign(payload, secret, {
-            expiresIn: "1hr",
+            expiresIn: "10s",
         });
 
         return verifyToken;
