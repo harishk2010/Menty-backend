@@ -6,19 +6,18 @@ import cors from 'cors'
 import instructorRoutes from "./routes/instructorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import adminRoutes from "./routes/adminRoutes";
-import proxy = require("http-proxy-middleware");
 import consume from "./config/kafka/consumer";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
-import { JwtService } from "./utils/jwt";
+
 config()
 
 let app:Application=express()
 const PORT:number=Number(process.env.port)||5001
 
 const corsOptions = {
+    credentials: true,
     origin: String(process.env.FRONTEND_URL),
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
 };
 app.use(cookieParser());
 app.use(cors(corsOptions))
@@ -43,17 +42,6 @@ consume()
 app.get('/', (req, res) => {
     res.json('auth service is running ')
 })
-app.post("/api/refresh-token", async (req, res) => {
-    const { refreshToken } = req.body;
-    try {
-        const jwt=new JwtService()
-        const payload = jwt.verifyToken(refreshToken);
-        const newAccessToken = jwt.accessToken({ role: payload });
-        res.json({ accessToken: newAccessToken });
-    } catch (error) {
-        res.status(401).json({ message: "Invalid refresh token" });
-    }
-});
 
 
 const start = async() => {

@@ -3,7 +3,8 @@ import { config } from "dotenv";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import proxy from 'express-http-proxy'
+// import proxy from 'express-http-proxy'
+import morgan from  "morgan" 
 
 config();
 
@@ -14,19 +15,14 @@ const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , VERIFICATION_URL ,NOTIFICATION
 console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,NOTIFICATION_URL , VERIFICATION_URL});
 
 const corsOptions = {
+    credentials: true,
     origin: FRONTEND_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
 };
 
-app.use(cookieParser())
+// app.use(cookieParser())
 app.use(cors(corsOptions));
-// app.use(cookieParser());
 
-// app.use((req, res, next) => {
-//     console.log(`LOGGING 📝 : ${req.files} request to: ${req.originalUrl}   , baseurl ${req.baseUrl}  `);
-//     next(); 
-// });
 
 const services = [
     {
@@ -47,6 +43,7 @@ const services = [
     },
 ];
 
+app.use(morgan('dev'))
 
 // Setup proxies
 services.forEach(({ context, path }) => {

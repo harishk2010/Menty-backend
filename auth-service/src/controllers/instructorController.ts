@@ -349,15 +349,20 @@ export class InstructorController {
 
   async test(req:Request,res:Response){
     try {
-      console.log("testing.............")
-      
-      const acc=await this.JWT.verifyToken(req.cookies["accessToken"])
-      console.log(acc,"tester access")
-      res.status(200).send({success:true,message:"hey instructor"})
-      
-    } catch (error) {
-      throw error
+      const acc = await this.JWT.verifyToken(req.cookies["accessToken"]);
+        console.log(acc, "tester access");
+
+        res.status(200).send({ success: true, message: "hey instructor" });
+    } catch (error: any) {
+        console.error("Error in test method:", error.message);
+        if (error.message === 'Token expired') {
+            res.status(401).send({ success: false, message: "Token expired. Please log in again." });
+        } else {
+            res.status(400).send({ success: false, message: "Invalid token. Please log in." });
+        }
     }
+
+      
   }
 
   async doGoogleLogin(req:Request,res:Response) {

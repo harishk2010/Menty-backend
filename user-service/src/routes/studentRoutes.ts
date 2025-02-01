@@ -2,19 +2,17 @@ import { StudentController } from "../controllers/studentController";
 import { Router } from "express";
 import upload from "../utils/multer";
 import { isAdmin, isStudent } from "../middlewares/roleAuth";
+import authenticateToken from "../middlewares/AuthenticatedRoutes";
 const router=Router()
 let studentController=new StudentController()
 
-router.patch('/updateProfile',upload.single('profile'),isStudent,studentController.updateProfile.bind(studentController))
-router.patch('/updatePassword',isStudent,studentController.updatePassword.bind(studentController))
+router.patch('/updateProfile',authenticateToken,upload.single('profile'),isStudent,studentController.updateProfile.bind(studentController))
+router.patch('/updatePassword',authenticateToken,isStudent,studentController.updatePassword.bind(studentController))
 
 //block/unblock
-router.get('/getStudents',studentController.getStudents.bind(studentController))
+router.get('/getStudents',isStudent,authenticateToken,studentController.getStudents.bind(studentController))
 router.patch('/blockStudent/:email',studentController.blockStudent.bind(studentController))
-router.get('/:email',studentController.getStudent.bind(studentController))
-// router.get('/getStudents',(req:Request,res:Response)=>{
-//     res.json("hii")
-// })
+router.get('/:email',authenticateToken,studentController.getStudent.bind(studentController))
 
 const studentRoutes=router
 export default studentRoutes

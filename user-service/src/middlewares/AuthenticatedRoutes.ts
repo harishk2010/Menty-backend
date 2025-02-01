@@ -2,8 +2,6 @@
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { config } from 'dotenv';
-import { JwtService } from '../utils/jwt';
-
 config();
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
@@ -33,11 +31,11 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
     }
 
     try {
-        // Verify Access Token
+        
         const accessPayload = jwt.verify(accessToken, JWT_SECRET) as AuthenticatedRequest['user'];
         console.log('Access token verified:', accessPayload);
 
-        // If valid, attach payload to request and proceed
+        
         req.user = accessPayload;
         return next();
     } catch (err: any) {
@@ -51,7 +49,7 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
 
             // Verify Refresh Token
             try {
-                const refreshPayload = jwt.verify(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
+                const refreshPayload =await accessToken(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
                 if (!refreshPayload) {
                     return res.status(401).json({ message: 'Invalid refresh token. Please log in.' });
                 }
@@ -65,24 +63,22 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
 
                 console.log('Refresh token verified:', refreshPayload);
 
-                // Generate a new Access Token
-                const jwtt=new JwtService()
-                const newAccessToken =await jwtt.accessToken(
+                             
+                const newAccessToken =await accessToken(
                     {email:refreshPayload.email, role: refreshPayload.role },
-                   
                 );
                 console.log('New access token generated:', newAccessToken);
 
                 // Set new Access Token in cookies
                 res.cookie('accessToken', newAccessToken, {
                     httpOnly: true,
-                  
+                    secure: process.env.NODE_ENV === 'production', // Ensure secure cookies in production
                 });
 
-                
+                // Update req.cookies with the new access token
                 req.cookies['accessToken'] = newAccessToken;
 
-               
+                // Attach payload to request
                 req.user = refreshPayload;
                 return next();
             } catch (refreshErr: any) {

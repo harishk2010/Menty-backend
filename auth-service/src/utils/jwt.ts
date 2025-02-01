@@ -27,13 +27,13 @@ export class JwtService {
         if (!secret) {
             throw new Error("JWT_SECRET is not defined in the environment variables");
         }
-
+console.log(payload,"payyload")
         // Sign the token with the validated secret
-        const verifyToken =await jwt.sign(payload, secret, {
+        return jwt.sign(payload, secret, {
             expiresIn: "10s",
         });
 
-        return verifyToken;
+        // return verifyToken;
     }
      
     async refreshToken(payload: Object): Promise<string> {
@@ -45,7 +45,7 @@ export class JwtService {
 
         // Sign the token with the validated secret
         const verifyToken =await jwt.sign(payload, secret, {
-            expiresIn: "3hr",
+            expiresIn: "20s",
         });
 
         return verifyToken;
