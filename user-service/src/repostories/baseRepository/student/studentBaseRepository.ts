@@ -1,11 +1,10 @@
+import UserModel, { IUser } from "../../../models/userModel";
 import { Document, Model } from "mongoose";
-import UserModel, { IUser } from "../../models/userModel";
+import { IStudentBaseRepository } from "./IStudentBaseRepository";
 
-export class StudentBaseRepository<T extends Document> {
-  private model: Model<T>;
-  constructor(model: Model<T>) {
-    this.model = model;
-  }
+
+export class StudentBaseRepository implements IStudentBaseRepository {
+ 
 
   async createStudent(payload: IUser): Promise<IUser | null> {
     try {
@@ -13,7 +12,9 @@ export class StudentBaseRepository<T extends Document> {
       await student.save();
       return student;
     } catch (error) {
+      console.log(error);
       throw error;
+      
     }
   }
 
@@ -32,8 +33,9 @@ export class StudentBaseRepository<T extends Document> {
       });
       return studentData;
     } catch (error) {
+      console.log(error);
       throw error;
-    }
+          }
   }
 
   async updatePassword(email: string, password: string): Promise<IUser | null> {
@@ -49,17 +51,20 @@ export class StudentBaseRepository<T extends Document> {
       );
       return studentData;
     } catch (error) {
+      console.log(error);
       throw error;
+      
     }
   }
 
-  async findAllStudents(){
+  async findAllStudents():Promise<IUser[]>{
     try {
         const response=await UserModel.find()
         return response
         
     } catch (error) {
         console.log(error);
+        throw error;
         
     }
   }

@@ -30,7 +30,7 @@ export class JwtService {
 console.log(payload,"payyload")
         // Sign the token with the validated secret
         return jwt.sign(payload, secret, {
-            expiresIn: "10s",
+            expiresIn: "1hr",
         });
 
         // return verifyToken;
@@ -45,7 +45,7 @@ console.log(payload,"payyload")
 
         // Sign the token with the validated secret
         const verifyToken =await jwt.sign(payload, secret, {
-            expiresIn: "20s",
+            expiresIn: "6hr",
         });
 
         return verifyToken;

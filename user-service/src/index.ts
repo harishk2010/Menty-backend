@@ -6,6 +6,7 @@ import cors from 'cors'
 import studentRoutes from "./routes/studentRoutes";
 import consume from "./config/kafka/consumer";
 import instructorRoutes from "./routes/instructorRoutes";
+import verificationRoutes from "./routes/verificationRoutes";
 
 config()
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/student', studentRoutes)
 app.use('/instructors',instructorRoutes)
+app.use('/verification',verificationRoutes)
 
 consume()
 

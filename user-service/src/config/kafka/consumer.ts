@@ -1,10 +1,8 @@
 import kafka from "./kafkaConfig";
-import { StudentController } from "../../controllers/studentController";
-import { InstructorController } from "../../controllers/instructorController";
+import { instructorController, studentController } from "../dependencyInjector";
 
 async function consume() {
-  const studentController = new StudentController();
-  const instructorController = new InstructorController();
+
   const consumer = kafka.consumer({ groupId: "users-service" });
 
   try {
@@ -17,8 +15,8 @@ async function consume() {
         "password-reset-student",
         "add-instructor",
         "password-reset-instructor",
-        "verification-request",
-        "approve-reject-request",
+        // "verification-request",
+        // "approve-reject-request",
       ],
       fromBeginning: true,
     });
@@ -59,21 +57,21 @@ async function consume() {
               console.log("Processing password-reset event:", messageValue);
               break;
             //verification
-            case "verification-request":
-              await instructorController.updateVerifyStatus(messageValue);
-              console.log(
-                "Processing verification-request event:",
-                messageValue
-              );
-              break;
-            case "approve-reject-request":
-              console.log("ap-rej-req")
-              await instructorController.approveRequest(messageValue);
-              console.log(
-                "Processing req-approve-request event:",
-                messageValue
-              );
-              break;
+            // case "verification-request":
+            //   await instructorController.updateVerifyStatus(messageValue);
+            //   console.log(
+            //     "Processing verification-request event:",
+            //     messageValue
+            //   );
+            //   break;
+            // case "approve-reject-request":
+            //   console.log("ap-rej-req")
+            //   await instructorController.approveRequest(messageValue);
+            //   console.log(
+            //     "Processing req-approve-request event:",
+            //     messageValue
+            //   );
+            //   break;
 
             default:
               console.warn(`No handler for topic: ${topic}`);

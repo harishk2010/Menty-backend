@@ -11,10 +11,7 @@ async function consume() {
 
     await consumer.subscribe({
       topics: [
-        "add-student",
-        "password-reset-student",
-        "add-instructor",
-        "password-reset-instructor",
+       
       ],
       fromBeginning: true,
     });

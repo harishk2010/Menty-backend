@@ -1,19 +1,22 @@
-import { IUser } from "../models/userModel";
+import { IUser } from "../../models/userModel";
 import { Request, Response } from "express";
-import { instructorServices } from "../services/instructorServices";
-import { uploadToS3Bucket } from "../utils/s3Bucket";
+import { InstructorServices } from "../../services/instructor/instructorServices";
+import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
-import verifyToken from "../utils/jwt";
-import produce from "../config/kafka/producer";
-import mongoose from "mongoose";
+import verifyToken from "../../utils/jwt";
+import produce from "../../config/kafka/producer";
 
-export class InstructorController {
-  private instructorService: instructorServices;
-  constructor() {
-    this.instructorService = new instructorServices();
+import { IInstructorControllers } from "./IInstructorController";
+import { IInstructorService } from "../../services/instructor/IInstructorService";
+import { IInstructor } from "../../models/instructorModel";
+
+export class InstructorController implements IInstructorControllers{
+  private instructorService: IInstructorService;
+  constructor(instructorService:IInstructorService) {
+    this.instructorService =  instructorService;
   }
 
-  public async addInstructor(payload: IUser): Promise<any> {
+  public async addInstructor(payload: IInstructor): Promise<void> {
     try {
       let response = await this.instructorService.createInstructor(payload);
     } catch (error) {
@@ -74,7 +77,8 @@ export class InstructorController {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+      throw error
     }
   }
 
@@ -146,7 +150,11 @@ export class InstructorController {
       if(!InstructorData){
         throw new Error("No user found")
       }
-      const id=InstructorData._id
+      let id = InstructorData?._id?.toString(); // Ensure id is a string or null
+
+      if (!id) {
+          throw new Error("Instructor ID is missing"); // Handle the undefined case
+      }
       const isBlocked=!InstructorData?.isBlocked
 
       const InstructorStatus=await this.instructorService.updateProfile(id,{isBlocked})
@@ -167,13 +175,13 @@ export class InstructorController {
       
     } catch (error) {
       console.log(error)
+      throw error
       
     }
   }
 
-
   ///kafka consume
-  async passwordReset(data:any){
+  async passwordReset(data:any): Promise<IInstructor | null>{
     try {
       const {password,email}=data
       const response = await this.instructorService.updatePassword(
@@ -183,29 +191,40 @@ export class InstructorController {
       return response
     } catch (error) {
       console.log(error)
+      throw error
     }
   }
-  async updateVerifyStatus(data:any){
+  async updateVerifyStatus(data: any): Promise<IInstructor | null> {
     try {
-      let email=data.emailID
-      let status=data.status
-      
-      console.log(email,status)
-      const instructorData= await this.instructorService.getInstructorData(email)
-      let response
-      if(status==="approved"){
-        const isVerified=true
-         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
-      }else{
+        let email = data.emailID;
+        let status = data.status;
 
-         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
-      }
-      return response
+        console.log(email, status,"emailstatus");
+
+        const instructorData = await this.instructorService.getInstructorData(email);
+        console.log(instructorData,"inssss")
+        let response;
+        let id = instructorData?._id?.toString(); // Ensure id is a string or null
+
+        if (!id) {
+            throw new Error("Instructor ID is missing"); // Handle the undefined case
+        }
+
+        if (status === "approved") {
+            const isVerified = true;
+            response = await this.instructorService.updateProfile(id, { verificationStatus: status, isVerified });
+        } else {
+            response = await this.instructorService.updateProfile(id, { verificationStatus: status });
+        }
+
+        return response;
     } catch (error) {
-      console.log(error)
+        console.log(error);
+        throw error;
     }
-  }
-  async approveRequest(data:any){
+}
+
+  async approveRequest(data:any): Promise<IInstructor | null>{
     try {
       let email=data.emailID
       let status=data.status
@@ -213,20 +232,26 @@ export class InstructorController {
       console.log(email,status)
       const instructorData= await this.instructorService.getInstructorData(email)
       let response
+      let id = instructorData?._id?.toString(); // Ensure id is a string or null
+
+      if (!id) {
+          throw new Error("Instructor ID is missing"); // Handle the undefined case
+      }
       if(status==="approved"){
         const isVerified=true
-         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
+         response = await this.instructorService.updateProfile(id,{verificationStatus:status,isVerified});
       }else if(status==="rejected"){
         const isVerified=false
 
-         response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status,isVerified});
+         response = await this.instructorService.updateProfile(id,{verificationStatus:status,isVerified});
         }else{
-        response = await this.instructorService.updateProfile(instructorData?._id,{verificationStatus:status});
+        response = await this.instructorService.updateProfile(id,{verificationStatus:status});
 
       }
       return response
     } catch (error) {
       console.log(error)
+      throw error
     }
   }
 }

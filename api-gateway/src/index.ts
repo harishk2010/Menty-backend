@@ -37,10 +37,7 @@ const services = [
         path: NOTIFICATION_URL, // Target service URL
         context: "/notification", // Route on your gateway
     },
-    {
-        path: VERIFICATION_URL, // Target service URL
-        context: "/verification", // Route on your gateway
-    },
+    
 ];
 
 app.use(morgan('dev'))

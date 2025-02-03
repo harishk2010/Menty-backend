@@ -1,11 +1,9 @@
 import { Document, Model } from "mongoose";
-import InstructorModel, { IInstructor } from "../../models/instructorModel";
+import InstructorModel, { IInstructor } from "../../../models/instructorModel";
+import { IInstructorBaseRepository } from "./IInstructorBaseRepository";
 
-export class InstructorBaseRepository<T extends Document> {
-  private model: Model<T>;
-  constructor(model: Model<T>) {
-    this.model = model;
-  }
+export class InstructorBaseRepository implements IInstructorBaseRepository{
+  
 
   async createInstructor(payload: IInstructor): Promise<IInstructor | null> {
     try {
@@ -53,13 +51,16 @@ export class InstructorBaseRepository<T extends Document> {
     }
   }
 
-  async findAllInstructors(){
+  async findAllInstructors(): Promise<IInstructor[] > {
     try {
         const response=await InstructorModel.find()
+   
         return response
         
     } catch (error) {
         console.log(error);
+        throw error;
+
         
     }
   }

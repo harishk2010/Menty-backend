@@ -1,10 +1,10 @@
-import { InstructorController } from "../controllers/instructorController";
+import { instructorController } from "../config/dependencyInjector";
 import { Router } from "express";
 import upload from "../utils/multer";
 import { isAdmin, isInstructor } from "../middlewares/roleAuth";
 import authenticateToken from "../middlewares/AuthenticatedRoutes";
 const router=Router()
-let instructorController=new InstructorController()
+
 
 router.post('/updateProfile',authenticateToken,upload.single('profile'),isInstructor,instructorController.updateProfile.bind(instructorController))
 router.patch('/updatePassword',isInstructor,instructorController.updatePassword.bind(instructorController))

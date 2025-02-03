@@ -1,26 +1,29 @@
-import { IUser } from "../models/userModel";
+import { IUser } from "../../models/userModel";
 import { Request, Response } from "express";
-import { studentServices } from "../services/studentServices";
-import { uploadToS3Bucket } from "../utils/s3Bucket";
+import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
-import verifyToken from "../utils/jwt";
-import produce from "../config/kafka/producer";
-import mongoose from "mongoose";
+import verifyToken from "../../utils/jwt";
+import produce from "../../config/kafka/producer";
+import { IStudentControllers } from "./IStudentController";
+import { IStudentService } from "../../services/student/IStudentService";
 
-export class StudentController {
-  private studentService: studentServices;
-  constructor() {
-    this.studentService = new studentServices();
+export class StudentController implements IStudentControllers {
+  private studentService: IStudentService;
+  constructor(studentService:IStudentService) {
+    this.studentService = studentService;
   }
 
-  public async addStudent(payload: IUser): Promise<any> {
+  public async addStudent(payload: IUser):  Promise<void> {
     try {
       let response = await this.studentService.createStudent(payload);
+
     } catch (error) {
       console.log(error);
+      throw error;
+      
     }
   }
-  public async getStudent(req: Request, res: Response): Promise<any> {
+  public async getStudent(req: Request, res: Response):  Promise<void> {
     try {
       const { email } = req.params;
       // console.log(email,"get Student Data")
@@ -29,6 +32,8 @@ export class StudentController {
       res.json(response);
     } catch (error) {
       console.log(error);
+      throw error;
+      
     }
   }
 
@@ -73,6 +78,8 @@ export class StudentController {
       }
     } catch (error) {
       console.log(error);
+      throw error;
+      
     }
   }
 
@@ -118,10 +125,12 @@ export class StudentController {
       }
     } catch (error) {
       console.log(error);
+      throw error;
+      
     }
   }
 
-  public async getStudents(req:Request,res:Response){
+  public async getStudents(req:Request,res:Response):Promise<void>{
     try {
     
       const students=await this.studentService.getStudents()
@@ -131,10 +140,11 @@ export class StudentController {
       })
     } catch (error) {
       console.log(error);
+      throw error;
       
     }
   }
-  public async blockStudent(req:Request,res:Response){
+  public async blockStudent(req:Request,res:Response):Promise<void>{
     try {
       const { email }=req.params
 
@@ -143,9 +153,13 @@ export class StudentController {
       if(!studentData){
         throw new Error("No user found")
       }
-      const id=studentData._id
-      const isBlocked=!studentData?.isBlocked
+      let id = studentData?._id?.toString(); // Ensure id is a string or null
 
+      if (!id) {
+          throw new Error("Instructor ID is missing"); // Handle the undefined case
+      }
+      const isBlocked=!studentData?.isBlocked
+ 
       const studentStatus=await this.studentService.updateProfile(id,{isBlocked})
       await produce("block-student",{email,isBlocked})
 
@@ -163,14 +177,16 @@ export class StudentController {
       }
       
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      throw error;
+      
       
     }
   }
 
 
   ///kafka consume
-  async passwordReset(data:any){
+  async passwordReset(data:any):Promise<IUser | null>{
     try {
       const {password,email}=data
       const response = await this.studentService.updatePassword(
@@ -179,7 +195,9 @@ export class StudentController {
       );
       return response
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      throw error;
+      
     }
   }
 }

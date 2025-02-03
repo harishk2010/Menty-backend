@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { config } from 'dotenv';
 config();
+import { accessToken } from '../utils/jwt';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -20,19 +21,19 @@ interface AuthenticatedRequest extends Request {
 const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
     console.log('Auth middleware entered');
 
-    const accessToken = req.cookies['accessToken'];
+    const theAccessToken = req.cookies['accessToken'];
     const refreshToken = req.cookies['refreshToken'];
 
     console.log('Cookies received:', req.cookies);
-    console.log('accessToken:', accessToken);
+    console.log('accessToken:', theAccessToken);
 
-    if (!accessToken) {
+    if (!theAccessToken) {
         return res.status(401).json({ failToken: true, message: 'No access token provided' });
     }
 
     try {
         
-        const accessPayload = jwt.verify(accessToken, JWT_SECRET) as AuthenticatedRequest['user'];
+        const accessPayload = jwt.verify(theAccessToken, JWT_SECRET) as AuthenticatedRequest['user'];
         console.log('Access token verified:', accessPayload);
 
         
@@ -49,7 +50,8 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
 
             // Verify Refresh Token
             try {
-                const refreshPayload =await accessToken(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
+                // const jwtt=new JwtService()
+                const refreshPayload = jwt.verify(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
                 if (!refreshPayload) {
                     return res.status(401).json({ message: 'Invalid refresh token. Please log in.' });
                 }
