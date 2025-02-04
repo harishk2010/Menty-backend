@@ -1,0 +1,17 @@
+import upload from "../utils/multer";
+import { categoryController } from "../config/dependencyInjector";
+import express, { Request, Response, Router } from "express";
+
+const router = Router();
+
+router
+  .route("/category")
+  .post(categoryController.addCategory.bind(categoryController))
+  .put(categoryController.editCategory.bind(categoryController))
+  .patch(categoryController.unListCategory.bind(categoryController))
+  .get(categoryController.listCategory.bind(categoryController));
+
+router.route('/categories').get(categoryController.getAllCategory.bind(categoryController));
+
+const categoryRoutes = router;
+export default categoryRoutes;

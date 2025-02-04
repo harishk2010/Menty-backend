@@ -1,8 +1,8 @@
-import { NotificationControllers } from "../../controllers/notificationController";
+import notificatinController from "../dependencyInjection";
 import kafka from "./kafkaConfig";
 
 async function consume() {
-  const notificatinController=new NotificationControllers()
+  // const notificatinController=new NotificationControllers()
   const consumer = kafka.consumer({ groupId: "notification-service" });
 
   try {

@@ -1,10 +1,7 @@
 import kafka from "./kafkaConfig";
-import { StudentController } from "../../controllers/studentController";
-import { InstructorController } from "../../controllers/instructorController";
-
+import { studentController ,instructorController } from "../dependencyInjector";
 async function consume() {
-  const studentController = new StudentController();
-  const instructorController=new InstructorController()
+
   const consumer = kafka.consumer({ groupId: "auth-service" });
 
   try {

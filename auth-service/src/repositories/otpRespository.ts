@@ -1,24 +1,47 @@
 import { Iotp } from "../interface/otp"
 import baseOtpRepository from "./baseRepositories/baseOtpRepository"
 import otpModel from "../models/otpModel"
+import IOtpRepository from "./interfaces/IOtpRespoitory"
+import IOtpBaseRepository from "./baseRepositories/interfaces/IOtpBaseRepository"
 
-export class otpRespository{
-    private baseOtpRepository:baseOtpRepository<Iotp>
-    constructor(){
-        this.baseOtpRepository=new baseOtpRepository(otpModel)
+export class OtpRespository implements IOtpRepository{
+    private baseOtpRepository:IOtpBaseRepository
+    constructor(baseOtpRepository:IOtpBaseRepository){
+        this.baseOtpRepository=baseOtpRepository
 
     }
-    public async createOtp(email:string,otp:string){
-        const response = await this.baseOtpRepository.saveOtp(email,otp)
-        return response
+    public async createOtp(email:string,otp:string): Promise<Iotp | null>{
+        try {
+            
+            const response = await this.baseOtpRepository.saveOtp(email,otp)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
-    public async findOtp(email:string){
+    public async findOtp(email:string): Promise<Iotp | null>{
+       try {
         const response=await this.baseOtpRepository.findOtp(email)
         console.log(response,"otprepo")
         return response
+        
+       } catch (error) {
+        console.log(error)
+        throw error
+       }
+       
+        
     }
-    public async deleteOtp(email:string){
-        const response=await this.baseOtpRepository.deleteOtp(email)
-        return response
+    public async deleteOtp(email:string): Promise<Iotp | null>{
+       
+       try {
+           const response=await this.baseOtpRepository.deleteOtp(email)
+           return response
+        
+       } catch (error) {
+        console.log(error)
+        throw error
+       }
     }
 }

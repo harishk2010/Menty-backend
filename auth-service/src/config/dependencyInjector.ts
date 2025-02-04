@@ -1,42 +1,44 @@
-import { IVerificationService } from "../services/verification/IVerificationService"
-import { IVerificationControllers } from "../controllers/verification/controllers/IVerificationControllers"
-import { VerificationContoller } from "../controllers/verification/controllers/verificationControllers"
-import { VerificationService } from "../services/verification/verificationService"
-import { IVerificationRepository } from "../repostories/verification/IVerificationRepository"
-import { VerificationRepository } from "../repostories/verification/verificationRepository"
-import { IVerificationBaseRepository } from "../repostories/baseRepository/verification/IVerificationBaseRepository"
-import { VerificationBaseRepository } from "../repostories/baseRepository/verification/verificationBaseRepository"
-import { IInstructorControllers } from "../controllers/instructor/IInstructorController"
-import { InstructorController } from "../controllers/instructor/instructorController"
-import { IInstructorService } from "../services/instructor/IInstructorService"
-import { InstructorServices } from "../services/instructor/instructorServices"
-import { IInstructorRepository } from "../repostories/instructor/IInstructorRepository"
-import { InstructorRepository } from "../repostories/instructor/instructorRepository"
-import { IInstructorBaseRepository } from "../repostories/baseRepository/instructor/IInstructorBaseRepository"
-import { InstructorBaseRepository } from "../repostories/baseRepository/instructor/instructorBaseRepository"
-import { IStudentBaseRepository } from "../repostories/baseRepository/student/IStudentBaseRepository"
-import { StudentBaseRepository } from "../repostories/baseRepository/student/studentBaseRepository"
-import { IStudentRepository } from "../repostories/student/IStudentRepository"
-import { StudentRepository } from "../repostories/student/studentRepository"
-import { IStudentService } from "../services/student/IStudentService"
-import { StudentServices } from "../services/student/studentServices"
-import { IStudentControllers } from "../controllers/student/IStudentController"
-import { StudentController } from "../controllers/student/studentController"
+import  IInstructorControllers  from "../controllers/interfaces/IInstructorController"
+import { InstructorController } from "../controllers/instructorController"
+import  IInstructorService  from "../services/interfaces/IIntstuctorServices"
+import { InstructorServices } from "../services/instructorServices"
+import  IInstructorRepository from "../repositories/interfaces/IInstructorRepository"
+import { InstructorRepository } from "../repositories/instructorRepository"
+import  IInstructorBaseRepository  from "../repositories/baseRepositories/interfaces/IInstructorBaseRepository"
+import  InstructorBaseRepository  from "../repositories/baseRepositories/instructorBaseRepository"
+import  IStudentBaseRepository  from "../repositories/baseRepositories/interfaces/IStudentBaseRepository"
+import  StudentBaseRepository  from "../repositories/baseRepositories/studentBaseRepository"
+import  IStudentRepository  from "../repositories/interfaces/IStudentRepository"
+import  {StudentRepository}  from "../repositories/studentRepository"
+import  IStudentService  from "../repositories/interfaces/IStudentRepository"
+import { StudentServices } from "../services/studentServices"
+import  IStudentControllers  from "../controllers/interfaces/IStudentControllers"
+import { StudentController } from "../controllers/studentController"
+import IOtpBaseRepository from "../repositories/baseRepositories/interfaces/IOtpBaseRepository"
+import { OtpRespository } from "../repositories/otpRespository"
+import IOtpRepository from "../repositories/interfaces/IOtpRespoitory"
+import BaseOtpRepository from "../repositories/baseRepositories/baseOtpRepository"
+import {  OtpService } from "../services/otpService"
+import IOtpServices from "../services/interfaces/IOtpService"
+import { IAdminControllers } from "@/controllers/interfaces/IAdminControllers"
+import { AdminController } from "../controllers/adminController"
 
-const verificationBaseRepository:IVerificationBaseRepository=new VerificationBaseRepository()
-const verificationRepository:IVerificationRepository=new VerificationRepository(verificationBaseRepository)
-const verificationService:IVerificationService=new VerificationService(verificationRepository)
-const  verificationController:IVerificationControllers=new VerificationContoller(verificationService)
+
+const baseOtpRepository:IOtpBaseRepository=new BaseOtpRepository()
+const otpRespository:IOtpRepository=new OtpRespository(baseOtpRepository)
+const otpService:IOtpServices=new OtpService(otpRespository)
 
 const instructorBaseRepository:IInstructorBaseRepository=new InstructorBaseRepository()
 const instructorRepository:IInstructorRepository=new InstructorRepository(instructorBaseRepository)
 const instructorService:IInstructorService=new InstructorServices(instructorRepository)
-const instructorController:IInstructorControllers=new InstructorController(instructorService)
+const instructorController:IInstructorControllers=new InstructorController(instructorService,otpService)
 
 
 const studentBaseRepository:IStudentBaseRepository=new StudentBaseRepository()
 const studentRepository:IStudentRepository=new StudentRepository(studentBaseRepository)
 const studentService:IStudentService=new StudentServices(studentRepository)
-const studentController:IStudentControllers=new StudentController(studentService)
+const studentController:IStudentControllers=new StudentController(studentService,otpService)
 
-export { verificationController,instructorController,studentController}
+
+const adminController:IAdminControllers=new AdminController()
+export { instructorController,studentController ,adminController}

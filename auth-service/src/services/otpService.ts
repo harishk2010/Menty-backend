@@ -1,23 +1,43 @@
-import { otpRespository } from "../repositories/otpRespository"
+import IOtpRepository from "@/repositories/interfaces/IOtpRespoitory"
+import IOtpServices from "./interfaces/IOtpService"
 
-export class otpService{
-    private otpRespository:otpRespository
-    constructor(){
-        this.otpRespository=new otpRespository()
+export class OtpService implements IOtpServices{
+    private otpRespository:IOtpRepository
+    constructor(otpRespository:IOtpRepository){
+        this.otpRespository=otpRespository
 
     }
     public async createOtp(email:string,otp:string){
-        const response= await this.otpRespository.createOtp(email,otp)
-        return response
+        try {
+            const response= await this.otpRespository.createOtp(email,otp)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 
     public async findOtp(email:string){
-        const response=await this.otpRespository.findOtp(email)
-        return response
+        try {
+            
+            const response=await this.otpRespository.findOtp(email)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 
     public async deleteOtp(email:string){
-        const response=await this.otpRespository.deleteOtp(email)
-        return response
+        try {
+            
+            const response=await this.otpRespository.deleteOtp(email)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        }
     }
 }

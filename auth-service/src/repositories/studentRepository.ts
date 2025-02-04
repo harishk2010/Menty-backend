@@ -1,13 +1,12 @@
-import { NextFunction } from "express";
+import { IUser } from "../models/userModel";
+import IStudentRepository from "./interfaces/IStudentRepository";
+import IStudentBaseRepository from "./baseRepositories/interfaces/IStudentBaseRepository";
 
-import StudentBaseRepository from "./baseRepositories/studentBaseRepository";
-import UserModel,{ IUser } from "../models/userModel";
 
-
-export class StudentRepository{
-    private baseRepository:StudentBaseRepository<IUser>
-    constructor(){
-        this.baseRepository=new StudentBaseRepository(UserModel)
+export class StudentRepository implements IStudentRepository{
+    private baseRepository:IStudentBaseRepository
+    constructor(baseRepository:IStudentBaseRepository){
+        this.baseRepository=baseRepository
 
     }
     
@@ -25,7 +24,7 @@ export class StudentRepository{
         const response= await this.baseRepository.resetPassword(email,password)
         return response
     }
-    public async googleLogin(name: string, email: string, password: string): Promise<object | void> {
+    public async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
         try {
             const response = await this.baseRepository.googleLogin(name, email, password);
             return response;
@@ -33,7 +32,7 @@ export class StudentRepository{
             throw error;
         }
     }
-    public async updateProfile(email:string,data:any): Promise<any> {
+    public async updateProfile(email:string,data:any): Promise<IUser | null> {
         try {
             const response = await this.baseRepository.updateProfile(email,data);
             return response;

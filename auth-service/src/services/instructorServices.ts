@@ -1,31 +1,51 @@
+import IInstructorRepository from "@/repositories/interfaces/IInstructorRepository"
 import { IInstructor } from "../models/instructorModel"
 import { InstructorRepository } from "../repositories/instructorRepository"
+import IInstructorServices from "./interfaces/IIntstuctorServices"
 
-export class InstructorServices{
+export class InstructorServices implements IInstructorServices{
 
-    private instructorRepository:InstructorRepository
+    private instructorRepository:IInstructorRepository
 
-    constructor(){
-        this.instructorRepository=new InstructorRepository()
+    constructor(instructorRepository:IInstructorRepository){
+        this.instructorRepository=instructorRepository
 
     }
     
-    public async findByEmail(email:string){
-        const response=await this.instructorRepository.findByEmail(email)
-        return response
+    public async findByEmail(email:string): Promise<IInstructor | null>{
+        try {
+            const response=await this.instructorRepository.findByEmail(email)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 
 
-    public async createUser(userData:any){
-        const response=await this.instructorRepository.createUser(userData)
-        return response
+    public async createUser(userData:any): Promise<IInstructor | null>{
+        try {
+            
+            const response=await this.instructorRepository.createUser(userData)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
-    public async resetPassword(email:string,password:string){
-        const response=await this.instructorRepository.resetPassword(email,password)
-        return response
+    public async resetPassword(email:string,password:string): Promise<IInstructor | null>{
+        try {
+            const response=await this.instructorRepository.resetPassword(email,password)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
     
-    public async googleLogin(name: string, email: string, password: string): Promise<object | void> {
+    public async googleLogin(name: string, email: string, password: string): Promise<IInstructor | null> {
         try {
             const response = await this.instructorRepository.googleLogin(name, email, password);
             return response;
@@ -33,7 +53,7 @@ export class InstructorServices{
             throw error;
         }
     }
-    public async updateProfile(email:string,data:any): Promise<object | void> {
+    public async updateProfile(email:string,data:any): Promise<IInstructor | null> {
         try {
             const response = await this.instructorRepository.updateProfile(email,data);
             return response;

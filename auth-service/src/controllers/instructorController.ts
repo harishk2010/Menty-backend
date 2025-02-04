@@ -2,37 +2,34 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { InstructorServices } from "../services/instructorServices";
 import { OtpGenerate } from "../utils/otpGenerator";
-import { otpService } from "../services/otpService";
-import { SentEmail } from "../utils/senEmail";
 import { JwtService } from "../utils/jwt";
 import { IInstructor } from "../models/instructorModel";
 import {
   access_token_options,
   refresh_token_options,
 } from "../utils/tokenOptions";
-import { SentForgotEmail } from "../utils/sendForgotPasswordEmail";
 import { NextFunction } from "http-proxy-middleware/dist/types";
 import produce from "../config/kafka/producer";
+import IInstructorControllers from "./interfaces/IInstructorController";
+import IInstructorServices from "../services/interfaces/IIntstuctorServices";
+import IOtpServices from "../services/interfaces/IOtpService";
 // import  from '../utils/jwt'
 
-export class InstructorController {
-  private instructorService: InstructorServices;
-  private otpService: otpService;
+export class InstructorController implements IInstructorControllers{
+  private instructorService: IInstructorServices;
+  private otpService: IOtpServices;
   private otpGenerator: OtpGenerate;
-  private sendEmail: SentEmail;
   private JWT: JwtService;
-  private SentForgotEmail:SentForgotEmail
 
-  constructor() {
-    this.instructorService = new InstructorServices();
-    this.otpService = new otpService();
+  constructor(instructorService: IInstructorServices,otpService: IOtpServices) {
+    this.instructorService = instructorService
+    this.otpService = otpService;
     this.otpGenerator = new OtpGenerate();
-    this.sendEmail = new SentEmail();
-    this.SentForgotEmail=new SentForgotEmail()
+
     this.JWT = new JwtService();
   }
 
-  public async instructorSignUp(req: Request, res: Response): Promise<any> {
+  public async instructorSignUp(req: Request, res: Response): Promise<void> {
     try {
       let { email, password ,username } = req.body;
       console.log(email, password);
@@ -48,11 +45,12 @@ export class InstructorController {
       console.log(ExistingInstructor, "ExistingInstructor");
 
       if (ExistingInstructor) {
-        return res.json({
+         res.json({
           success: false,
           message: "Existing user",
           user: ExistingInstructor,
         });
+        return
         
       } else {
         const otp = await this.otpGenerator.createOtpDigit();
@@ -73,11 +71,12 @@ export class InstructorController {
         //     sameSite: 'none',
         //     expires: new Date(Date.now() + 300 * 60 * 1000)
         // })
-        return res.status(201).json({
+         res.status(201).json({
           success: true,
           message: "Signup successful, OTP sent to email",
           token,
         });
+        return
         // const token=await this.instructorService.signUp({email,password})
         // return res.status(200).json({
         //   success:true
@@ -85,7 +84,7 @@ export class InstructorController {
       }
     } catch (error: any) {
       console.error(error);
-      return res.status(500).json({
+       res.status(500).json({
         success: false,
         message: "Internal Server Error",
         error: error.message,
@@ -93,7 +92,7 @@ export class InstructorController {
     }
   }
  
-  public async resendOtp(req: Request, res: Response): Promise<any> {
+  public async resendOtp(req: Request, res: Response): Promise<void> {
     try {
       let { email ,username} = req.body;
       console.log(email, "emaillllll");
@@ -113,7 +112,7 @@ export class InstructorController {
     }
   }
 
-  public async createUser(req: Request, res: Response): Promise<any> {
+  public async createUser(req: Request, res: Response): Promise<void> {
     try {
       const { otp } = req.body;
       console.log(req.headers, "headersssss");
@@ -125,7 +124,7 @@ export class InstructorController {
       const decode = await this.JWT.verifyToken(token);
       console.log(decode, "decode");
       if (!decode) {
-        return new Error("token has expired, register again");
+        throw new Error("token has expired, register again");
       }
       const resultOtp = await this.otpService.findOtp(decode.email);
       console.log(resultOtp?.otp, "<>", otp);
@@ -137,29 +136,32 @@ export class InstructorController {
           await produce("add-instructor", user);
           await this.otpService.deleteOtp(user.email);
 
-          return res.status(201).json({
+           res.status(201).json({
             success: true,
             message: "User Created Succesfully!",
             user,
           });
+          return
         }
       } else {
-        return res.json({
+         res.json({
           success: false,
           message: "Wrong Otp",
         });
+        return
       }
     } catch (error: any) {
       console.error(error);
-      return res.status(500).json({
+       res.status(500).json({
         success: false,
         message: "Internal Server Error",
         error: error.message,
       });
+      
     }
   }
 
-  public async login(req: Request, res: Response): Promise<any> {
+  public async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       console.log("Login request:", email);
@@ -169,10 +171,11 @@ export class InstructorController {
       console.log(instructor, "instructor");
 
       if (!instructor) {
-        return res.json({
+         res.json({
           success: false,
           message: "invalid email id",
         });
+        return
       }
 
       // Compare the password with the hashed password in the database
@@ -183,16 +186,18 @@ export class InstructorController {
       
 
       if (!isPasswordValid) {
-        return res.json({
+         res.json({
           success: false,
           message: "Invalid Password",
         });
+        return
       }
       if(instructor.isBlocked){
-        return res.json({
+         res.json({
          success:false,
          message:"instructor Blocked"
        })
+       return
        
      }
       let role = instructor.role;
@@ -201,7 +206,7 @@ export class InstructorController {
       const refreshToken = await this.JWT.refreshToken({ email, role });
 
       // Return the token in the response
-      return (
+       
         res
           .status(200)
           .cookie("accessToken", accesstoken,{ httpOnly: true })
@@ -215,10 +220,10 @@ export class InstructorController {
             user: instructor,
             token:{accesstoken,refreshToken}
           })
-      );
+      
     } catch (error: any) {
       console.error(error);
-      return res.status(500).json({
+       res.status(500).json({
         success: false,
         message: "Internal Server Error",
         error: error.message,
@@ -296,7 +301,7 @@ export class InstructorController {
   }
 
   
-  public async forgotResendOtp(req: Request, res: Response): Promise<any> {
+  public async forgotResendOtp(req: Request, res: Response): Promise<void> {
     try {
       let { email } = req.body;
       console.log(email, "emaillllll");
@@ -312,7 +317,7 @@ export class InstructorController {
       });
     } catch (error: any) {
       console.error(error);
-      return res.status(500).json({
+       res.status(500).json({
         success: false,
         message: "Internal Server Error",
         error: error.message,
@@ -320,7 +325,7 @@ export class InstructorController {
     }
   }
 
-  async resetPassword(req:Request,res:Response){
+  async resetPassword(req:Request,res:Response):Promise<void>{
     try {
       const { password }=req.body
       const hashedPassword= await bcrypt.hash(password,10)
@@ -431,7 +436,7 @@ export class InstructorController {
         throw error;
     }
 }
-async updatePassword(data: { email: string; password: string }) {
+async updatePassword(data: { email: string; password: string }): Promise<IInstructor | null> {
   try {
     console.log(data.email, data.password, "consumeeeeee");
     const passwordReset = await this.instructorService.resetPassword(
@@ -441,25 +446,30 @@ async updatePassword(data: { email: string; password: string }) {
     return passwordReset;
   } catch (error) {
     console.log(error);
+    throw error
   }
 }
 
-async updateProfile(data: any) {
+async updateProfile(data: { email: string; username: string ,profilePicUrl:string }): Promise<IInstructor | null> {
   try {
     const { email ,username, profilePicUrl} = data;
     console.log(data, "consumeeee");
     const response=await this.instructorService.updateProfile(email,{username, profilePicUrl})
+ return response
   } catch (error) {
-    console.log(error);
+    console.log(error)
+    throw error
   }
 }
 
-async blockInstructor(data:any){
+async blockInstructor(data:{email:string,isBlocked:string}): Promise<IInstructor | null>{
   try {
     const {email,isBlocked}=data
     const response=await this.instructorService.updateProfile(email,{isBlocked})
+ return response
   } catch (error) {
     console.log(error)
+    throw error
   }
 }
   

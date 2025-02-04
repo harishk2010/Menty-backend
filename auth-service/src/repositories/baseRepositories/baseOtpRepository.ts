@@ -1,14 +1,10 @@
 import { Iotp } from "../../interface/otp";
 import otpModel from "../../models/otpModel";
 import { Document, Model } from "mongoose";
+import IOtpBaseRepository from "./interfaces/IOtpBaseRepository";
 
-export default class baseOtpRepository<T extends Document> {
-  private model: Model<T>;
-
-  constructor(model: Model<T>) {
-    this.model = model;
-  }
-
+export default class BaseOtpRepository implements IOtpBaseRepository {
+ 
   async saveOtp(email: string, otp: string): Promise<Iotp | null> {
     try {
       const output = await otpModel.findOneAndUpdate(

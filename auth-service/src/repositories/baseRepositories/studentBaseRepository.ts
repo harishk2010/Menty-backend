@@ -2,12 +2,9 @@ import { NextFunction } from "http-proxy-middleware/dist/types";
 import { Document, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import UserModel, { IUser } from "../../models/userModel";
-export default class StudentBaseRepository<T extends Document> {
-  private model: Model<T>;
-
-  constructor(model: Model<T>) {
-    this.model = model;
-  }
+import IStudentBaseRepository from "./interfaces/IStudentBaseRepository";
+export default class StudentBaseRepository implements IStudentBaseRepository {
+ 
 
   async findByEmail(email: string): Promise<IUser | null> {
     console.log("student");
@@ -19,7 +16,8 @@ export default class StudentBaseRepository<T extends Document> {
       await user.save();
       return user;
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw error
     }
   }
 
@@ -33,7 +31,8 @@ export default class StudentBaseRepository<T extends Document> {
 
       return updatedUser;
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw error
     }
   }
 
@@ -41,7 +40,7 @@ export default class StudentBaseRepository<T extends Document> {
     name: string,
     email: string,
     password: string
-  ): Promise<IUser | void> {
+  ): Promise<IUser | null> {
     try {
       const user = await this.findByEmail(email);
 
@@ -76,11 +75,12 @@ export default class StudentBaseRepository<T extends Document> {
       // Return the existing user if not blocked
       return user;
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw error
     }
   }
 
-  async updateProfile(email:string,data: any) {
+  async updateProfile(email:string,data: any): Promise<IUser | null> {
     try {
       
       const response = await UserModel.findOneAndUpdate(
@@ -98,6 +98,7 @@ export default class StudentBaseRepository<T extends Document> {
       return response
     } catch (error) {
       console.log(error);
+      throw error
     }
   }
 }

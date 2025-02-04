@@ -1,10 +1,10 @@
 import  authenticateToken  from "../middlewares/AuthenticatedRoutes";
-import { InstructorController } from "../controllers/instructorController";
+import { instructorController } from "../config/dependencyInjector";
 import { Router } from "express";
 import { isInstructor } from "../middlewares/roleAuth";
 
 let router=Router()
-let instructorController=new InstructorController()
+
 
 router.post('/register',instructorController.instructorSignUp.bind(instructorController))
 router.post('/resendOtp',instructorController.resendOtp.bind(instructorController))

@@ -1,34 +1,28 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { StudentServices } from "../services/studentServices";
 import { OtpGenerate } from "../utils/otpGenerator";
-import { otpService } from "../services/otpService";
-import { SentEmail } from "../utils/senEmail";
 import { JwtService } from "../utils/jwt";
 import { IUser } from "@/models/userModel";
-import {
-  access_token_options,
-  refresh_token_options,
-} from "../utils/tokenOptions";
-import { SentForgotEmail } from "../utils/sendForgotPasswordEmail";
-import { NextFunction } from "http-proxy-middleware/dist/types";
 import produce from "../config/kafka/producer";
+import IStudentServices from "../services/interfaces/IStudentServices";
+import IStudentControllers from "./interfaces/IStudentControllers";
+import IOtpServices from "@/services/interfaces/IOtpService";
 // import  from '../utils/jwt'
 
-export class StudentController {
-  private studentService: StudentServices;
-  private otpService: otpService;
-  private otpGenerator: OtpGenerate;
-  private sendEmail: SentEmail;
-  private JWT: JwtService;
-  private SentForgotEmail: SentForgotEmail;
+export class StudentController implements IStudentControllers{
+  private studentService: IStudentServices;
+  private otpService: IOtpServices;
 
-  constructor() {
-    this.studentService = new StudentServices();
-    this.otpService = new otpService();
+  private otpGenerator: OtpGenerate;
+  private JWT: JwtService;
+
+
+  constructor(studentService: IStudentServices,otpService: IOtpServices) {
+    this.studentService=studentService  
+    this.otpService = otpService;
+
     this.otpGenerator = new OtpGenerate();
-    this.sendEmail = new SentEmail();
-    this.SentForgotEmail = new SentForgotEmail();
+
     this.JWT = new JwtService();
   }
 
@@ -218,7 +212,7 @@ export class StudentController {
       throw error;
     }
   }
-  async verifyEmail(req: Request, res: Response) {
+  async verifyEmail(req: Request, res: Response):Promise<void> {
     try {
       const { email } = req.body;
       let existingUser = await this.studentService.findByEmail(email);
@@ -400,7 +394,7 @@ export class StudentController {
   }
 
   //consumed kafka codes
-  async updatePassword(data: { email: string; password: string }) {
+  async updatePassword(data: { email: string; password: string }): Promise<IUser | null> {
     try {
       console.log(data.email, data.password, "consumeeeeee");
       const passwordReset = await this.studentService.resetPassword(
@@ -410,25 +404,30 @@ export class StudentController {
       return passwordReset;
     } catch (error) {
       console.log(error);
+      throw error
     }
   }
 
-  async updateProfile(data: any) {
+  async updateProfile(data:{ email: string; username: string ,profilePicUrl:string }): Promise<IUser | null> {
     try {
       const { email ,username, profilePicUrl} = data;
       console.log(data, "consumeeee");
       const response=await this.studentService.updateProfile(email,{username, profilePicUrl})
+      return response
     } catch (error) {
       console.log(error);
+      throw error
     }
   }
 
-  async blockStudent(data:any){
+  async blockStudent(data:{email:string,isBlocked:string}): Promise<IUser | null>{
     try {
       const {email,isBlocked}=data
       const response=await this.studentService.updateProfile(email,{isBlocked})
+  return response
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      throw error
     }
   }
 }

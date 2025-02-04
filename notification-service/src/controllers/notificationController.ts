@@ -1,8 +1,9 @@
 import { SendForgotEmail } from "../utils/sendForgotPasswordEmail";
 import { SendEmail } from "../utils/sendOtpEmail";
 import {SendVerifiedEmail} from "../utils/verifiedEmail"
+import INotificationControllers from "./INotificationControllers";
 
-export class NotificationControllers {
+export class NotificationControllers implements INotificationControllers {
   private sendEmail: SendEmail;
   private sendForgotPasswordEmail: SendForgotEmail;
   private sendVerifiedEmail:SendVerifiedEmail
@@ -12,7 +13,7 @@ export class NotificationControllers {
     this.sendVerifiedEmail=new SendVerifiedEmail()
   }
 
-  async sendOtpEmail(data: { email: string; name: string; otp: string }) {
+  async sendOtpEmail(data: { email: string; name: string; otp: string }):Promise<void> {
     try {
       const { name, email, otp } = data;
 
@@ -22,7 +23,7 @@ export class NotificationControllers {
       console.log(error);
     }
   }
-  async sendForgotEmail(data: { email: string; otp: string }) {
+  async sendForgotEmail(data: { email: string; otp: string }):Promise<void> {
     try {
       const { email, otp } = data;
       await this.sendForgotPasswordEmail.sendEmailVerification(email, otp);
@@ -31,7 +32,7 @@ export class NotificationControllers {
       console.log(error);
     }
   }
-  async sendVerifiedInstructorEmail(data: { email: string; username: string }) {
+  async sendVerifiedInstructorEmail(data: { email: string; username: string }):Promise<void> {
     try {
       const { email,username } = data;
       console.log(email,username,"mail>>>")

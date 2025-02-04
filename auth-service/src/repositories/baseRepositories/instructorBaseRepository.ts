@@ -3,16 +3,19 @@ import { NextFunction } from "http-proxy-middleware/dist/types"
 import InstructorModel, { IInstructor } from "../../models/instructorModel"
 import { Document , Model } from "mongoose"
 import bcrypt from "bcrypt";
-export default class InstructorBaseRepository<T extends Document>{
-    private model:Model<T>
-
-    constructor(model:Model<T>){
-        this.model=model
-
-    }
+import IInstructorBaseRepository from "./interfaces/IInstructorBaseRepository";
+export default class InstructorBaseRepository implements IInstructorBaseRepository{
+    
     
     async findByEmail(email:string):Promise<IInstructor|null >{
-        return await this.model.findOne({email:email})
+        try {
+            
+            return await InstructorModel.findOne({email:email})
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        }
     }
     async createInstructor(userData:any):Promise<IInstructor |null>{
         try {
@@ -20,6 +23,7 @@ export default class InstructorBaseRepository<T extends Document>{
             await user.save()
             return user
         } catch (error) {
+            console.log(error);
             throw error
             
         }
@@ -37,6 +41,7 @@ export default class InstructorBaseRepository<T extends Document>{
         
               return updatedUser;
         } catch (error) {
+            console.log(error);
             throw error
             
         }
@@ -48,7 +53,7 @@ export default class InstructorBaseRepository<T extends Document>{
         email: string,
         password: string,
         
-    ): Promise<IInstructor | void> {
+    ): Promise<IInstructor | null> {
         try {
             const user = await this.findByEmail(email);
     
@@ -83,10 +88,11 @@ export default class InstructorBaseRepository<T extends Document>{
             // Return the existing user if not blocked
             return user;
         } catch (error) {
-            throw (error);
+            console.log(error);
+            throw error
         }
     }
-    async updateProfile(email:string,data: any) {
+    async updateProfile(email:string,data: any): Promise<IInstructor | null> {
         try {
           
           const response = await InstructorModel.findOneAndUpdate(
@@ -104,6 +110,7 @@ export default class InstructorBaseRepository<T extends Document>{
           return response
         } catch (error) {
           console.log(error);
+          throw error
         }
       }
     
