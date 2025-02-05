@@ -3,7 +3,7 @@ import kafka from "./kafkaConfig";
 async function consume() {
   // const studentController = new StudentController();
   // const instructorController=new InstructorController()
-  const consumer = kafka.consumer({ groupId: "user-service" });
+  const consumer = kafka.consumer({ groupId: "admin-service" });
 
   try {
     console.log("Connecting to User-Service Consumer...");
@@ -11,15 +11,15 @@ async function consume() {
 
     await consumer.subscribe({
       topics: [
-        "add-student",
-        "password-reset-student",
-        "add-instructor",
-        "password-reset-instructor",
+        // "add-student",
+        // "password-reset-student",
+        // "add-instructor",
+        // "password-reset-instructor",
       ],
       fromBeginning: true,
     });
 
-    console.log("User-Service Consumer is running...");
+    console.log("Admin-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {

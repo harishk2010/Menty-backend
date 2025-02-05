@@ -1,18 +1,17 @@
-import express,{Application , Request ,Response} from "express"
+import express,{Application , NextFunction, Request ,Response} from "express"
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import connectDB from "./config/db";
 import cors from 'cors'
 
 import consume from "./config/kafka/consumer";
-import verificationRoutes from "./routes/mentorshipRoutes";
-
+import categoryRoutes from "./routes/categoryRoutes";
 
 config()
 
 
 let app:Application=express()
-const PORT:number=Number(process.env.port)||5002
+const PORT:number=Number(process.env.port)||5004
 
 const corsOptions = {
     origin: String(process.env.FRONTEND_URL),
@@ -26,8 +25,13 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-app.use('/',verificationRoutes)
+app.use('/category',categoryRoutes)
 consume()
+app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
+    console.error("Error:", err.message);
+    
+    res.status(500).json({ error: "Internal Server Error" });
+});
 
 
 app.use((req, res, next) => {

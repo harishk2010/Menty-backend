@@ -1,7 +1,7 @@
 import { Kafka } from "kafkajs";
 
 const kafka=new Kafka({
-    clientId:"verification-service",
+    clientId:"admin-service",
     brokers:['localhost:9092'],
     retry: {
         retries: 5, // Number of retry attempts

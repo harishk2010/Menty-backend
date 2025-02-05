@@ -10,9 +10,9 @@ config();
 
 const app: Application = express();
 
-const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , VERIFICATION_URL ,NOTIFICATION_URL} = process.env;
+const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL} = process.env;
 
-console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,NOTIFICATION_URL , VERIFICATION_URL});
+console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,NOTIFICATION_URL , ADMIN_URL});
 
 const corsOptions = {
     credentials: true,
@@ -26,16 +26,20 @@ app.use(cors(corsOptions));
 
 const services = [
     {
-        path: AUTH_URL, // Target service URL
-        context: "/auth", // Route on your gateway
+        path: AUTH_URL, 
+        context: "/auth", 
     },
     {
-        path: USER_URL, // Target service URL
-        context: "/user", // Route on your gateway
+        path: USER_URL, 
+        context: "/user", 
     },
     {
-        path: NOTIFICATION_URL, // Target service URL
-        context: "/notification", // Route on your gateway
+        path: NOTIFICATION_URL, 
+        context: "/notification", 
+    },
+    {
+        path: ADMIN_URL, 
+        context: "/admin", 
     },
     
 ];
