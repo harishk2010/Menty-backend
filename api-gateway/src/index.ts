@@ -10,9 +10,9 @@ config();
 
 const app: Application = express();
 
-const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL} = process.env;
+const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL,COURSE_URL} = process.env;
 
-console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,NOTIFICATION_URL , ADMIN_URL});
+console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,COURSE_URL ,NOTIFICATION_URL , ADMIN_URL});
 
 const corsOptions = {
     credentials: true,
@@ -40,6 +40,10 @@ const services = [
     {
         path: ADMIN_URL, 
         context: "/admin", 
+    },
+    {
+        path: COURSE_URL, 
+        context: "/course", 
     },
     
 ];
