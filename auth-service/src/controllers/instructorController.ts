@@ -201,9 +201,10 @@ export class InstructorController implements IInstructorControllers{
        
      }
       let role = instructor.role;
+      let id = instructor._id;
       // Generate a JWT token if credentials are correct
-      const accesstoken = await this.JWT.accessToken({ email, role });
-      const refreshToken = await this.JWT.refreshToken({ email, role });
+      const accesstoken = await this.JWT.accessToken({ email, role ,id });
+      const refreshToken = await this.JWT.refreshToken({ email, role ,id});
 
       // Return the token in the response
        
@@ -384,8 +385,9 @@ export class InstructorController implements IInstructorControllers{
           await produce("add-instructor", user);
           console.log(user.token, "User token");
           const role=user.role
-          const accesstoken = await this.JWT.accessToken({ email, role });
-          const refreshToken = await this.JWT.refreshToken({ email, role });
+          let id = user._id;
+          const accesstoken = await this.JWT.accessToken({ email, role, id });
+          const refreshToken = await this.JWT.refreshToken({ email, role, id });
           console.log(accesstoken,"-----",refreshToken)
           
           

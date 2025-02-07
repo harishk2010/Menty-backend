@@ -10,7 +10,11 @@ router.route('/addCourse')
             { name: "demoVideos", maxCount: 1 },
             { name: "thumbnail", maxCount: 1 },
           ]),courseController.addCourse.bind(courseController))
+router.route('/courses')
+.get(courseController.getAllCourses.bind(courseController))
 
+router.route('/course/:id')
+.get(courseController.getCourseById.bind(courseController))
 
 const courseRoutes = router;
 export default courseRoutes;
