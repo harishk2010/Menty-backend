@@ -4,6 +4,7 @@ import { updateRequestType } from "../../Types/updateRequestType";
 
 export interface ICourseBaseRepository{
     createCourse(courseData: ICourse): Promise<ICourse>
+    updateCourseByCourseId(courseId:string,courseData: ICourse): Promise<ICourse | null>
     getAllCourses(): Promise<ICourse[]>
     getCourseById(id: string): Promise<ICourse | null>
 }

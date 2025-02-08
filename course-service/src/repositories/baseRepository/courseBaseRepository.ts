@@ -8,6 +8,10 @@ export class CourseBaseRepository implements ICourseBaseRepository{
         const course = new CourseModel(courseData);
         return await course.save();
       }
+     async updateCourseByCourseId(courseId:string,courseData:ICourse):Promise<ICourse | null>{
+      const course= await CourseModel.findByIdAndUpdate(courseId,courseData,{new:true})
+      return course
+     }
     
       // Get all courses
       async getAllCourses(): Promise<ICourse[]> {

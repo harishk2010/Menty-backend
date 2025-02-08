@@ -13,6 +13,10 @@ export class CourseRepository implements ICourseRepository {
         return await this.courseBaseRepository.createCourse(courseData);
       }
     
+    async  updateCourse(courseId:string,courseData: ICourse): Promise<ICourse | null> {
+        return await this.courseBaseRepository.updateCourseByCourseId(courseId,courseData);
+      }
+    
       // Get all courses
       async getAllCourses(): Promise<ICourse[]> {
         return await this.courseBaseRepository.getAllCourses();
