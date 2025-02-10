@@ -7,6 +7,7 @@ import cors from 'cors'
 import consume from "./config/kafka/consumer";
 
 import courseRoutes from "./routes/courseRoutes";
+import chapterRoutes from "./routes/chapterRoutes";
 
 config()
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use('/course',courseRoutes)
+app.use('/chapter',chapterRoutes)
 consume()
 app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
     console.error("Error:", err.message);

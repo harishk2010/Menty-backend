@@ -13,7 +13,17 @@ const s3 = new S3Client({
     secretAccessKey: process.env.BUCKET_SECERET_ACCESS_KEY!,
   },
 });
-
+const getFolderName = (fieldname: string) => {
+  let name;
+  if (fieldname == "thumbnail") {
+    name = "thumbnail";
+  } else if (fieldname == "demoVideos") {
+    name = "demoVideos";
+  } else {
+    name = "chapterVideo";
+  }
+  return name;
+};
 // ✅ Use `multer-s3` for direct S3 uploads
 const upload = multer({
   storage: multerS3({
@@ -21,9 +31,9 @@ const upload = multer({
     bucket: process.env.BUCKET_NAME!,
     // acl: "public-read",
     contentType: multerS3.AUTO_CONTENT_TYPE,
-    key: (req, file, cb) => {
-      
-      const folder = file.fieldname === "thumbnail" ? "thumbnails" : "demoVideos";
+    key: async (req, file, cb) => {
+      const folder = await getFolderName(file.fieldname);
+
       cb(null, `${folder}/${Date.now()}_${file.originalname}`);
     },
   }),
