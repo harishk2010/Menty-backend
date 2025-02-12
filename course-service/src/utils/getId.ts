@@ -15,9 +15,9 @@ const getId = (token: string, req: CustomRequest): string | null => {
     try {
         
         const accessToken = req.cookies['accessToken']
-        console.log('acc', accessToken)
+        // console.log('acc', accessToken)
         const decodedData: any = jwt.decode(accessToken)
-        console.log(decodedData)
+        // console.log(decodedData)
         const { id } = decodedData
         return id
     } catch (error) {

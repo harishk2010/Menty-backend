@@ -24,10 +24,19 @@ router.route("/updateCourse/:courseId").post(
 router
   .route("/courses")
   .get(courseController.getAllCourses.bind(courseController));
+router
+  .route("/payment")
+  .post(courseController.buyCourse.bind(courseController));
 
 router
   .route("/course/:id")
   .get(courseController.getCourseById.bind(courseController));
+router
+  .route("/boughtCourses/:id")
+  .get(courseController.getBoughtCourses.bind(courseController));
+router
+  .route("/playCourseDetails/:id")
+  .get(courseController.coursePlay.bind(courseController));
 router
   .route("/handlePublish/:id")
   .put(courseController.publishCourse.bind(courseController));

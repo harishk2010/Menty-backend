@@ -7,5 +7,8 @@ export interface ICourseControllers {
     getAllCourses(req:Request,res:Response,next:NextFunction):Promise<void>
     getCourseById(req:Request,res:Response,next:NextFunction):Promise<void>
     publishCourse(req:Request,res:Response,next:NextFunction):Promise<void>
+    buyCourse(req:Request,res:Response,next:NextFunction):Promise<void>
+    getBoughtCourses(req:Request,res:Response,next:NextFunction):Promise<void>
+    coursePlay(req: Request, res: Response):Promise<any>
   
 }
