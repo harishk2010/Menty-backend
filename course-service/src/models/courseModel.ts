@@ -13,7 +13,7 @@ export interface ICourse extends Document {
   courseName: string;
   mentorId: Schema.Types.ObjectId;
   categoryId: Schema.Types.ObjectId;
-  quizzId: Schema.Types.ObjectId;
+  quizId: Schema.Types.ObjectId;
   description: string;
   demoVideo: IDemoVideo[];
   fullVideo?: IFullVideo[];
@@ -38,6 +38,7 @@ const CourseSchema = new Schema<ICourse>(
     courseName: { type: String, required: true },
     mentorId: { type: Schema.Types.ObjectId, required:true, ref: 'Mentors' },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category'},
+    quizId: { type: Schema.Types.ObjectId, ref: 'Quiz'},
     description: { type: String, required: true },
     demoVideo: demoVideoSchema,
     fullVideo: [

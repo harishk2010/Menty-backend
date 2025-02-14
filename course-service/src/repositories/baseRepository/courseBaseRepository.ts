@@ -16,12 +16,11 @@ export class CourseBaseRepository implements ICourseBaseRepository{
       return course
      }
     
-      // Get all courses
+
       async getAllCourses(): Promise<ICourse[]> {
         return await CourseModel.find();
       }
     
-      // Get a single course by ID
       async getCourseById(id: string): Promise<ICourse | null> {
         return await CourseModel.findById(id);
       }
@@ -30,11 +29,7 @@ export class CourseBaseRepository implements ICourseBaseRepository{
       }
       async buyCourse(userId: string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
         try {
-          
 
-         
-      
-          // const savedUser = await boughtCourse.save()
           const courseDetails = await CourseModel.findById(courseId);
 
           const boughtCourse = await PurchasedCourseModel.findOneAndUpdate(
@@ -63,23 +58,20 @@ export class CourseBaseRepository implements ICourseBaseRepository{
 
             const skip = (page - 1) * limit;
 
-            // Fetch the courses with pagination and populate course details
             const response = await PurchasedCourseModel
                 .find({ userId: userId })
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
                 .populate("courseId", "courseName level thumbnailUrl")
-                // .populate("instructorId",'username')
+
                 .exec();
 
                 console.log(response)
-            // Count the total number of courses for the user
+
             const totalCourses = await PurchasedCourseModel.countDocuments({ userId: userId });
 
-           
 
-            // Return the paginated data
             return {
                 courses: response,
                 currentPage: page,
@@ -90,6 +82,33 @@ export class CourseBaseRepository implements ICourseBaseRepository{
             throw error
         }
     }
+    public async chapterVideoEnd(chapterId: string): Promise<any> {
+      try {
+
+          const findChapter = await PurchasedCourseModel.findOne({
+              "completedChapters.chapterId": chapterId
+          }) as unknown as IPurchasedCourse
+
+          if (!findChapter) {
+              return 'Purchased Course not Found'
+          }
+
+          const chapterIndex = findChapter.completedChapters.findIndex((chapter) => chapter.chapterId.toString() === chapterId);
+
+          if (chapterIndex === -1) {
+              return `Chapter Not Found`
+          }
+
+          findChapter.completedChapters[chapterIndex].isCompleted = true
+
+          const updatedChapters = await findChapter.save()
+
+          return updatedChapters
+
+      } catch (error: any) {
+          throw error
+      }
+  }
 
 
 

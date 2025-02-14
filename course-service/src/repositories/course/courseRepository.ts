@@ -49,5 +49,16 @@ export class CourseRepository implements ICourseRepository {
               throw error
           }
       }
+
+      public async chapterVideoEnd(courseId: string): Promise<ICourse | null> {
+        try {
+          const response = await this.courseBaseRepository.chapterVideoEnd(
+            courseId
+          );
+          return response;
+        } catch (error: any) {
+          throw error;
+        }
+      }
     }
 

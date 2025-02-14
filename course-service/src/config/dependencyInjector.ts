@@ -7,7 +7,7 @@ import { CourseRepository } from "../repositories/course/courseRepository"
 import { ICourseBaseRepository } from "../repositories/baseRepository/ICourseBaseRepository"
 import { CourseBaseRepository } from "../repositories/baseRepository/courseBaseRepository"
 import { IChapterControllers } from "../controllers/chapter/IChapterControllers"
-import { ChapterContoller } from "../controllers/chapter/chapterControllers"
+import { ChapterController } from "../controllers/chapter/chapterControllers"
 import { IChapterService } from "../services/chapter/IChapterService"
 import { ChapterService } from "../services/chapter/chapterService"
 import { IChapterRepository } from "../repositories/chapter/IChapterRepository"
@@ -24,6 +24,6 @@ const  courseController:ICourseControllers=new CourseContoller(courseService)
 const chapterBaseRepository:IChapterBaseRepository=new ChapterBaseRepository()
 const chapterRepository:IChapterRepository=new ChapterRepository(chapterBaseRepository)
 const chapterService:IChapterService=new ChapterService(chapterRepository)
-const chapterController:IChapterControllers=new ChapterContoller(chapterService)
+const chapterController:IChapterControllers=new ChapterController(chapterService)
 
 export { courseController,chapterController}

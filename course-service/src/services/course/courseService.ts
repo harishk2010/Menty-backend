@@ -33,22 +33,49 @@ export class CourseService implements ICourseService {
   async getChaptersById(id: string): Promise<IChapter[] | null> {
     return await this.courseRepository.getChapterById(id);
   }
-  async buyCourse(userId: string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
+  async buyCourse(
+    userId: string,
+    courseId: string,
+    completedChapters: any,
+    txnid: string
+  ): Promise<IPurchasedCourse | null> {
     try {
-      return await this.courseRepository.buyCourse(userId,courseId,completedChapters,txnid)
+      return await this.courseRepository.buyCourse(
+        userId,
+        courseId,
+        completedChapters,
+        txnid
+      );
     } catch (error) {
-      console.log(error)
-      throw error
-      
+      console.log(error);
+      throw error;
     }
   }
 
-  public async getBoughtCourses(userId: string, page: number, limit: number): Promise<any> {
+  public async getBoughtCourses(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<any> {
     try {
-        const response = await this.courseRepository.getBoughtCourses(userId, page, limit)
-        return response
+      const response = await this.courseRepository.getBoughtCourses(
+        userId,
+        page,
+        limit
+      );
+      return response;
     } catch (error: any) {
-        throw error
+      throw error;
     }
-}
+  }
+  public async chapterVideoEnd(courseId: string): Promise<ICourse | null> {
+    try {
+      const response = await this.courseRepository.chapterVideoEnd(
+        courseId
+      );
+      return response;
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }

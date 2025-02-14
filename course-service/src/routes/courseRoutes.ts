@@ -40,6 +40,18 @@ router
 router
   .route("/handlePublish/:id")
   .put(courseController.publishCourse.bind(courseController));
+router
+  .route("/chapterCompleted/:chapterId")
+  .put(courseController.chapterVideoEnd.bind(courseController));
+router
+  .route("/addQuiz")
+  .post(courseController.addQuiz.bind(courseController));
+router
+  .route("/editQuiz")
+  .post(courseController.editQuiz.bind(courseController));
+router
+  .route("/getQuiz/:quizId")
+  .get(courseController.getQuiz.bind(courseController));
 
 const courseRoutes = router;
 export default courseRoutes;
