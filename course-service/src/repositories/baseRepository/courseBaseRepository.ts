@@ -4,6 +4,7 @@ import { CourseModel, ICourse } from "../../models/courseModel";
 import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 import getId from "@/utils/getId";
+import mongoose from "mongoose";
 
 export class CourseBaseRepository implements ICourseBaseRepository{
 
@@ -24,20 +25,34 @@ export class CourseBaseRepository implements ICourseBaseRepository{
       async getCourseById(id: string): Promise<ICourse | null> {
         return await CourseModel.findById(id);
       }
+      async getInstructorCourses(instructorId: string): Promise<ICourse[]> {
+        try {
+          const response=await CourseModel.find({mentorId:instructorId})
+          return response
+          
+        } catch (error) {
+          throw error
+        }
+      }
       async getChapterById(id: string): Promise<IChapter[] | null> {
         return await ChapterModel.find({courseId:id});
       }
-      async buyCourse(userId: string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
+      async buyCourse(userId: string,quizId:string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
         try {
+          console.log("==",userId,courseId,completedChapters,txnid)
 
           const courseDetails = await CourseModel.findById(courseId);
+          const userObjectId = new mongoose.Types.ObjectId(userId);
+          const courseObjectId = new mongoose.Types.ObjectId(courseId);
 
           const boughtCourse = await PurchasedCourseModel.findOneAndUpdate(
             { userId, courseId },
+            // { userObjectId, courseObjectId },
             {
               instructorId: courseDetails?.mentorId,
               transactionId: txnid,
               completedChapters,
+              quizId,
               isCourseCompleted: false,
             },{
               upsert:true,
@@ -63,7 +78,7 @@ export class CourseBaseRepository implements ICourseBaseRepository{
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
-                .populate("courseId", "courseName level thumbnailUrl")
+                .populate("courseId", "courseName level thumbnailUrl quizId")
 
                 .exec();
 

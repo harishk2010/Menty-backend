@@ -23,6 +23,14 @@ export class InstructorBaseRepository implements IInstructorBaseRepository{
       throw error;
     }
   }
+  async getInstructorDataById(instructorId: string): Promise<IInstructor | null> {
+    try {
+      const instructorData = await InstructorModel.findById(instructorId);
+      return instructorData;
+    } catch (error) {
+      throw error;
+    }
+  }
   async updateProfile(id: any, data: object): Promise<IInstructor | null> {
     try {
       const instructorData = await InstructorModel.findByIdAndUpdate(id, data, {

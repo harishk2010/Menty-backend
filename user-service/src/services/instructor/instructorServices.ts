@@ -30,6 +30,16 @@ export class InstructorServices implements IInstructorService{
             
         }
     }
+    public async getInstructorDataById(instructorId:string):Promise<IInstructor | null>{
+        try {
+            const response=await this.instructorRepository.getInstructorDataById(instructorId)
+            return response
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        }
+    }
     public async updateProfile(id:string,data:object):Promise<IInstructor | null>{
         try {
             const response=await this.instructorRepository.updateProfile(id,data)

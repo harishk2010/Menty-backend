@@ -10,10 +10,10 @@ import { IInstructorControllers } from "./IInstructorController";
 import { IInstructorService } from "../../services/instructor/IInstructorService";
 import { IInstructor } from "../../models/instructorModel";
 
-export class InstructorController implements IInstructorControllers{
+export class InstructorController implements IInstructorControllers {
   private instructorService: IInstructorService;
-  constructor(instructorService:IInstructorService) {
-    this.instructorService =  instructorService;
+  constructor(instructorService: IInstructorService) {
+    this.instructorService = instructorService;
   }
 
   public async addInstructor(payload: IInstructor): Promise<void> {
@@ -37,34 +37,34 @@ export class InstructorController implements IInstructorControllers{
 
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {
-      const { _id, username, mobile ,expertise,skills} = req.body;
+      const { _id, username, mobile, expertise, skills } = req.body;
       console.log(req.body, "update Instructor Data");
       console.log(req.file, "update Instructor Data");
 
       let profilePicUrl = "No Picture";
       let response;
-      
+
       if (req.file) {
-        console.log("with profile pic")
+        console.log("with profile pic");
         profilePicUrl = await uploadToS3Bucket(req.file, "Instructors");
-        
+
         response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
           profilePicUrl,
         });
       } else {
-        console.log("without profile pic")
+        console.log("without profile pic");
         response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
           expertise,
-          skills
+          skills,
         });
       }
 
       if (response) {
-        await produce("update-profile-instructor",response)
+        await produce("update-profile-instructor", response);
         res.status(200).json({
           success: true,
           message: "Profile Updated!",
@@ -77,8 +77,8 @@ export class InstructorController implements IInstructorControllers{
         });
       }
     } catch (error) {
-      console.log(error)
-      throw error
+      console.log(error);
+      throw error;
     }
   }
 
@@ -105,7 +105,10 @@ export class InstructorController implements IInstructorControllers{
           hashedPassword
         );
         if (response) {
-          await produce("update-password-instructor",{email,password:hashedPassword})
+          await produce("update-password-instructor", {
+            email,
+            password: hashedPassword,
+          });
           res.status(200).json({
             success: true,
             message: "Password Updated",
@@ -127,131 +130,182 @@ export class InstructorController implements IInstructorControllers{
     }
   }
 
-  public async getInstructors(req:Request,res:Response){
+  public async getInstructors(req: Request, res: Response) {
     try {
-    
-      const Instructors=await this.instructorService.getInstructors()
-      console.log(Instructors,"Instructors allll")
-       res.status(200).json({
-        users:Instructors
-      })
+      const Instructors = await this.instructorService.getInstructors();
+      console.log(Instructors, "Instructors allll");
+      res.status(200).json({
+        users: Instructors,
+      });
     } catch (error) {
       console.log(error);
-      
     }
   }
-  public async blockInstructor(req:Request,res:Response){
+  public async blockInstructor(req: Request, res: Response) {
     try {
-      const { email }=req.params
-      console.log(email,"instructorrrrrr")
+      const { email } = req.params;
+      console.log(email, "instructorrrrrr");
 
-      const InstructorData=await this.instructorService.getInstructorData(email)
+      const InstructorData = await this.instructorService.getInstructorData(
+        email
+      );
 
-      if(!InstructorData){
-        throw new Error("No user found")
+      if (!InstructorData) {
+        throw new Error("No user found");
       }
       let id = InstructorData?._id?.toString(); // Ensure id is a string or null
 
       if (!id) {
-          throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing"); // Handle the undefined case
       }
-      const isBlocked=!InstructorData?.isBlocked
+      const isBlocked = !InstructorData?.isBlocked;
 
-      const InstructorStatus=await this.instructorService.updateProfile(id,{isBlocked})
-      await produce("block-instructor",{email,isBlocked})
+      const InstructorStatus = await this.instructorService.updateProfile(id, {
+        isBlocked,
+      });
+      await produce("block-instructor", { email, isBlocked });
 
-      if(InstructorStatus?.isBlocked){
+      if (InstructorStatus?.isBlocked) {
         res.status(200).json({
-          success:true,
-          message:"Instructor Blocked"
-        })
-      }else{
+          success: true,
+          message: "Instructor Blocked",
+        });
+      } else {
         res.status(200).json({
-          success:true,
-          message:"Instructor UnBlocked"
-        })
-
+          success: true,
+          message: "Instructor UnBlocked",
+        });
       }
-      
     } catch (error) {
-      console.log(error)
-      throw error
-      
+      console.log(error);
+      throw error;
     }
   }
 
   ///kafka consume
-  async passwordReset(data:any): Promise<IInstructor | null>{
+  async passwordReset(data: any): Promise<IInstructor | null> {
     try {
-      const {password,email}=data
+      const { password, email } = data;
       const response = await this.instructorService.updatePassword(
         email,
         password
       );
-      return response
+      return response;
     } catch (error) {
-      console.log(error)
-      throw error
+      console.log(error);
+      throw error;
     }
   }
   async updateVerifyStatus(data: any): Promise<IInstructor | null> {
     try {
-        let email = data.emailID;
-        let status = data.status;
+      let email = data.emailID;
+      let status = data.status;
 
-        console.log(email, status,"emailstatus");
+      console.log(email, status, "emailstatus");
 
-        const instructorData = await this.instructorService.getInstructorData(email);
-        console.log(instructorData,"inssss")
-        let response;
-        let id = instructorData?._id?.toString(); // Ensure id is a string or null
-
-        if (!id) {
-            throw new Error("Instructor ID is missing"); // Handle the undefined case
-        }
-
-        if (status === "approved") {
-            const isVerified = true;
-            response = await this.instructorService.updateProfile(id, { verificationStatus: status, isVerified });
-        } else {
-            response = await this.instructorService.updateProfile(id, { verificationStatus: status });
-        }
-
-        return response;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
-
-  async approveRequest(data:any): Promise<IInstructor | null>{
-    try {
-      let email=data.emailID
-      let status=data.status
-      
-      console.log(email,status)
-      const instructorData= await this.instructorService.getInstructorData(email)
-      let response
+      const instructorData = await this.instructorService.getInstructorData(
+        email
+      );
+      console.log(instructorData, "inssss");
+      let response;
       let id = instructorData?._id?.toString(); // Ensure id is a string or null
 
       if (!id) {
-          throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing"); // Handle the undefined case
       }
-      if(status==="approved"){
-        const isVerified=true
-         response = await this.instructorService.updateProfile(id,{verificationStatus:status,isVerified});
-      }else if(status==="rejected"){
-        const isVerified=false
 
-         response = await this.instructorService.updateProfile(id,{verificationStatus:status,isVerified});
-        }else{
-        response = await this.instructorService.updateProfile(id,{verificationStatus:status});
-
+      if (status === "approved") {
+        const isVerified = true;
+        response = await this.instructorService.updateProfile(id, {
+          verificationStatus: status,
+          isVerified,
+        });
+      } else {
+        response = await this.instructorService.updateProfile(id, {
+          verificationStatus: status,
+        });
       }
-      return response
+
+      return response;
     } catch (error) {
-      console.log(error)
-      throw error
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async approveRequest(data: any): Promise<IInstructor | null> {
+    try {
+      let email = data.emailID;
+      let status = data.status;
+
+      console.log(email, status);
+      const instructorData = await this.instructorService.getInstructorData(
+        email
+      );
+      let response;
+      let id = instructorData?._id?.toString(); // Ensure id is a string or null
+
+      if (!id) {
+        throw new Error("Instructor ID is missing"); // Handle the undefined case
+      }
+      if (status === "approved") {
+        const isVerified = true;
+        response = await this.instructorService.updateProfile(id, {
+          verificationStatus: status,
+          isVerified,
+        });
+      } else if (status === "rejected") {
+        const isVerified = false;
+
+        response = await this.instructorService.updateProfile(id, {
+          verificationStatus: status,
+          isVerified,
+        });
+      } else {
+        response = await this.instructorService.updateProfile(id, {
+          verificationStatus: status,
+        });
+      }
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async updateWallet(data: any): Promise<IInstructor | null> {
+    try {
+      const { txnid, amount, description, type, instructorId } = data;
+      const instructorDetails =
+        await this.instructorService.getInstructorDataById(instructorId);
+      if(!instructorDetails){
+        throw new Error("No instructor details found")
+      }
+      const transactions = instructorDetails?.wallet.transactions ?? [];
+      let walletDetails
+      if(type==='debit'){
+
+        walletDetails = {
+         balance: instructorDetails?.wallet.balance - amount,
+         transactions: [...transactions, { amount, description, txnid, type }],
+       };
+      }else{
+        walletDetails = {
+         balance: instructorDetails?.wallet.balance + amount,
+         transactions: [...transactions, { amount, description, txnid, type }],
+       };
+
+      }
+      console.log(walletDetails,"wallet")
+      const response = await this.instructorService.updateProfile(
+        instructorId,
+        {wallet:walletDetails}
+      );
+      console.log(response)
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 }

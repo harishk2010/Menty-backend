@@ -25,6 +25,10 @@ export class CourseService implements ICourseService {
   async getAllCourses(): Promise<ICourse[]> {
     return await this.courseRepository.getAllCourses();
   }
+  async getInstructorCourses(instructorId: string): Promise<ICourse[]> {
+    return await this.courseRepository.getInstructorCourses(instructorId);
+    
+  }
 
   // Get a single course by ID
   async getCourseById(id: string): Promise<ICourse | null> {
@@ -36,12 +40,14 @@ export class CourseService implements ICourseService {
   async buyCourse(
     userId: string,
     courseId: string,
+    quizId:string,
     completedChapters: any,
     txnid: string
   ): Promise<IPurchasedCourse | null> {
     try {
       return await this.courseRepository.buyCourse(
         userId,
+        quizId,
         courseId,
         completedChapters,
         txnid

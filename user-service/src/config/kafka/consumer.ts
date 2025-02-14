@@ -15,6 +15,7 @@ async function consume() {
         "password-reset-student",
         "add-instructor",
         "password-reset-instructor",
+        "update-instructor-wallet"
         // "verification-request",
         // "approve-reject-request",
       ],
@@ -54,6 +55,10 @@ async function consume() {
 
             case "password-reset-instructor":
               await instructorController.passwordReset(messageValue);
+              console.log("Processing password-reset event:", messageValue);
+              break;
+            case "update-instructor-wallet":
+              await instructorController.updateWallet(messageValue);
               console.log("Processing password-reset event:", messageValue);
               break;
             //verification

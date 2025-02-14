@@ -14,9 +14,25 @@ export interface IInstructor extends Document {
   verificationStatus: string;
   isVerified?: boolean;
   isBlocked?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  wallet: {
+    balance: number;
+    transactions: ITransaction[];
+  };
 }
+export interface ITransaction {
+  amount: number;
+  type: "credit" | "debit";
+  txnid:string;
+  description: string;
+  date: Date;
+}
+const TransactionSchema: Schema<ITransaction> = new Schema({
+  amount: { type: Number, required: true },
+  type: { type: String, enum: ["credit", "debit"], required: true },
+  description: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+});
+
 
 const InstructorSchema: Schema<IInstructor> = new Schema(
   {
@@ -39,8 +55,11 @@ const InstructorSchema: Schema<IInstructor> = new Schema(
     },
     isVerified: { type: Boolean, required: false, default: false },
     isBlocked: { type: Boolean, required: false, default: false },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    wallet: {
+      balance: { type: Number, required: true, default: 0 },
+      transactions: [TransactionSchema],
+      txnid:{type:String,required:false}
+    },
   },
   {
     timestamps: true,

@@ -11,40 +11,51 @@ export class ChapterController implements IChapterControllers {
     try {
       const { courseId } = req.params;
       const { title, description } = req.body;
-      const file = req.file as Express.Multer.File;
-
-      if (!courseId || !title || !description || !file?.path) {
-        res.status(400).json({ message: "Missing required fields or file", success: false });
+      
+      const file = req.file as Express.Multer.File & { location: string };
+      console.log(file, "file");
+    
+      if (!courseId || !title || !description ) {
+        res.status(400).json({ message: "Missing required fields", success: false });
         return;
       }
-
+      if (!file?.location) {
+        res.status(400).json({ message: "Missing required file", success: false });
+        return;
+      }
+    
       const newChapter = await this.chapterService.createChapter({
         chapterTitle: title,
         courseId: new Types.ObjectId(courseId),
         description,
-        videoUrl: file.path,
+        videoUrl: file.location, 
       });
-
+    
       await CourseModel.findByIdAndUpdate(
         courseId,
         { $push: { fullVideo: { chapterId: newChapter._id } } },
         { new: true }
       );
-
+    
       res.status(201).json({ message: "Chapter added successfully", success: true, data: newChapter });
     } catch (error) {
       next(error);
     }
+    
   }
 
   async updateChapter(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { chapterId } = req.params;
       const { title, description ,courseId } = req.body;
-      const file = req.file as Express.Multer.File;
+      const file = req.file as Express.Multer.File  & { location: string };
 
       if (!chapterId || !title || !description) {
         res.status(400).json({ message: "Missing required fields", success: false });
+        return;
+      }
+      if ( !file?.location) {
+        res.status(400).json({ message: "Missing required file", success: false });
         return;
       }
 
@@ -52,7 +63,7 @@ export class ChapterController implements IChapterControllers {
         courseId ,
         chapterTitle: title,
         description,
-        videoUrl: file?.path,
+        videoUrl: file?.location,
       };
 
       const updatedChapter = await this.chapterService.updateChapter(chapterId, updateData);

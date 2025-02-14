@@ -24,15 +24,13 @@ export class ChapterBaseRepository implements IChapterBaseRepository {
         throw new Error("Chapter not found");
       }
 
-      const updatedCourse = await CourseModel.updateOne(
+       await CourseModel.updateOne(
         { "fullVideo.chapterId": chapterId },
         { $set: { "fullVideo.$[elem].chapterId": updatedChapter._id } },
         { arrayFilters: [{ "elem.chapterId": chapterId }] }
       );
 
-      if (!updatedCourse || updatedCourse.modifiedCount === 0) {
-        console.warn("No course updated for the given chapterId");
-      }
+      
       return updatedChapter;
     } catch (error) {
       throw error;

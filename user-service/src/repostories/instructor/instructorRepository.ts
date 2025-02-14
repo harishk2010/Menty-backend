@@ -33,6 +33,17 @@ export class InstructorRepository implements IInstructorRepository{
             
         }
     }
+    async getInstructorDataById(instructorId:string):Promise<IInstructor | null>{
+        try {
+            const response=await this.instructorBaseRepository.getInstructorDataById(instructorId)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        }
+    }
     async updateProfile(id:any,data:object):Promise<IInstructor | null>{
         try {
             const response=await this.instructorBaseRepository.updateProfile(id,data)

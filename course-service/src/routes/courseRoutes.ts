@@ -32,6 +32,10 @@ router
   .route("/course/:id")
   .get(courseController.getCourseById.bind(courseController));
 router
+  .route("/instructorCourses/:instructorId")
+  .get(courseController.getInstructorCourses.bind(courseController));
+
+router
   .route("/boughtCourses/:id")
   .get(courseController.getBoughtCourses.bind(courseController));
 router
@@ -47,11 +51,14 @@ router
   .route("/addQuiz")
   .post(courseController.addQuiz.bind(courseController));
 router
-  .route("/editQuiz")
-  .post(courseController.editQuiz.bind(courseController));
+  .route("/editQuiz/:id")
+  .put(courseController.editQuiz.bind(courseController));
 router
   .route("/getQuiz/:quizId")
   .get(courseController.getQuiz.bind(courseController));
+router
+  .route("/sumbitResult/:courseId")
+  .put(courseController.submitResult.bind(courseController));
 
 const courseRoutes = router;
 export default courseRoutes;

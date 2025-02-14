@@ -15,7 +15,8 @@ export interface IPurchasedCourse extends Document {
   transactionId: string;
   price: number;
   purchasedAt: Date;
-  completedAt?: Date; // Optional: Timestamp when the course is completed
+  completedAt?: Date;
+  quizId:Schema.Types.ObjectId;
 }
 
 const CompletedChapterSchema = new Schema<ICompletedChapter>({
@@ -35,6 +36,7 @@ const PurchasedCourseSchema = new Schema<IPurchasedCourse>(
     price: { type: Number},
     purchasedAt: { type: Date, default: Date.now },
     completedAt: { type: Date },
+    quizId:{type:Schema.Types.ObjectId,ref:'Quiz',required:true}
   },
   { timestamps: true }
 );

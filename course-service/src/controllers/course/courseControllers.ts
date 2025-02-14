@@ -8,6 +8,7 @@ import { ChapterService } from "../../services/chapter/chapterService";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 import { ICourse } from "../../models/courseModel";
 import { QuizModel } from "../../models/quizModel";
+import kafka from "@/config/kafka/kafkaConfig";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -102,21 +103,56 @@ export class CourseContoller implements ICourseControllers {
 
   public async buyCourse(req: Request, res: Response, next:NextFunction): Promise<any> {
     try {
-      const { courseId, txnid } = req.body;
+      const { courseId, txnid ,amount ,courseName } = req.body;
+      console.log(req.body,"=====================\\\\\\\\")
       const isCourseExist = await this.courseService.getCourseById(String(courseId));
       if (!isCourseExist) throw new Error("Course not found");
+      
+
+      const instructorPayment=(0.9*amount)
+      console.log(instructorPayment,amount,"=>>")
+      const adminPayment=(0.1*amount)
 
       const chapters = await this.courseService.getChaptersById(String(courseId));
       if (!chapters || chapters.length === 0) throw new Error("Chapters not found");
 
       const completedChapters = chapters.map((chapter: any) => ({ chapterId: chapter._id, isCompleted: false }));
       const userId = await getId("accessToken", req);
-      const response = await this.courseService.buyCourse(String(userId), String(isCourseExist._id), completedChapters, String(txnid));
+      const quizId=isCourseExist.quizId
+      const response = await this.courseService.buyCourse(String(userId),String(quizId), String(isCourseExist._id), completedChapters, String(txnid));
+      console.log(response,"response buyed")
+      if(response){
+       produce('update-instructor-wallet',{instructorId:isCourseExist.mentorId,txnid,amount:instructorPayment,type:'credit',description:`Payment Received for Course:${courseName}`})
 
-      res.status(200).send({ message: "Thank you for Enrolling!", success: true, data: response });
+        res.status(200).send({ message: "Thank you for Enrolling!", success: true, data: response });
+      }
     } catch (error) {
       console.log(error)
       next(error);
+    }
+  }
+  public async getInstructorCourses(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {instructorId}=req.params
+      const response=await this.courseService.getInstructorCourses(instructorId)
+      if(response){
+        res.status(200).json({
+          success:true,
+          message:"User courses fetched !",
+          data:response
+        })
+      }else{
+        res.status(500).json({
+          success:false,
+          message:"Something wrong Please try Later!",
+          data:response
+        })
+
+      }
+      
+    } catch (error) {
+      console.log(error)
+      next(error)
     }
   }
 
@@ -140,11 +176,13 @@ export class CourseContoller implements ICourseControllers {
           courseName: course.courseId.courseName,
           level: course.courseId.level,
           thumbnailUrl: course.courseId.thumbnailUrl,
+          quizId:course.courseId.quizId
         },
         completedChapters: course.completedChapters,
         isCourseCompleted: course.isCourseCompleted,
         purchasedAt: course.purchasedAt,
       }));
+      console.log("===>",response.courses)
 
       res.status(200).send({ message: "Buyed Courses Got Successfully", success: true, data: response });
     } catch (error) {
@@ -200,6 +238,16 @@ export class CourseContoller implements ICourseControllers {
 
      
       const savedQuiz = await QuizModel.create(quizData);
+      const courseData = await this.courseService.getCourseById(quizData.courseId);
+      if (!courseData) throw new Error("No course found");
+
+      const updatedCourseData = { ...courseData.toObject(), quizId:savedQuiz._id};
+      
+     
+
+        await this.courseService.updateCourse(String(savedQuiz.courseId),updatedCourseData)
+      
+
       res.status(201).json({
         success:true,
         message:"Quiz added to the Course",
@@ -216,23 +264,28 @@ export class CourseContoller implements ICourseControllers {
   }
   public async editQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
     try {
-
-      const quizData=req.body
-
-     
-      const savedQuiz = await QuizModel.create(quizData);
-      res.status(201).json({
+      console.log(req.params,req.body,"bodyyy")
+      const updatedQuiz = await QuizModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          
+        }
+      );
+      console.log(updatedQuiz,"updateddd")
+      if (!updatedQuiz) {
+        res.status(404).json({ 
+          success:false,
+          message: "Quiz not found" });
+        return;
+      }
+      res.status(200).json({
         success:true,
-        message:"Quiz added to the Course",
-        data:savedQuiz
-
-      });
-
-
-      
-    } catch (error) {
-      console.log(error)
-      throw error
+        message:"updated quizz successfully!",
+        data:updatedQuiz});
+    } catch (error:any) {
+      res.status(500).json({ message: error.message });
     }
   }
   public async getQuiz(req:Request,res:Response,next:NextFunction):Promise<void>{
@@ -252,6 +305,51 @@ export class CourseContoller implements ICourseControllers {
       });
 
 
+      
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+
+  public async submitResult(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      const {courseId}=req.params
+      const {score,total}=req.body
+      console.log(score,total,"=====>final score")
+
+      if(!courseId)  throw new Error("courseId not found");
+      if(!score || !total)  throw new Error("finalscore not found");
+      const userId = await getId("accessToken", req);
+      const percentage=(score/total)*100
+      const Pass=percentage>40
+      if(Pass){
+        const courseData = await PurchasedCourseModel.findOneAndUpdate({
+          courseId,userId
+        },{
+          isCourseCompleted:true
+        },{
+          new:true
+        })
+        // await this.courseService.updateCourse(courseId,{})
+        res.status(200).json({
+          success:true,
+          message:"Course Cmmpleted!",
+          data:courseData
+        })
+      }else{
+        res.status(400).json({
+          success:false,
+          message:"Retry Quiz!"
+        })
+        return
+      }
+
+      // console.log(Pass,"pass")
+
+      
+      
       
     } catch (error) {
       console.log(error)

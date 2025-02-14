@@ -31,9 +31,13 @@ export class CourseRepository implements ICourseRepository {
       async getChapterById(id: string): Promise<IChapter[] | null> {
         return await this.courseBaseRepository.getChapterById(id);
       }
-      async buyCourse(userId: string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
+      async getInstructorCourses(instructorId: string): Promise<ICourse[]> {
+        return await this.courseBaseRepository.getInstructorCourses(instructorId);
+        
+      }
+      async buyCourse(userId: string,quizId:string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
          try {
-          return await this.courseBaseRepository.buyCourse(userId,courseId,completedChapters,txnid)
+          return await this.courseBaseRepository.buyCourse(userId,courseId,quizId,completedChapters,txnid)
           
          } catch (error) {
           console.log(error)

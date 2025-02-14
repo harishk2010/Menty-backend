@@ -10,7 +10,9 @@ export interface ICourseBaseRepository{
     getAllCourses(): Promise<ICourse[]>
     getCourseById(id: string): Promise<ICourse | null>
     getChapterById(id: string): Promise<IChapter[] | null>
-     buyCourse(userId: string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>
+    getInstructorCourses(instructorId:string): Promise<ICourse[]>
+
+     buyCourse(userId: string,quizId:string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>
      getBoughtCourses(userId: string, page: number , limit: number ): Promise<any>
      chapterVideoEnd(courseId: string): Promise<ICourse | null>
     }
