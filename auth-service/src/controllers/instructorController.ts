@@ -382,7 +382,7 @@ export class InstructorController implements IInstructorControllers{
         console.log(user, "User after creation in controller Google");
         
         if (user) {
-          await produce("add-instructor", user);
+          await produce("add-instructor-data", user);
           console.log(user.token, "User token");
           const role=user.role
           let id = user._id;
