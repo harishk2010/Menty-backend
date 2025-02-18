@@ -9,6 +9,7 @@ import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedMo
 import { ICourse } from "../../models/courseModel";
 import { QuizModel } from "../../models/quizModel";
 import kafka from "@/config/kafka/kafkaConfig";
+import { ChapterModel } from "../../models/chapterModel";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -85,9 +86,27 @@ export class CourseContoller implements ICourseControllers {
 
   async publishCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log("enetered")
       const { id } = req.params;
       const courseData = await this.courseService.getCourseById(id);
+      console.log(courseData,"=>")
       if (!courseData) throw new Error("No course found");
+      if(!courseData.quizId){
+        res.json({
+          success: false,
+          message: "Add Quiz to Publish Course!",
+        })
+        return 
+      }
+      const chapters=await ChapterModel.find({courseId:id})
+      console.log(chapters,"chapppppp")
+      if(chapters.length===0){
+        res.json({
+          success: false,
+          message: "Add chapters to Publish Course!",
+        })
+        return 
+      }
 
       const updatedCourseData = { ...courseData.toObject(), isPublished: !courseData.isPublished };
       const courseStatus = await this.courseService.updateCourse(id, updatedCourseData);
@@ -320,7 +339,7 @@ export class CourseContoller implements ICourseControllers {
       console.log(score,total,"=====>final score")
 
       if(!courseId)  throw new Error("courseId not found");
-      if(!score || !total)  throw new Error("finalscore not found");
+      // if(!score || !total)  throw new Error("finalscore not found");
       const userId = await getId("accessToken", req);
       const percentage=(score/total)*100
       const Pass=percentage>40
@@ -339,16 +358,14 @@ export class CourseContoller implements ICourseControllers {
           data:courseData
         })
       }else{
-        res.status(400).json({
+        res.json({
           success:false,
           message:"Retry Quiz!"
         })
         return
       }
 
-      // console.log(Pass,"pass")
 
-      
       
       
     } catch (error) {

@@ -2,7 +2,8 @@ import { ObjectId } from "mongoose"
 import { InstructorRepository } from "../../repostories/instructor/instructorRepository"
 import { IInstructorService } from "./IInstructorService"
 import { IInstructorRepository } from "../../repostories/instructor/IInstructorRepository"
-import { IInstructor } from "../../models/instructorModel"
+import { IInstructor, ITransaction } from "../../models/instructorModel"
+import { it } from "node:test"
 
 export class InstructorServices implements IInstructorService{
     private instructorRepository:IInstructorRepository
@@ -26,6 +27,16 @@ export class InstructorServices implements IInstructorService{
             return response
         } catch (error) {
             console.log(error)
+            throw error
+            
+        }
+    }
+    public async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
+        try {
+            const response=await this.instructorRepository.getTransactionsList(email,currentPage,itemsPerPage)
+            return response
+            
+        } catch (error) {
             throw error
             
         }

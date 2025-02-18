@@ -36,7 +36,7 @@ const demoVideoSchema = new Schema<IDemoVideo>({
 const CourseSchema = new Schema<ICourse>(
   {
     courseName: { type: String, required: true },
-    mentorId: { type: Schema.Types.ObjectId, required:true, ref: 'Mentors' },
+    mentorId: { type: Schema.Types.ObjectId, required:true, ref: 'Instructor' },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category'},
     quizId: { type: Schema.Types.ObjectId, ref: 'Quiz'},
     description: { type: String, required: true },
@@ -51,7 +51,7 @@ const CourseSchema = new Schema<ICourse>(
     level: { type: String, required: true },
     duration: { type: String, required: true },
     thumbnailUrl: { type: String, required: true },
-    isPublished: { type: Boolean, default: true },
+    isPublished: { type: Boolean, default: false },
     isListed: { type: Boolean, default: true },
   },
   { timestamps: true }

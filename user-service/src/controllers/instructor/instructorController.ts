@@ -81,6 +81,30 @@ export class InstructorController implements IInstructorControllers {
       throw error;
     }
   }
+  public async getTransactions(req: Request, res: Response): Promise<void> {
+    try {
+      const { currentPage, itemsPerPage ,email}=req.query
+      console.log(currentPage,itemsPerPage,email)
+      const response=await this.instructorService.getTransactionsList(String(email),Number(currentPage),Number(itemsPerPage))
+      if(!response){
+        res.status(500).json({
+          success:false,
+          message:"Something error! Couldn't fetch data!",
+        })
+      }
+      res.status(200).json({
+        success:true,
+        message:"fetched transactions data!",
+        data:{
+          data:response,
+          total:response?.length
+        }
+      })
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
   public async updatePassword(req: Request, res: Response): Promise<any> {
     try {
@@ -308,4 +332,5 @@ export class InstructorController implements IInstructorControllers {
       throw error;
     }
   }
+
 }

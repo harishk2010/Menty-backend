@@ -9,6 +9,7 @@ export interface IInstructorControllers {
     updateProfile(req: Request, res: Response): Promise<void>;
     updatePassword(req: Request, res: Response): Promise<void>;
     getInstructors(req: Request, res: Response): Promise<void>;
+    getTransactions(req: Request, res: Response): Promise<void>;
     blockInstructor(req: Request, res: Response): Promise<void>;
     passwordReset(data:any): Promise<IInstructor | null>;
     updateWallet(data:any): Promise<IInstructor | null>;

@@ -2,7 +2,7 @@ import UserModel, { IUser } from "../../models/userModel";
 import { Model } from "mongoose";
 import { IInstructorRepository } from "./IInstructorRepository";
 import { IInstructorBaseRepository } from "../baseRepository/instructor/IInstructorBaseRepository";
-import { IInstructor } from "../../models/instructorModel";
+import { IInstructor, ITransaction } from "../../models/instructorModel";
 
 
 export class InstructorRepository implements IInstructorRepository{
@@ -10,6 +10,18 @@ export class InstructorRepository implements IInstructorRepository{
     constructor(instructorBaseRepository:IInstructorBaseRepository){
         this.instructorBaseRepository=instructorBaseRepository
 
+    }
+
+    async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
+        try {
+            const response=await this.instructorBaseRepository.getTransactionsList(email,currentPage,itemsPerPage)
+            return response
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        } 
     }
     async createInstructor(payload:any):Promise<IInstructor | null>{
         try {

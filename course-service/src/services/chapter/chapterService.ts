@@ -17,12 +17,12 @@ export class ChapterService implements IChapterService{
         return await this.chapterRepository.updateChapter(chapterId,chapterData);
       }
     
-      // Get all chapters
+     
       async getAllChapters(courseId:string): Promise<IChapter[]> {
         return await this.chapterRepository.getAllChapters(courseId);
       }
     
-      // Get a single chapter by ID
+      
       async getChapterById(id: string): Promise<IChapter | null> {
         return await this.chapterRepository.getChapterById(id);
       }

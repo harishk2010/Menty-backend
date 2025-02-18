@@ -13,7 +13,7 @@ async function consume() {
       topics: [
         "add-student",
         "password-reset-student",
-        "add-instructor",
+        "add-instructor-data",
         "password-reset-instructor",
         "update-instructor-wallet"
         // "verification-request",
@@ -48,7 +48,7 @@ async function consume() {
               break;
 
             //instructor
-            case "add-instructor":
+            case "add-instructor-data":
               await instructorController.addInstructor(messageValue);
               console.log("Processed add-student event:", messageValue);
               break;

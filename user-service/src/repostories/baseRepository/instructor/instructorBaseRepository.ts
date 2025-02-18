@@ -1,10 +1,8 @@
 import { Document, Model } from "mongoose";
-import InstructorModel, { IInstructor } from "../../../models/instructorModel";
+import InstructorModel, { IInstructor, ITransaction } from "../../../models/instructorModel";
 import { IInstructorBaseRepository } from "./IInstructorBaseRepository";
 
-export class InstructorBaseRepository implements IInstructorBaseRepository{
-  
-
+export class InstructorBaseRepository implements IInstructorBaseRepository {
   async createInstructor(payload: IInstructor): Promise<IInstructor | null> {
     try {
       const instructor = await InstructorModel.create(payload);
@@ -12,6 +10,39 @@ export class InstructorBaseRepository implements IInstructorBaseRepository{
       return instructor;
     } catch (error) {
       throw error;
+    }
+  }
+  async getTransactionsList(
+    email: string,
+    currentPage: number,
+    itemsPerPage: number
+  ): Promise<ITransaction[] | null> {
+    try {
+      // const transactionsDetails = await InstructorModel.findOne(
+      //   { email },
+      //   { "wallet.transactions": 1,_id:0}
+      // ).sort({"wallte.transactions.date":-1}).skip((currentPage-1)*itemsPerPage).limit(itemsPerPage)
+      // if(!transactionsDetails){
+      //   return null
+      // }
+      // return transactionsDetails
+      const instructor = await InstructorModel.findOne(
+        { email },
+        { 
+          "wallet.transactions": { 
+            $slice: [(currentPage - 1) * itemsPerPage, itemsPerPage] // Pagination
+          }, 
+          _id: 0 
+        }
+      )
+  
+      if (!instructor) {
+        return null;
+      }
+  
+      return instructor?.wallet?.transactions 
+    } catch (error) {
+      throw error
     }
   }
 
@@ -23,7 +54,9 @@ export class InstructorBaseRepository implements IInstructorBaseRepository{
       throw error;
     }
   }
-  async getInstructorDataById(instructorId: string): Promise<IInstructor | null> {
+  async getInstructorDataById(
+    instructorId: string
+  ): Promise<IInstructor | null> {
     try {
       const instructorData = await InstructorModel.findById(instructorId);
       return instructorData;
@@ -42,7 +75,10 @@ export class InstructorBaseRepository implements IInstructorBaseRepository{
     }
   }
 
-  async updatePassword(email: string, password: string): Promise<IInstructor | null> {
+  async updatePassword(
+    email: string,
+    password: string
+  ): Promise<IInstructor | null> {
     try {
       const instructorData = await InstructorModel.findOneAndUpdate(
         { email },
@@ -59,17 +95,14 @@ export class InstructorBaseRepository implements IInstructorBaseRepository{
     }
   }
 
-  async findAllInstructors(): Promise<IInstructor[] > {
+  async findAllInstructors(): Promise<IInstructor[]> {
     try {
-        const response=await InstructorModel.find()
-   
-        return response
-        
-    } catch (error) {
-        console.log(error);
-        throw error;
+      const response = await InstructorModel.find();
 
-        
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 }

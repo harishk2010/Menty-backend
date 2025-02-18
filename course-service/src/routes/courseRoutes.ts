@@ -2,10 +2,12 @@ import upload from "../utils/multer";
 import { courseController } from "../config/dependencyInjector";
 import express, { Request, Response, Router } from "express";
 import multer from "multer";
+import authenticateToken from "../middlewares/AuthenticatedRoutes";
 
 const router = Router();
 
 router.route("/addCourse").post(
+  authenticateToken,
   upload.fields([
     { name: "demoVideos", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
@@ -14,6 +16,7 @@ router.route("/addCourse").post(
 );
 
 router.route("/updateCourse/:courseId").post(
+  authenticateToken,
   upload.fields([
     { name: "demoVideos", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
@@ -26,39 +29,39 @@ router
   .get(courseController.getAllCourses.bind(courseController));
 router
   .route("/payment")
-  .post(courseController.buyCourse.bind(courseController));
+  .post(authenticateToken,courseController.buyCourse.bind(courseController));
 
 router
   .route("/course/:id")
   .get(courseController.getCourseById.bind(courseController));
 router
   .route("/instructorCourses/:instructorId")
-  .get(courseController.getInstructorCourses.bind(courseController));
+  .get(authenticateToken,courseController.getInstructorCourses.bind(courseController));
 
 router
   .route("/boughtCourses/:id")
-  .get(courseController.getBoughtCourses.bind(courseController));
+  .get(authenticateToken,courseController.getBoughtCourses.bind(courseController));
 router
   .route("/playCourseDetails/:id")
-  .get(courseController.coursePlay.bind(courseController));
+  .get(authenticateToken,courseController.coursePlay.bind(courseController));
 router
   .route("/handlePublish/:id")
-  .put(courseController.publishCourse.bind(courseController));
+  .put(authenticateToken,courseController.publishCourse.bind(courseController));
 router
   .route("/chapterCompleted/:chapterId")
-  .put(courseController.chapterVideoEnd.bind(courseController));
+  .put(authenticateToken,courseController.chapterVideoEnd.bind(courseController));
 router
   .route("/addQuiz")
-  .post(courseController.addQuiz.bind(courseController));
+  .post(authenticateToken,courseController.addQuiz.bind(courseController));
 router
   .route("/editQuiz/:id")
-  .put(courseController.editQuiz.bind(courseController));
+  .put(authenticateToken,courseController.editQuiz.bind(courseController));
 router
   .route("/getQuiz/:quizId")
-  .get(courseController.getQuiz.bind(courseController));
+  .get(authenticateToken,courseController.getQuiz.bind(courseController));
 router
   .route("/sumbitResult/:courseId")
-  .put(courseController.submitResult.bind(courseController));
+  .put(authenticateToken,courseController.submitResult.bind(courseController));
 
 const courseRoutes = router;
 export default courseRoutes;
