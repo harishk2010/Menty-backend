@@ -22,21 +22,18 @@ import { IStudentService } from "../services/student/IStudentService"
 import { StudentServices } from "../services/student/studentServices"
 import { IStudentControllers } from "../controllers/student/IStudentController"
 import { StudentController } from "../controllers/student/studentController"
+import { GenericRepository } from "../repostories/GenericRepository"
 
-const verificationBaseRepository:IVerificationBaseRepository=new VerificationBaseRepository()
-const verificationRepository:IVerificationRepository=new VerificationRepository(verificationBaseRepository)
+const verificationRepository:IVerificationRepository=new VerificationRepository()
 const verificationService:IVerificationService=new VerificationService(verificationRepository)
 const  verificationController:IVerificationControllers=new VerificationContoller(verificationService)
 
-const instructorBaseRepository:IInstructorBaseRepository=new InstructorBaseRepository()
-const instructorRepository:IInstructorRepository=new InstructorRepository(instructorBaseRepository)
+const instructorRepository:IInstructorRepository=new InstructorRepository()
 const instructorService:IInstructorService=new InstructorServices(instructorRepository)
 const instructorController:IInstructorControllers=new InstructorController(instructorService)
 
-
-const studentBaseRepository:IStudentBaseRepository=new StudentBaseRepository()
-const studentRepository:IStudentRepository=new StudentRepository(studentBaseRepository)
-const studentService:IStudentService=new StudentServices(studentRepository)
-const studentController:IStudentControllers=new StudentController(studentService)
-
+// const genericRepository=new GenericRepository()
+const studentRepository:IStudentRepository = new StudentRepository();
+const studentService:IStudentService = new StudentServices(studentRepository);
+const studentController:IStudentControllers = new StudentController(studentService);
 export { verificationController,instructorController,studentController}

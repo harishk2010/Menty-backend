@@ -1,95 +1,58 @@
-import UserModel, { IUser } from "../../models/userModel";
-import { Model } from "mongoose";
-import { IInstructorRepository } from "./IInstructorRepository";
-import { IInstructorBaseRepository } from "../baseRepository/instructor/IInstructorBaseRepository";
 import { IInstructor, ITransaction } from "../../models/instructorModel";
+import { GenericRepository } from "../GenericRepository";
+import InstructorModel from "../../models/instructorModel";
+import { IInstructorRepository } from "./IInstructorRepository";
 
+export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
+  constructor() {
+    super(InstructorModel);
+  }
 
-export class InstructorRepository implements IInstructorRepository{
-    private instructorBaseRepository:IInstructorBaseRepository
-    constructor(instructorBaseRepository:IInstructorBaseRepository){
-        this.instructorBaseRepository=instructorBaseRepository
+  /**
+   * Get a list of transactions for an instructor.
+   * @param email - Email of the instructor.
+   * @param currentPage - Current page number for pagination.
+   * @param itemsPerPage - Number of items per page.
+   * @returns A list of transactions.
+   */
+  async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
+    try {
+      const skip = (currentPage - 1) * itemsPerPage;
+      const instructor = await InstructorModel.findOne({ email },
+        { 
+          "wallet.transactions": { 
+            $slice: [(currentPage - 1) * itemsPerPage, itemsPerPage] // Pagination
+          }, 
+          _id: 0 
+        })
+        if (!instructor) {
+            return null;
+          }
+      
+          return instructor?.wallet?.transactions 
+    } catch (error) {
+      console.error("Error in getTransactionsList:", error);
+      throw error;
+    }
+  }
 
+  /**
+   * Update an instructor's password by email.
+   * @param email - Email of the instructor.
+   * @param password - New password.
+   * @returns The updated instructor data.
+   */
+  async updatePassword(email: string, password: string): Promise<IInstructor | null> {
+    try {
+      const response = await InstructorModel.findOneAndUpdate(
+        { email },
+        { $set: { password } },
+        { new: true }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error in updatePassword:", error);
+      throw error;
     }
-
-    async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
-        try {
-            const response=await this.instructorBaseRepository.getTransactionsList(email,currentPage,itemsPerPage)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        } 
-    }
-    async createInstructor(payload:any):Promise<IInstructor | null>{
-        try {
-            const response=await this.instructorBaseRepository.createInstructor(payload)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        }
-    }
-    async getInstructorData(email:string):Promise<IInstructor | null>{
-        try {
-            const response=await this.instructorBaseRepository.getInstructorData(email)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        }
-    }
-    async getInstructorDataById(instructorId:string):Promise<IInstructor | null>{
-        try {
-            const response=await this.instructorBaseRepository.getInstructorDataById(instructorId)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        }
-    }
-    async updateProfile(id:any,data:object):Promise<IInstructor | null>{
-        try {
-            const response=await this.instructorBaseRepository.updateProfile(id,data)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        }
-    }
-    
-    async updatePassword(email:string,password:string):Promise<IInstructor | null>{
-        try {
-            const response=await this.instructorBaseRepository.updatePassword(email,password)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async getInstructors():Promise<IInstructor[] | null>{
-        try {
-            const response=await this.instructorBaseRepository.findAllInstructors()
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-            
-        }
-    }
-    
-    
-    
+  }
 }

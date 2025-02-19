@@ -1,46 +1,64 @@
+import UserModel from "../models/userModel";
 import { IUser } from "../models/userModel";
-import IStudentRepository from "./interfaces/IStudentRepository";
-import IStudentBaseRepository from "./baseRepositories/interfaces/IStudentBaseRepository";
+import { GenericRepository } from "./GenericRepository";
+import { IStudentRepository } from "./interfaces/IStudentRepository";
 
+export class StudentRepository extends GenericRepository<IUser> implements IStudentRepository {
+  constructor() {
+    super(UserModel);
+  }
 
-export class StudentRepository implements IStudentRepository{
-    private baseRepository:IStudentBaseRepository
-    constructor(baseRepository:IStudentBaseRepository){
-        this.baseRepository=baseRepository
+  async findByEmail(email: string): Promise<IUser | null> {
+    return await this.findOne({ email });
+  }
 
-    }
-    
-    async findByEmail(email:string){
-        const response = await this.baseRepository.findByEmail(email)
-        return response
-    }
+  async createUser(userData: any): Promise<IUser | null> {
+    return await this.create(userData);
+  }
 
-    async createUser(userData:any) {
-        const response= await this.baseRepository.createStudent(userData)
-        return response
-    }
-    
-    async resetPassword(email:string,password:string) {
-        const response= await this.baseRepository.resetPassword(email,password)
-        return response
-    }
-    public async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
-        try {
-            const response = await this.baseRepository.googleLogin(name, email, password);
-            return response;
-        } catch (error) {
-            throw error;
+  async resetPassword(email: string, password: string): Promise<IUser | null> {
+    try {
+
+        const student=await this.findOne({email})
+        if(!student){
+            throw new Error("No Student data found")
         }
+        const studentId=(student._id as unknown as string)
+        
+        const response=await this.update(studentId, { password });
+        return response
+    } catch (error) {
+        throw error
+        
     }
-    public async updateProfile(email:string,data:any): Promise<IUser | null> {
-        try {
-            const response = await this.baseRepository.updateProfile(email,data);
-            return response;
-        } catch (error) {
-            throw error;
+  }
+
+  async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
+    const user = await this.findByEmail(email);
+
+    if (!user) {
+      // Create a new user
+      const newUser = await this.createUser({ name, email, password });
+      return newUser;
+    }
+
+    return user;
+  }
+
+  async updateProfile(email: string, data: any): Promise<IUser | null> {
+    try {
+
+        const student=await this.findOne({email})
+        if(!student){
+            throw new Error("No Student data found")
         }
+        const studentId=(student._id as unknown as string)
+        
+        const response=await this.update(studentId, data);
+        return response
+    } catch (error) {
+        throw error
+        
     }
-    
-    
-    
+  }
 }

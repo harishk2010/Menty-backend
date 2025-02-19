@@ -10,6 +10,7 @@ import { ICourse } from "../../models/courseModel";
 import { QuizModel } from "../../models/quizModel";
 import kafka from "@/config/kafka/kafkaConfig";
 import { ChapterModel } from "../../models/chapterModel";
+import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -209,27 +210,87 @@ export class CourseContoller implements ICourseControllers {
     }
   }
 
-  public async coursePlay(req: Request, res: Response, next:NextFunction): Promise<any> {
+  // public async coursePlay(req: Request, res: Response, next:NextFunction): Promise<any> {
+  //   try {
+  //     const { id } = req.params;
+  //     const purchasedCourse = (await PurchasedCourseModel.findById(id)
+  //       .populate({
+  //         path: "courseId",
+  //         select: "courseName duration level description category thumbnailUrl",
+  //         populate: { path: "fullVideo.chapterId", model: "Chapter", select: "chapterTitle courseId chapterNumber description videoUrl createdAt" },
+  //       })
+  //       .exec() as unknown as IPurchasedCourse)
+
+  //     if (!purchasedCourse) throw new Error("Purchased course not found");
+
+  //     const courseData = purchasedCourse.courseId as unknown as ICourse;
+  //     const chaptersData = courseData?.fullVideo?.map((video: any) => video.chapterId);
+
+  //     res.status(200).json({
+  //       success: true,
+  //       message: "retrived play data",
+  //       data: { purchasedCourse, course: { courseName: courseData?.courseName, duration: courseData?.duration, level: courseData?.level, description: courseData?.description, category: courseData?.category, thumbnailUrl: courseData?.thumbnailUrl }, chapters: chaptersData },
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  public async coursePlay(req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
       const { id } = req.params;
+      console.log("inside  course play ")
+  
+      // Fetch the purchased course and populate the necessary fields
       const purchasedCourse = (await PurchasedCourseModel.findById(id)
         .populate({
           path: "courseId",
           select: "courseName duration level description category thumbnailUrl",
-          populate: { path: "fullVideo.chapterId", model: "Chapter", select: "chapterTitle courseId chapterNumber description videoUrl createdAt" },
+          populate: {
+            path: "fullVideo.chapterId",
+            model: "Chapter",
+            select: "chapterTitle courseId chapterNumber description videoUrl createdAt",
+          },
         })
-        .exec() as unknown as IPurchasedCourse)
-
+        .exec()) as unknown as IPurchasedCourse;
+  
       if (!purchasedCourse) throw new Error("Purchased course not found");
-
+  
       const courseData = purchasedCourse.courseId as unknown as ICourse;
       const chaptersData = courseData?.fullVideo?.map((video: any) => video.chapterId);
-
+      if(!chaptersData) throw new Error("Internal Error")
+  
+      // Generate signed URLs for each chapter's videoUrl
+      const chaptersWithSignedUrls = await Promise.all(
+        chaptersData.map(async (chapter: any) => {
+          if (chapter.videoUrl) {
+            // Generate a signed URL for the video
+            const signedUrl = await generateSignedUrl(chapter.videoUrl);
+            return {
+              ...chapter.toObject(), // Convert Mongoose document to plain object
+              videoUrl: signedUrl, // Replace videoUrl with the signed URL
+            };
+          }
+          return chapter;
+        })
+      );
+  
       res.status(200).json({
         success: true,
-        message: "retrived play data",
-        data: { purchasedCourse, course: { courseName: courseData?.courseName, duration: courseData?.duration, level: courseData?.level, description: courseData?.description, category: courseData?.category, thumbnailUrl: courseData?.thumbnailUrl }, chapters: chaptersData },
+        message: "Retrieved play data",
+        data: {
+          purchasedCourse,
+          course: {
+            courseName: courseData?.courseName,
+            duration: courseData?.duration,
+            level: courseData?.level,
+            description: courseData?.description,
+            category: courseData?.category,
+            thumbnailUrl: courseData?.thumbnailUrl,
+          },
+          chapters: chaptersWithSignedUrls, // Use chapters with signed URLs
+        },
       });
+      console.log(chaptersWithSignedUrls)
     } catch (error) {
       next(error);
     }
@@ -250,129 +311,129 @@ export class CourseContoller implements ICourseControllers {
     }
   }
 
-  public async addQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
-    try {
+  // public async addQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
+  //   try {
 
-      const quizData=req.body
+  //     const quizData=req.body
 
      
-      const savedQuiz = await QuizModel.create(quizData);
-      const courseData = await this.courseService.getCourseById(quizData.courseId);
-      if (!courseData) throw new Error("No course found");
+  //     const savedQuiz = await QuizModel.create(quizData);
+  //     const courseData = await this.courseService.getCourseById(quizData.courseId);
+  //     if (!courseData) throw new Error("No course found");
 
-      const updatedCourseData = { ...courseData.toObject(), quizId:savedQuiz._id};
+  //     const updatedCourseData = { ...courseData.toObject(), quizId:savedQuiz._id};
       
      
 
-        await this.courseService.updateCourse(String(savedQuiz.courseId),updatedCourseData)
+  //       await this.courseService.updateCourse(String(savedQuiz.courseId),updatedCourseData)
       
 
-      res.status(201).json({
-        success:true,
-        message:"Quiz added to the Course",
-        data:savedQuiz
+  //     res.status(201).json({
+  //       success:true,
+  //       message:"Quiz added to the Course",
+  //       data:savedQuiz
 
-      });
+  //     });
 
 
       
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
-  public async editQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
-    try {
-      console.log(req.params,req.body,"bodyyy")
-      const updatedQuiz = await QuizModel.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
+  //   } catch (error) {
+  //     console.log(error)
+  //     throw error
+  //   }
+  // }
+  // public async editQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
+  //   try {
+  //     console.log(req.params,req.body,"bodyyy")
+  //     const updatedQuiz = await QuizModel.findByIdAndUpdate(
+  //       req.params.id,
+  //       req.body,
+  //       {
+  //         new: true,
           
-        }
-      );
-      console.log(updatedQuiz,"updateddd")
-      if (!updatedQuiz) {
-        res.status(404).json({ 
-          success:false,
-          message: "Quiz not found" });
-        return;
-      }
-      res.status(200).json({
-        success:true,
-        message:"updated quizz successfully!",
-        data:updatedQuiz});
-    } catch (error:any) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-  public async getQuiz(req:Request,res:Response,next:NextFunction):Promise<void>{
-    try {
+  //       }
+  //     );
+  //     console.log(updatedQuiz,"updateddd")
+  //     if (!updatedQuiz) {
+  //       res.status(404).json({ 
+  //         success:false,
+  //         message: "Quiz not found" });
+  //       return;
+  //     }
+  //     res.status(200).json({
+  //       success:true,
+  //       message:"updated quizz successfully!",
+  //       data:updatedQuiz});
+  //   } catch (error:any) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // }
+  // public async getQuiz(req:Request,res:Response,next:NextFunction):Promise<void>{
+  //   try {
 
-      const {quizId}=req.params
+  //     const {quizId}=req.params
 
-      console.log(quizId,"quizID")
+  //     console.log(quizId,"quizID")
      
-      const savedQuiz = await QuizModel.findById(quizId);
-      console.log("saved",savedQuiz)
-      res.status(201).json({
-        success:true,
-        message:"Quiz added to the Course",
-        data:savedQuiz
+  //     const savedQuiz = await QuizModel.findById(quizId);
+  //     console.log("saved",savedQuiz)
+  //     res.status(201).json({
+  //       success:true,
+  //       message:"Quiz added to the Course",
+  //       data:savedQuiz
 
-      });
-
-
-      
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
-
-  public async submitResult(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-
-      const {courseId}=req.params
-      const {score,total}=req.body
-      console.log(score,total,"=====>final score")
-
-      if(!courseId)  throw new Error("courseId not found");
-      // if(!score || !total)  throw new Error("finalscore not found");
-      const userId = await getId("accessToken", req);
-      const percentage=(score/total)*100
-      const Pass=percentage>40
-      if(Pass){
-        const courseData = await PurchasedCourseModel.findOneAndUpdate({
-          courseId,userId
-        },{
-          isCourseCompleted:true
-        },{
-          new:true
-        })
-        // await this.courseService.updateCourse(courseId,{})
-        res.status(200).json({
-          success:true,
-          message:"Course Cmmpleted!",
-          data:courseData
-        })
-      }else{
-        res.json({
-          success:false,
-          message:"Retry Quiz!"
-        })
-        return
-      }
+  //     });
 
 
       
+  //   } catch (error) {
+  //     console.log(error)
+  //     throw error
+  //   }
+  // }
+
+  // public async submitResult(req: Request, res: Response, next: NextFunction): Promise<void> {
+  //   try {
+
+  //     const {courseId}=req.params
+  //     const {score,total}=req.body
+  //     console.log(score,total,"=====>final score")
+
+  //     if(!courseId)  throw new Error("courseId not found");
+  //     // if(!score || !total)  throw new Error("finalscore not found");
+  //     const userId = await getId("accessToken", req);
+  //     const percentage=(score/total)*100
+  //     const Pass=percentage>40
+  //     if(Pass){
+  //       const courseData = await PurchasedCourseModel.findOneAndUpdate({
+  //         courseId,userId
+  //       },{
+  //         isCourseCompleted:true
+  //       },{
+  //         new:true
+  //       })
+  //       // await this.courseService.updateCourse(courseId,{})
+  //       res.status(200).json({
+  //         success:true,
+  //         message:"Course Cmmpleted!",
+  //         data:courseData
+  //       })
+  //     }else{
+  //       res.json({
+  //         success:false,
+  //         message:"Retry Quiz!"
+  //       })
+  //       return
+  //     }
+
+
       
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
+      
+  //   } catch (error) {
+  //     console.log(error)
+  //     throw error
+  //   }
+  // }
 
 
 }

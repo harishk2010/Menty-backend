@@ -13,7 +13,7 @@ const QuestionSchema = new Schema<IQuestions>({
   correctAnswer: { type: String, required: true },
 });
 
-interface IQuiz extends Document{
+export interface IQuiz extends Document{
   courseId:Schema.Types.ObjectId;
   title:string;
   description:string;

@@ -8,6 +8,7 @@ import consume from "./config/kafka/consumer";
 
 import courseRoutes from "./routes/courseRoutes";
 import chapterRoutes from "./routes/chapterRoutes";
+import quizRoutes from "./routes/quizRoutes";
 
 config()
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/course',courseRoutes)
 app.use('/chapter',chapterRoutes)
+app.use('/quiz',quizRoutes)
 consume()
 app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
     console.error("Error:", err.message);

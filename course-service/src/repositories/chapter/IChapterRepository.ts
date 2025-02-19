@@ -1,9 +1,6 @@
 import { IChapter } from "../../models/chapterModel";
-import { updateRequestType } from "../../Types/updateRequestType";
+import { IGenericRepository } from "../GenericRepository";
 
-export interface IChapterRepository {
-  createChapter(chapterData: IChapter): Promise<IChapter>;
-  updateChapter(chapterId:string,chapterData: IChapter): Promise<IChapter | null>
-  getAllChapters(courseId:string): Promise<IChapter[]>;
-  getChapterById(id: string): Promise<IChapter | null>;
+export interface IChapterRepository extends IGenericRepository<IChapter> {
+  getAllChapters(courseId: string): Promise<IChapter[] >;
 }

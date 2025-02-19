@@ -1,77 +1,30 @@
-import UserModel, { IUser } from "../../models/userModel";
+import { IUser } from "../../models/userModel";
+import { GenericRepository } from "../GenericRepository";
+import UserModel from "../../models/userModel";
+import { IStudentRepository } from "./IStudentRepository";
 
-import { Model } from "mongoose";
-import {  IStudentRepository } from "./IStudentRepository";
-import { IStudentBaseRepository } from "../baseRepository/student/IStudentBaseRepository";
+export class StudentRepository extends GenericRepository<IUser> implements IStudentRepository {
+  constructor() {
+    super(UserModel);
+  }
 
-
-export class StudentRepository implements IStudentRepository{
-    private studentBaseRepository:IStudentBaseRepository
-    constructor(studentBaseRepository:IStudentBaseRepository){
-        this.studentBaseRepository=studentBaseRepository
-
+  /**
+   * Update a student's password by email.
+   * @param email - Email of the student.
+   * @param password - New password.
+   * @returns The updated student data.
+   */
+  async updatePassword(email: string, password: string): Promise<IUser | null> {
+    try {
+      const response = await UserModel.findOneAndUpdate(
+        { email },
+        { $set: { password } },
+        { new: true }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error in updatePassword:", error);
+      throw error;
     }
-    async createStudent(payload:any):Promise<IUser | null>{
-        try {
-            const response=await this.studentBaseRepository.createStudent(payload)
-            return response
-            
-            
-        } catch (error) {
-            console.log(error);
-            throw error;
-            
-        }
-    }
-    async getStudentData(email:string):Promise<IUser | null>{
-        try {
-            const response=await this.studentBaseRepository.getStudentData(email)
-            return response
-            
-        } catch (error) {
-            console.log(error);
-            throw error;
-            
-        }
-    }
-    async updateProfile(id:any,data:object):Promise<IUser | null>{
-        try {
-            const response=await this.studentBaseRepository.updateProfile(id,data)
-            return response
-            
-        } catch (error) {
-            console.log(error);
-        throw error;
-        
-            
-        }
-    }
-    
-    async updatePassword(email:string,password:string):Promise<IUser | null>{
-        try {
-            const response=await this.studentBaseRepository.updatePassword(email,password)
-            return response
-            
-        } catch (error) {
-            console.log(error);
-            throw error;
-            
-            
-        }
-    }
-    async getStudents():Promise<IUser[]>{
-        try {
-            const response=await this.studentBaseRepository.findAllStudents()
-            return response
-            
-        } catch (error) {
-            console.log(error);
-            throw error;
-            
-            
-        }
-    }
-    
-    
-    
+  }
 }

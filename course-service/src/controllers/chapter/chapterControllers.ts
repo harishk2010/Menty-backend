@@ -12,32 +12,71 @@ export class ChapterController implements IChapterControllers {
       const { courseId } = req.params;
       const { title, description } = req.body;
       
-      const file = req.file as Express.Multer.File & { location: string };
-      console.log(file, "file");
+      // const file = req.file as Express.Multer.File & { location: string };
+      // console.log(file, "file");
     
-      if (!courseId || !title || !description ) {
+      // if (!courseId || !title || !description ) {
+      //   res.status(400).json({ message: "Missing required fields", success: false });
+      //   return;
+      // }
+      // if (!file?.key) {
+      //   res.status(400).json({ message: "Missing required file", success: false });
+      //   return;
+      // }
+      // // if (!file?.location) {
+      // //   res.status(400).json({ message: "Missing required file", success: false });
+      // //   return;
+      // // }
+    
+      // const newChapter = await this.chapterService.createChapter({
+      //   chapterTitle: title,
+      //   courseId: new Types.ObjectId(courseId),
+      //   description,
+      //   // videoUrl: file.location, 
+      //   videoUrl: file.key, 
+      // });
+    
+      // await CourseModel.findByIdAndUpdate(
+      //   courseId,
+      //   { $push: { fullVideo: { chapterId: newChapter._id } } },
+      //   { new: true }
+      // );
+    
+      // res.status(201).json({ message: "Chapter added successfully", success: true, data: newChapter });
+      const file = req.file as Express.Multer.File & { key: string };
+
+      console.log(file, "file");
+  
+      if (!courseId || !title || !description) {
         res.status(400).json({ message: "Missing required fields", success: false });
         return;
       }
-      if (!file?.location) {
+  
+      if (!file?.key) {
         res.status(400).json({ message: "Missing required file", success: false });
         return;
       }
-    
+  
+      // ✅ Store only the S3 key (not the full URL)
       const newChapter = await this.chapterService.createChapter({
         chapterTitle: title,
         courseId: new Types.ObjectId(courseId),
         description,
-        videoUrl: file.location, 
+        videoUrl: file.key, // Store only the S3 object key
       });
-    
+  
+      // ✅ Add the chapter to the course
       await CourseModel.findByIdAndUpdate(
         courseId,
         { $push: { fullVideo: { chapterId: newChapter._id } } },
         { new: true }
       );
-    
-      res.status(201).json({ message: "Chapter added successfully", success: true, data: newChapter });
+  
+      res.status(201).json({ 
+        message: "Chapter added successfully", 
+        success: true, 
+        data: newChapter 
+      });
     } catch (error) {
       next(error);
     }

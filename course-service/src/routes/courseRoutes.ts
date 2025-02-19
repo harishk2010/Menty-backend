@@ -50,18 +50,6 @@ router
 router
   .route("/chapterCompleted/:chapterId")
   .put(authenticateToken,courseController.chapterVideoEnd.bind(courseController));
-router
-  .route("/addQuiz")
-  .post(authenticateToken,courseController.addQuiz.bind(courseController));
-router
-  .route("/editQuiz/:id")
-  .put(authenticateToken,courseController.editQuiz.bind(courseController));
-router
-  .route("/getQuiz/:quizId")
-  .get(authenticateToken,courseController.getQuiz.bind(courseController));
-router
-  .route("/sumbitResult/:courseId")
-  .put(authenticateToken,courseController.submitResult.bind(courseController));
 
 const courseRoutes = router;
 export default courseRoutes;

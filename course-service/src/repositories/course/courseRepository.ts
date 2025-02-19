@@ -1,68 +1,106 @@
-// import { updateRequestType } from "../Types/updateRequestType";
-import { IPurchasedCourse } from "../../models/purchasedModel";
-import { IChapter } from "../../models/chapterModel";
 import { ICourse } from "../../models/courseModel";
-import { ICourseBaseRepository } from "../baseRepository/ICourseBaseRepository";
-import { CourseBaseRepository } from "../baseRepository/courseBaseRepository";
+import { GenericRepository } from "../GenericRepository";
+import {CourseModel} from "../../models/courseModel";
 import { ICourseRepository } from "./ICourseRepository";
+import { ChapterModel, IChapter } from "../../models/chapterModel";
+import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 
-export class CourseRepository implements ICourseRepository {
-    private courseBaseRepository:ICourseBaseRepository
-    constructor(courseBaseRepository:ICourseBaseRepository){
-        this.courseBaseRepository=courseBaseRepository
+export class CourseRepository extends GenericRepository<ICourse> implements ICourseRepository {
+  constructor() {
+    super(CourseModel);
+  }
+
+  async getChapterById(id: string): Promise<IChapter[] | null> {
+    try {
+      const chapters = await ChapterModel.find({ courseId: id });
+      return chapters;
+    } catch (error) {
+      throw error;
     }
-    async createCourse(courseData: ICourse): Promise<ICourse> {
-        return await this.courseBaseRepository.createCourse(courseData);
-      }
-    
-    async  updateCourse(courseId:string,courseData: ICourse): Promise<ICourse | null> {
-        return await this.courseBaseRepository.updateCourseByCourseId(courseId,courseData);
-      }
-    
-      // Get all courses
-      async getAllCourses(): Promise<ICourse[]> {
-        return await this.courseBaseRepository.getAllCourses();
-      }
-    
-      // Get a single course by ID
-      async getCourseById(id: string): Promise<ICourse | null> {
-        return await this.courseBaseRepository.getCourseById(id);
-      }
-      async getChapterById(id: string): Promise<IChapter[] | null> {
-        return await this.courseBaseRepository.getChapterById(id);
-      }
-      async getInstructorCourses(instructorId: string): Promise<ICourse[]> {
-        return await this.courseBaseRepository.getInstructorCourses(instructorId);
-        
-      }
-      async buyCourse(userId: string,quizId:string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>{
-         try {
-          return await this.courseBaseRepository.buyCourse(userId,courseId,quizId,completedChapters,txnid)
-          
-         } catch (error) {
-          console.log(error)
-          throw error
-         }
-        }
+  }
 
-        public async getBoughtCourses(userId: string, page: number, limit: number): Promise<any> {
-          try {
-              const response = await this.courseBaseRepository.getBoughtCourses(userId, page, limit)
-              return response
-          } catch (error: any) {
-              throw error
-          }
-      }
-
-      public async chapterVideoEnd(courseId: string): Promise<ICourse | null> {
-        try {
-          const response = await this.courseBaseRepository.chapterVideoEnd(
-            courseId
-          );
-          return response;
-        } catch (error: any) {
-          throw error;
-        }
-      }
+  async getInstructorCourses(instructorId: string): Promise<ICourse[]> {
+    try {
+      const courses = await this.findAll({ mentorId: instructorId });
+      return courses;
+    } catch (error) {
+      throw error;
     }
+  }
 
+  async buyCourse(
+    userId: string,
+    quizId: string,
+    courseId: string,
+    completedChapters: any,
+    txnid: string
+  ): Promise<IPurchasedCourse | null> {
+    try {
+      const courseDetails = await this.findById(courseId);
+      if (!courseDetails) throw new Error("Course not found");
+
+      const boughtCourse = await PurchasedCourseModel.findOneAndUpdate(
+        { userId, courseId },
+        {
+          instructorId: courseDetails.mentorId,
+          transactionId: txnid,
+          completedChapters,
+          quizId,
+          isCourseCompleted: false,
+        },
+        { upsert: true, new: true }
+      );
+
+      return boughtCourse;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getBoughtCourses(userId: string, page: number, limit: number): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+
+      const response = await PurchasedCourseModel.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("courseId", "courseName level thumbnailUrl quizId")
+        .exec();
+
+      const totalCourses = await PurchasedCourseModel.countDocuments({ userId });
+
+      return {
+        courses: response,
+        currentPage: page,
+        totalPages: Math.ceil(totalCourses / limit),
+        totalCourses: totalCourses,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async chapterVideoEnd(chapterId: string): Promise<any> {
+    try {
+      const findChapter = await PurchasedCourseModel.findOne({
+        "completedChapters.chapterId": chapterId,
+      });
+
+      if (!findChapter) throw new Error("Purchased Course not Found");
+
+      const chapterIndex = findChapter.completedChapters.findIndex(
+        (chapter) => chapter.chapterId.toString() === chapterId
+      );
+
+      if (chapterIndex === -1) throw new Error("Chapter Not Found");
+
+      findChapter.completedChapters[chapterIndex].isCompleted = true;
+      const updatedChapters = await findChapter.save();
+
+      return updatedChapters;
+    } catch (error) {
+      throw error;
+    }
+  }
+}

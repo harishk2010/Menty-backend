@@ -1,4 +1,5 @@
-import IOtpRepository from "@/repositories/interfaces/IOtpRespoitory"
+import { Iotp } from "../interface/otp"
+import IOtpRepository from "../repositories/interfaces/IOtpRespoitory"
 import IOtpServices from "./interfaces/IOtpService"
 
 export class OtpService implements IOtpServices{
@@ -18,7 +19,7 @@ export class OtpService implements IOtpServices{
         }
     }
 
-    public async findOtp(email:string){
+    public async findOtp(email:string): Promise<Iotp | null>{
         try {
             
             const response=await this.otpRespository.findOtp(email)

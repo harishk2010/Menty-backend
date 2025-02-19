@@ -1,11 +1,10 @@
-
 import { IUser } from "../../models/userModel";
+import { IGenericRepository } from "../GenericRepository";
 
-export default interface IStudentRepository {
-    findByEmail(email:string): Promise<IUser | null>;
-    createUser(userData:any): Promise<IUser | null>;
-    resetPassword(email:string,password:string): Promise<IUser | null>;
-    googleLogin(name: string, email: string, password: string): Promise<IUser | null>;
-    updateProfile( email: string,data:any): Promise<IUser | null>;
-   
+export interface IStudentRepository extends IGenericRepository<IUser> {
+  findByEmail(email: string): Promise<IUser | null>;
+  createUser(userData: any): Promise<IUser | null>;
+  resetPassword(email: string, password: string): Promise<IUser | null>;
+  googleLogin(name: string, email: string, password: string): Promise<IUser | null>;
+  updateProfile(email: string, data: any): Promise<IUser | null>;
 }

@@ -1,68 +1,58 @@
-import { NextFunction } from "express";
-import InstructorModel, { IInstructor } from "../models/instructorModel";
-import InstructorBaseRepository from "./baseRepositories/instructorBaseRepository";
-import IInstructorRepository from "./interfaces/IInstructorRepository";
-import IInstructorBaseRepository from "./baseRepositories/interfaces/IInstructorBaseRepository";
+import { IInstructor } from "../models/instructorModel";
+import { GenericRepository } from "./GenericRepository";
+import InstructorModel from "../models/instructorModel";
+import  {IInstructorRepository}  from "../repositories/interfaces/IInstructorRepository";
 
+export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
+  constructor() {
+    super(InstructorModel);
+  }
 
-export class InstructorRepository implements IInstructorRepository{
-    private baseRepository:IInstructorBaseRepository
-    constructor(baseRepository:IInstructorBaseRepository){
-        this.baseRepository=baseRepository
+  async findByEmail(email: string): Promise<IInstructor | null> {
+    return await this.findOne({ email });
+  }
 
-    }
-    
-    async findByEmail(email:string): Promise<IInstructor | null>{
-       try {
-           const response = await this.baseRepository.findByEmail(email)
-           return response
+  async createUser(userData: any): Promise<IInstructor | null> {
+    return await this.create(userData);
+  }
+
+  async resetPassword(email: string, password: string): Promise<IInstructor | null> {
+    try {
+        const instructor=await this.findOne({email})
+        if(!instructor){
+            throw new Error("No InstructorData found")
+        }
+        const userId=(instructor._id as unknown as string)
         
-       } catch (error) {
-        console.log(error)
+        return await this.update(userId, { password });
+    } catch (error) {
         throw error
-       }
+    }
+  }
+
+  async googleLogin(name: string, email: string, password: string): Promise<IInstructor | null> {
+    const user = await this.findByEmail(email);
+
+    if (!user) {
+      // Create a new user
+      const newUser = await this.createUser({ name, email, password });
+      return newUser;
     }
 
-    async createUser(userData:any): Promise<IInstructor | null> {
-        
-        try {
-            const response= await this.baseRepository.createInstructor(userData)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
+    return user;
+  }
+
+  async updateProfile(email: string, data: any): Promise<IInstructor | null> {
+
+    try {
+        const instructor=await this.findOne({email})
+        if(!instructor){
+            throw new Error("No InstructorData found")
         }
-    }
-    
-    async resetPassword(email:string,password:string): Promise<IInstructor | null> {
-       
-       try {
-           
-           const response= await this.baseRepository.resetPassword(email,password)
-           return response
-       } catch (error) {
-        console.log(error)
+        const userId=(instructor._id as unknown as string)
+        return await this.update(userId, data);
+    } catch (error) {
         throw error
-       }
     }
-    public async googleLogin(name: string, email: string, password: string): Promise<IInstructor | null> {
-        try {
-            const response = await this.baseRepository.googleLogin(name, email, password);
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
-    public async updateProfile(email:string,data:any): Promise<IInstructor | null>{
-        try {
-            const response = await this.baseRepository.updateProfile(email,data);
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
-    
-    
-    
+  }
 }

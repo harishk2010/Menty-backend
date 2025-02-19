@@ -1,18 +1,18 @@
-import { IPurchasedCourse } from "@/models/purchasedModel";
-import { IChapter } from "../../models/chapterModel";
 import { ICourse } from "../../models/courseModel";
-import { updateRequestType } from "../../Types/updateRequestType";
+import { IGenericRepository } from "../GenericRepository";
+import { IChapter } from "../../models/chapterModel";
+import { IPurchasedCourse } from "../../models/purchasedModel";
 
-export interface ICourseRepository {
-  createCourse(courseData: ICourse): Promise<ICourse>;
-  updateCourse(courseId:string,courseData: ICourse): Promise<ICourse | null>
-  getAllCourses(): Promise<ICourse[]>;
-  getInstructorCourses(instructorId:string): Promise<ICourse[]>
-
-  getCourseById(id: string): Promise<ICourse | null>;
+export interface ICourseRepository extends IGenericRepository<ICourse> {
   getChapterById(id: string): Promise<IChapter[] | null>;
-  buyCourse(userId: string,quizId:string, courseId: string, completedChapters: any, txnid: string):Promise<IPurchasedCourse | null>
-  getBoughtCourses(userId: string, page: number , limit: number ): Promise<any>
-  chapterVideoEnd(courseId: string): Promise<ICourse | null>
-
+  getInstructorCourses(instructorId: string): Promise<ICourse[]>;
+  buyCourse(
+    userId: string,
+    quizId: string,
+    courseId: string,
+    completedChapters: any,
+    txnid: string
+  ): Promise<IPurchasedCourse | null>;
+  getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
+  chapterVideoEnd(chapterId: string): Promise<any>;
 }
