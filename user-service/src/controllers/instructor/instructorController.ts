@@ -26,8 +26,19 @@ export class InstructorController implements IInstructorControllers {
   public async getInstructor(req: Request, res: Response): Promise<any> {
     try {
       const { email } = req.params;
-      // console.log(email,"get Instructor Data")
+      console.log(email,"get Instructor Data")
       let response = await this.instructorService.getInstructorData(email);
+      // console.log(response)
+      res.json(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async getInstructorById(req: Request, res: Response): Promise<void> {
+    try {
+      const { instructorId } = req.params;
+      console.log(instructorId,"get Instructor Data by id")
+      let response = await this.instructorService.getInstructorDataById(instructorId);
       // console.log(response)
       res.json(response);
     } catch (error) {

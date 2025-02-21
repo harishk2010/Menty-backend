@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 export interface IInstructorControllers {
     addInstructor(payload: IInstructor): Promise<void>;
     getInstructor(req: Request, res: Response): Promise<void>;
+    getInstructorById(req: Request, res: Response): Promise<void>;
     updateProfile(req: Request, res: Response): Promise<void>;
     updatePassword(req: Request, res: Response): Promise<void>;
     getInstructors(req: Request, res: Response): Promise<void>;
