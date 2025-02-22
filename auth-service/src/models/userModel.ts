@@ -41,7 +41,7 @@ const UserSchema: Schema<IUser> = new Schema(
     mobile: { type: Number, required: false },
     password: { type: String, required: true },
     role: { type: String, required: false, default: "student" },
-    profilePicUrl: { type: String, required: false, default: "No Picture" },
+    profilePicUrl: { type: String, required: false, default: "https://freesvg.org/img/abstract-user-flat-4.png" },
     studiedHours: { type: Number, required: false, default: 0 },
     isVerified: { type: Boolean, required: false, default: false },
     isBlocked: { type: Boolean, required: false, default: false },

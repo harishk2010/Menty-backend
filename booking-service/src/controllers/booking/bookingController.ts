@@ -59,5 +59,29 @@ export class BookingController implements IBookingController{
         
       }
     }
+
+    async getBookindDataById(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+
+        const { bookingId}=req.params
+        console.log(bookingId)
+        if(!bookingId){
+          throw new Error("No bookingId found!")
+        }
+
+        const response=await this.bookingService.getBookindDataById(bookingId)
+        console.log(response)
+        if(response){
+          res.status(200).json({
+            success:true,
+            message:"fetched bookingData",
+            data:response
+          })
+        }
+        
+      } catch (error) {
+        
+      }
+    }
 }
 

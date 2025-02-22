@@ -10,6 +10,9 @@ router
 router
   .route("/:studentId")
   .get(authenticateToken,bookingController.getBookingsByStudentId.bind(bookingController));
+router
+  .route("/bookingData/:bookingId")
+  .get(authenticateToken,bookingController.getBookindDataById.bind(bookingController));
 
   const bookingRoutes= router
   export default bookingRoutes

@@ -33,7 +33,7 @@ const InstructorSchema: Schema<IInstructor> = new Schema(
     profilePicUrl: {
       type: String,
       required: false,
-      default: "No Profile Pic",
+      default: "https://freesvg.org/img/abstract-user-flat-4.png",
     },
     isVerified: { type: Boolean, required: false, default: false },
     isBlocked: { type: Boolean, required: false, default: false },

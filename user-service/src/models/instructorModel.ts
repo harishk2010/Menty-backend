@@ -46,7 +46,7 @@ const InstructorSchema: Schema<IInstructor> = new Schema(
     profilePicUrl: {
       type: String,
       required: false,
-      default: "img not provided",
+      default: "https://freesvg.org/img/abstract-user-flat-4.png",
     },
     verificationStatus: {
       type: String,

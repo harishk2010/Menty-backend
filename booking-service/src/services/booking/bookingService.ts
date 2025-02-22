@@ -45,4 +45,13 @@ export class BookingService implements IBookingService{
     }
     
   }
+  async getBookindDataById(bookingId: string): Promise<IBooking | null> {
+    try {
+      return await this.bookingRepository.findById(bookingId)
+      
+    } catch (error) {
+      throw error
+      
+    }
+  }
 }
