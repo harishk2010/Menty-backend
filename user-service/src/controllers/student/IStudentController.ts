@@ -9,6 +9,7 @@ export interface IStudentControllers {
     updateProfile(req: Request, res: Response): Promise<void>;
     updatePassword(req: Request, res: Response): Promise<void>;
     getStudents(req: Request, res: Response): Promise<void>;
+    getStudentDataById(req: Request, res: Response): Promise<void>;
     blockStudent(req: Request, res: Response): Promise<void>;
     passwordReset(data:any): Promise<IUser | null>;
    

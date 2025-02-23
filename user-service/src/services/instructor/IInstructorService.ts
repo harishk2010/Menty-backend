@@ -7,5 +7,6 @@ export interface IInstructorService {
   updateProfile(id: string, data: object): Promise<IInstructor | null>;
   getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null>;
   updatePassword(email: string, password: string): Promise<IInstructor | null>;
+  updatePlanPrice(instructorId:string,planPrice: number): Promise<IInstructor | null>;
   getInstructors(): Promise<IInstructor[] | null>;
 }

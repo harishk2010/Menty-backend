@@ -39,6 +39,15 @@ export class InstructorServices implements IInstructorService {
       throw error;
     }
   }
+  async updatePlanPrice(instructorId:string,planPrice: number): Promise<IInstructor | null> {
+    try {
+      const response = await this.instructorRepository.update(instructorId,{planPrice});
+      return response;
+    } catch (error) {
+      console.error("Error in updatePlanPrice:", error);
+      throw error;
+    }
+  }
 
   /**
    * Get instructor data by ID.

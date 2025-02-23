@@ -10,6 +10,11 @@ router
 router
   .route("/:studentId")
   .get(authenticateToken,bookingController.getBookingsByStudentId.bind(bookingController));
+  
+router
+  .route("/instructorBookings/:instructorId")
+  .get(authenticateToken,bookingController.getBookingsByInstructorId.bind(bookingController));
+
 router
   .route("/bookingData/:bookingId")
   .get(authenticateToken,bookingController.getBookindDataById.bind(bookingController));

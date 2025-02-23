@@ -15,4 +15,5 @@ export interface ICourseRepository extends IGenericRepository<ICourse> {
   ): Promise<IPurchasedCourse | null>;
   getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
   chapterVideoEnd(chapterId: string): Promise<any>;
+  getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>
 }

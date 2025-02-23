@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 // import proxy from 'express-http-proxy'
 import morgan from  "morgan" 
+import logger from './logger/logger'
 
 config();
 
@@ -56,7 +57,15 @@ const services = [
     
 ];
 
-app.use(morgan('dev'))
+// app.use(morgan('dev'))
+app.use(
+    morgan('combined', {
+      stream: {
+        write: (message) => logger.info(message.trim()), // Send Morgan logs to Winston
+      },
+    })
+  );
+  
 
 // Setup proxies
 services.forEach(({ context, path }) => {
@@ -74,6 +83,7 @@ services.forEach(({ context, path }) => {
 });
 
 app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
+    logger.error(`Error: ${err.message}`);
     console.error("Error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
 });

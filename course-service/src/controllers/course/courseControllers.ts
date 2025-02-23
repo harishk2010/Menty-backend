@@ -74,12 +74,38 @@ export class CourseContoller implements ICourseControllers {
   async getCourseById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      console.log(id)
       const course = await this.courseService.getCourseById(id);
       if (!course) {
         res.status(404).json({ message: "Course not found" });
         return;
       }
       res.status(200).json(course);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getBoughtCourseById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      console.log(id)
+      const course = await this.courseService.getBoughtCourseById(id);
+      if (!course ) {
+        res.status(404).json({ message: "Course not found" });
+        return;
+      }
+      const courseId=course.courseId
+      if (!courseId ) {
+        res.status(404).json({ message: "CourseId not found" });
+        return;
+      }
+      const courseDetails=await this.courseService.getCourseById(String(courseId))
+      const response = {
+        ...course,  // Extract only the raw data
+        courseDetails // Ensure nested object is also raw
+      };
+      console.log(response)
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

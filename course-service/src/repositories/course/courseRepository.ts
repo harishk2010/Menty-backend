@@ -103,4 +103,15 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
       throw error;
     }
   }
+
+  async getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null> {
+    try {
+      if (!courseId) throw new Error("Purchased courseId not Found");
+      const course=await PurchasedCourseModel.findById(courseId)
+      return course
+      
+    } catch (error) {
+      throw error
+    }
+  }
 }

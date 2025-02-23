@@ -10,6 +10,7 @@ export interface ICourseControllers {
     publishCourse(req:Request,res:Response,next:NextFunction):Promise<void>
     buyCourse(req:Request,res:Response,next:NextFunction):Promise<void>
     getBoughtCourses(req:Request,res:Response,next:NextFunction):Promise<void>
+    getBoughtCourseById(req:Request,res:Response,next:NextFunction):Promise<void>
     coursePlay(req: Request, res: Response, next:NextFunction):Promise<any>
     chapterVideoEnd(req: Request, res: Response, next:NextFunction):Promise<void>
     // addQuiz(req: Request, res: Response, next:NextFunction):Promise<void>

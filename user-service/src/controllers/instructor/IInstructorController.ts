@@ -12,6 +12,7 @@ export interface IInstructorControllers {
     getInstructors(req: Request, res: Response): Promise<void>;
     getTransactions(req: Request, res: Response): Promise<void>;
     blockInstructor(req: Request, res: Response): Promise<void>;
+    updatePlanPrice(req: Request, res: Response): Promise<void>;
     passwordReset(data:any): Promise<IInstructor | null>;
     updateWallet(data:any): Promise<IInstructor | null>;
     updateVerifyStatus(data:any): Promise<IInstructor | null>;

@@ -45,6 +45,16 @@ export class BookingService implements IBookingService{
     }
     
   }
+  async getBookingsByInstructorId(instructorId: string): Promise<IBooking[] | null> {
+    try {
+      return await this.bookingRepository.findAll({instructorId})
+      
+    } catch (error) {
+      throw error
+      
+    }
+    
+  }
   async getBookindDataById(bookingId: string): Promise<IBooking | null> {
     try {
       return await this.bookingRepository.findById(bookingId)

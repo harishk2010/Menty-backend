@@ -14,6 +14,7 @@ export interface IInstructor extends Document {
   verificationStatus: string;
   isVerified?: boolean;
   isBlocked?: boolean;
+  planPrice?:number;
   wallet: {
     balance: number;
     transactions: ITransaction[];
@@ -43,6 +44,7 @@ const InstructorSchema: Schema<IInstructor> = new Schema(
     skills: { type: String, required: false },
     password: { type: String, required: true },
     role: { type: String, required: false, default: "instructor" },
+    planPrice:{type:Number,required:false,default:100},
     profilePicUrl: {
       type: String,
       required: false,

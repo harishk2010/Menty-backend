@@ -133,7 +133,7 @@ export class InstructorController implements IInstructorControllers{
 
         const user = await this.instructorService.createUser(decode);
         if (user) {
-          await produce("add-instructor", user);
+          await produce("add-instructor-data", user);
           await this.otpService.deleteOtp(user.email);
 
            res.status(201).json({

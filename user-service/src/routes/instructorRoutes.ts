@@ -13,6 +13,7 @@ router.patch('/updatePassword',isInstructor,instructorController.updatePassword.
 router.get('/getInstructors',authenticateToken,instructorController.getInstructors.bind(instructorController))
 router.get('/transactions',authenticateToken,instructorController.getTransactions.bind(instructorController))
 router.patch('/blockInstructor/:email',instructorController.blockInstructor.bind(instructorController))
+router.put('/updatePlanPrice/:instructorId',authenticateToken,instructorController.updatePlanPrice.bind(instructorController))
 router.get('/instructor/:instructorId',authenticateToken,instructorController.getInstructorById.bind(instructorController))
 router.get('/:email',authenticateToken,instructorController.getInstructor.bind(instructorController))
 

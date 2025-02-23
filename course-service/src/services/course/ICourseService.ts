@@ -5,6 +5,7 @@ import { IPurchasedCourse } from "../../models/purchasedModel";
 export interface ICourseService {
   createCourse(courseData: ICourse): Promise<ICourse>;
   updateCourse(courseId: string, courseData: ICourse): Promise<ICourse | null>;
+  getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>;
   getAllCourses(): Promise<ICourse[]>;
   getInstructorCourses(instructorId: string): Promise<ICourse[]>;
   getCourseById(id: string): Promise<ICourse | null>;

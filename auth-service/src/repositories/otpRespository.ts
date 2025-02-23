@@ -13,15 +13,11 @@ export class OtpRespository extends GenericRepository<Iotp> implements IOtpRepos
     }
     public async createOtp(email:string,otp:string): Promise<Iotp | null>{
         try {
-            const otpData=await this.findOne({email})
-
-            if(!otpData){
-                throw new Error("No Otp Data found")
-            }
-            const otpId=(otpData._id as unknown as string)
-            
-            const response = await this.update(otpId,{otp})
-            return response
+            const response = await this.updateOne({ email }, { otp });
+        if (!response) {
+            return await this.create({ email, otp } as Iotp); // Ensure `email` and `otp` exist
+        }
+        return response;
         } catch (error) {
             console.log(error)
             throw error

@@ -36,6 +36,19 @@ export class StudentController implements IStudentControllers {
       
     }
   }
+  public async getStudentDataById(req: Request, res: Response):  Promise<void> {
+    try {
+      const { studentId } = req.params;
+      // console.log(email,"get Student Data")
+      let response = await this.studentService.getStudentDataById(studentId);
+      // console.log(response)
+      res.json(response);
+    } catch (error) {
+      console.log(error);
+      throw error;
+      
+    }
+  }
 
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {

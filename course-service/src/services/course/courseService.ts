@@ -53,4 +53,14 @@ export class CourseService implements ICourseService {
   async chapterVideoEnd(chapterId: string): Promise<any> {
     return await this.courseRepository.chapterVideoEnd(chapterId);
   }
+  async getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null> {
+    try {
+      return await this.courseRepository.getBoughtCourseById(courseId);
+      
+    } catch (error) {
+      throw error
+      
+    }
+    
+  }
 }

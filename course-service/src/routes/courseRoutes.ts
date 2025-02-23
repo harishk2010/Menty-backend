@@ -42,6 +42,9 @@ router
   .route("/boughtCourses/:id")
   .get(authenticateToken,courseController.getBoughtCourses.bind(courseController));
 router
+  .route("/boughtCourse/:id")
+  .get(authenticateToken,courseController.getBoughtCourseById.bind(courseController));
+router
   .route("/playCourseDetails/:id")
   .get(authenticateToken,courseController.coursePlay.bind(courseController));
 router

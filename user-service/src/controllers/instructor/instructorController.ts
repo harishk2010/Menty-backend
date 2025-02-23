@@ -26,7 +26,7 @@ export class InstructorController implements IInstructorControllers {
   public async getInstructor(req: Request, res: Response): Promise<any> {
     try {
       const { email } = req.params;
-      console.log(email,"get Instructor Data")
+      console.log(email, "get Instructor Data");
       let response = await this.instructorService.getInstructorData(email);
       // console.log(response)
       res.json(response);
@@ -37,8 +37,10 @@ export class InstructorController implements IInstructorControllers {
   async getInstructorById(req: Request, res: Response): Promise<void> {
     try {
       const { instructorId } = req.params;
-      console.log(instructorId,"get Instructor Data by id")
-      let response = await this.instructorService.getInstructorDataById(instructorId);
+      console.log(instructorId, "get Instructor Data by id");
+      let response = await this.instructorService.getInstructorDataById(
+        instructorId
+      );
       // console.log(response)
       res.json(response);
     } catch (error) {
@@ -94,23 +96,56 @@ export class InstructorController implements IInstructorControllers {
   }
   public async getTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const { currentPage, itemsPerPage ,email}=req.query
-      console.log(currentPage,itemsPerPage,email)
-      const response=await this.instructorService.getTransactionsList(String(email),Number(currentPage),Number(itemsPerPage))
-      if(!response){
+      const { currentPage, itemsPerPage, email } = req.query;
+      console.log(currentPage, itemsPerPage, email);
+      const response = await this.instructorService.getTransactionsList(
+        String(email),
+        Number(currentPage),
+        Number(itemsPerPage)
+      );
+      if (!response) {
         res.status(500).json({
-          success:false,
-          message:"Something error! Couldn't fetch data!",
-        })
+          success: false,
+          message: "Something error! Couldn't fetch data!",
+        });
+        return;
       }
       res.status(200).json({
-        success:true,
-        message:"fetched transactions data!",
-        data:{
-          data:response,
-          total:response?.length
-        }
-      })
+        success: true,
+        message: "fetched transactions data!",
+        data: {
+          data: response,
+          total: response?.length,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  async updatePlanPrice(req: Request, res: Response): Promise<void> {
+    try {
+      const { planPrice } = req.body;
+      const { instructorId } = req.params;
+      console.log(planPrice,instructorId)
+      const response = await this.instructorService.updatePlanPrice(
+        instructorId,
+        planPrice
+      );
+      if (!response) {
+        res.status(500).json({
+          success: false,
+          message: "Something error! Couldn't fetch data!",
+        });
+        return;
+      }
+      console.log(response)
+      res.status(200).json({
+        success: true,
+        message: "Updated PlanPrice!",
+
+        data: response,
+      });
     } catch (error) {
       console.log(error);
       throw error;
@@ -313,35 +348,32 @@ export class InstructorController implements IInstructorControllers {
       const { txnid, amount, description, type, instructorId } = data;
       const instructorDetails =
         await this.instructorService.getInstructorDataById(instructorId);
-      if(!instructorDetails){
-        throw new Error("No instructor details found")
+      if (!instructorDetails) {
+        throw new Error("No instructor details found");
       }
       const transactions = instructorDetails?.wallet.transactions ?? [];
-      let walletDetails
-      if(type==='debit'){
-
+      let walletDetails;
+      if (type === "debit") {
         walletDetails = {
-         balance: instructorDetails?.wallet.balance - amount,
-         transactions: [...transactions, { amount, description, txnid, type }],
-       };
-      }else{
+          balance: instructorDetails?.wallet.balance - amount,
+          transactions: [...transactions, { amount, description, txnid, type }],
+        };
+      } else {
         walletDetails = {
-         balance: instructorDetails?.wallet.balance + amount,
-         transactions: [...transactions, { amount, description, txnid, type }],
-       };
-
+          balance: instructorDetails?.wallet.balance + amount,
+          transactions: [...transactions, { amount, description, txnid, type }],
+        };
       }
-      console.log(walletDetails,"wallet")
+      console.log(walletDetails, "wallet");
       const response = await this.instructorService.updateProfile(
         instructorId,
-        {wallet:walletDetails}
+        { wallet: walletDetails }
       );
-      console.log(response)
+      console.log(response);
       return response;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
-
 }

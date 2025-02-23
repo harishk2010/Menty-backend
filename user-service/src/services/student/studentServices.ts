@@ -39,6 +39,15 @@ export class StudentServices implements IStudentService {
       throw error;
     }
   }
+  async getStudentDataById(studentId: string): Promise<IUser | null> {
+    try {
+      const response = await this.studentRepository.findById(studentId);
+      return response;
+    } catch (error) {
+      console.error("Error in getStudentData:", error);
+      throw error;
+    }
+  }
 
   /**
    * Update student profile.
