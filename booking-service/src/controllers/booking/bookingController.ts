@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { BookingService } from "../../services/booking/bookingService";
 import IBookingController from "./IBookingController";
-import IBookingService from "@/services/booking/IBookingService";
+import IBookingService from "../../services/booking/IBookingService";
 import { error } from "console";
+import produce from "../../config/kafka/producer";
 
 
 
@@ -22,12 +23,16 @@ export class BookingController implements IBookingController{
           res.json({success:false})
           return
         }
+        const instructorShare=(req.body.amountPaid*0.9)
         const booking = await this.bookingService.bookSlot(
           req.body.studentId,
           req.body.slotId,
           req.body.instructorId
         );
-        
+        if(booking){
+
+          produce('update-instructor-wallet',{instructorId:req.body.instructorId,txnid:req.body.txnid,amount:instructorShare,type:'credit',description:`Payment Received for BookingId:${booking._id}`})
+        }
         console.log(booking,"booked")
         res.status(201).json({ success: true, message:"booked!",data:booking });
       } catch (error) {

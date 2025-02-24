@@ -8,13 +8,6 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
     super(InstructorModel);
   }
 
-  /**
-   * Get a list of transactions for an instructor.
-   * @param email - Email of the instructor.
-   * @param currentPage - Current page number for pagination.
-   * @param itemsPerPage - Number of items per page.
-   * @returns A list of transactions.
-   */
   async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
     try {
       const skip = (currentPage - 1) * itemsPerPage;
@@ -36,12 +29,6 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
     }
   }
 
-  /**
-   * Update an instructor's password by email.
-   * @param email - Email of the instructor.
-   * @param password - New password.
-   * @returns The updated instructor data.
-   */
   async updatePassword(email: string, password: string): Promise<IInstructor | null> {
     try {
       const response = await InstructorModel.findOneAndUpdate(

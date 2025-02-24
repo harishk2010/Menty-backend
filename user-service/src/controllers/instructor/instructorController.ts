@@ -346,21 +346,22 @@ export class InstructorController implements IInstructorControllers {
   async updateWallet(data: any): Promise<IInstructor | null> {
     try {
       const { txnid, amount, description, type, instructorId } = data;
+      console.log(data,"wallet instructor")
       const instructorDetails =
         await this.instructorService.getInstructorDataById(instructorId);
       if (!instructorDetails) {
-        throw new Error("No instructor details found");
+        throw new Error("No instructor details not found");
       }
       const transactions = instructorDetails?.wallet.transactions ?? [];
       let walletDetails;
       if (type === "debit") {
         walletDetails = {
-          balance: instructorDetails?.wallet.balance - amount,
+          balance: Number(instructorDetails?.wallet.balance) - Number(amount),
           transactions: [...transactions, { amount, description, txnid, type }],
         };
       } else {
         walletDetails = {
-          balance: instructorDetails?.wallet.balance + amount,
+          balance: Number(instructorDetails?.wallet.balance) + Number(amount),
           transactions: [...transactions, { amount, description, txnid, type }],
         };
       }

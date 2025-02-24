@@ -146,6 +146,27 @@ export class CourseContoller implements ICourseControllers {
       next(error);
     }
   }
+  public async listOrUnlistCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {courseId}=req.params
+      const courseData=await this.courseService.getCourseById(courseId)
+      if(!courseData){
+        throw new Error("no courseData found")
+        return
+      }
+      const listValue=!courseData?.isListed
+      const response=await this.courseService.updateCourse(courseId,{...courseData.toObject(),isListed:listValue})
+      res.status(200).json({
+        success: true,
+        message: response?.isListed ? "Course Listed" : "Course unListed",
+      });
+
+      
+    } catch (error) {
+      next(error)
+      
+    }
+  }
 
   public async buyCourse(req: Request, res: Response, next:NextFunction): Promise<any> {
     try {

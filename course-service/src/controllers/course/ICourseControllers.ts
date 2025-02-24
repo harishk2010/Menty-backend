@@ -13,6 +13,7 @@ export interface ICourseControllers {
     getBoughtCourseById(req:Request,res:Response,next:NextFunction):Promise<void>
     coursePlay(req: Request, res: Response, next:NextFunction):Promise<any>
     chapterVideoEnd(req: Request, res: Response, next:NextFunction):Promise<void>
+    listOrUnlistCourse(req: Request, res: Response, next:NextFunction):Promise<void>
     // addQuiz(req: Request, res: Response, next:NextFunction):Promise<void>
     // editQuiz(req: Request, res: Response, next:NextFunction):Promise<void>
     // getQuiz(req: Request, res: Response, next:NextFunction):Promise<void>

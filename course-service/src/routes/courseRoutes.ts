@@ -51,6 +51,9 @@ router
   .route("/handlePublish/:id")
   .put(authenticateToken,courseController.publishCourse.bind(courseController));
 router
+  .route("/listCourse/:courseId")
+  .put(authenticateToken,courseController.listOrUnlistCourse.bind(courseController));
+router
   .route("/chapterCompleted/:chapterId")
   .put(authenticateToken,courseController.chapterVideoEnd.bind(courseController));
 

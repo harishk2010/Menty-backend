@@ -10,11 +10,7 @@ export class StudentServices implements IStudentService {
     this.studentRepository = studentRepository;
   }
 
-  /**
-   * Create a new student.
-   * @param payload - Student data to create.
-   * @returns The created student.
-   */
+  
   async createStudent(payload: IUser): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.create(payload);
@@ -25,11 +21,7 @@ export class StudentServices implements IStudentService {
     }
   }
 
-  /**
-   * Get student data by email.
-   * @param email - Email of the student.
-   * @returns The student data.
-   */
+
   async getStudentData(email: string): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.findOne({ email });
@@ -49,12 +41,7 @@ export class StudentServices implements IStudentService {
     }
   }
 
-  /**
-   * Update student profile.
-   * @param id - ID of the student.
-   * @param data - Data to update.
-   * @returns The updated student data.
-   */
+
   async updateProfile(id: string, data: object): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.update(id, data);
@@ -65,12 +52,6 @@ export class StudentServices implements IStudentService {
     }
   }
 
-  /**
-   * Update student password.
-   * @param email - Email of the student.
-   * @param password - New password.
-   * @returns The updated student data.
-   */
   async updatePassword(email: string, password: string): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.updatePassword(email, password);
@@ -81,10 +62,6 @@ export class StudentServices implements IStudentService {
     }
   }
 
-  /**
-   * Get all students.
-   * @returns A list of all students.
-   */
   async getStudents(): Promise<IUser[]> {
     try {
       const response = await this.studentRepository.findAll();

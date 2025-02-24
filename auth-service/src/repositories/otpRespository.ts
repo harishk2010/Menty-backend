@@ -1,8 +1,8 @@
 import { Iotp } from "../interface/otp"
-import baseOtpRepository from "./baseRepositories/baseOtpRepository"
+
 import otpModel from "../models/otpModel"
 import IOtpRepository from "./interfaces/IOtpRespoitory"
-import IOtpBaseRepository from "./baseRepositories/interfaces/IOtpBaseRepository"
+
 import { GenericRepository } from "./GenericRepository"
 
 export class OtpRespository extends GenericRepository<Iotp> implements IOtpRepository{

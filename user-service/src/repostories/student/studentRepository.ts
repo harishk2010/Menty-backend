@@ -8,12 +8,7 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
     super(UserModel);
   }
 
-  /**
-   * Update a student's password by email.
-   * @param email - Email of the student.
-   * @param password - New password.
-   * @returns The updated student data.
-   */
+
   async updatePassword(email: string, password: string): Promise<IUser | null> {
     try {
       const response = await UserModel.findOneAndUpdate(
