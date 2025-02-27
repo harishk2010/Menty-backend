@@ -333,7 +333,7 @@ export class StudentController implements IStudentControllers{
       const { name, email, password } = req.body;
       const existingStudent = await this.studentService.findByEmail(email);
       if (!existingStudent) {
-        const user: any = await this.studentService.googleLogin(
+        const user = await this.studentService.googleLogin(
           name,
           email,
           password
@@ -342,7 +342,7 @@ export class StudentController implements IStudentControllers{
 
         if (user) {
           await produce("add-student", user);
-          console.log(user.token, "User token");
+      
           const role = user.role;
           const accesstoken = await this.JWT.accessToken({ email, role });
           const refreshToken = await this.JWT.refreshToken({ email, role });

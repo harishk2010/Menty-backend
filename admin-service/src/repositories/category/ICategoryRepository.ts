@@ -1,12 +1,7 @@
 import { ICategoryModel } from "../../models/categoryModel";
+import { IGenericRepository } from "../GenericRepository";
 
-
-export interface ICategoryRepository{
-    findCategoryByName(categoryName:string):Promise<ICategoryModel | null>
-    findCategoryById(categoryId:string):Promise<ICategoryModel | null>
-    addCategory(categoryName:string):Promise<ICategoryModel | null>
-    updateCategory(id:string,categoryName:string):Promise<ICategoryModel | null>
-    listOrUnlistCategory(id:string):Promise<ICategoryModel | null>
-    getAllCategory():Promise<ICategoryModel[]>
-  
+export interface ICategoryRepository extends IGenericRepository<ICategoryModel> {
+  findCategoryByName(categoryName: string): Promise<ICategoryModel | null>;
+  listOrUnlistCategory(id: string): Promise<ICategoryModel | null>;
 }

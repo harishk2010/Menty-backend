@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { config } from "dotenv";
 import { IInstructor } from "@/models/instructorModel";
 
@@ -51,7 +51,7 @@ console.log(payload,"payyload")
         return verifyToken;
     }
 
-    async verifyToken(token:string):Promise<any>{
+    async verifyToken(token:string):Promise<any >{
 
         try {
             console.log("verify ")

@@ -14,7 +14,7 @@ export class StudentServices implements IStudentServices {
     return await this.studentRepository.findByEmail(email);
   }
 
-  async createUser(userData: any): Promise<IUser | null> {
+  async createUser(userData: IUser): Promise<IUser | null> {
     return await this.studentRepository.createUser(userData);
   }
 

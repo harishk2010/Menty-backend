@@ -96,31 +96,50 @@ export class InstructorController implements IInstructorControllers {
   }
   public async getTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const { currentPage, itemsPerPage, email } = req.query;
-      console.log(currentPage, itemsPerPage, email);
-      const response = await this.instructorService.getTransactionsList(
-        String(email),
-        Number(currentPage),
-        Number(itemsPerPage)
-      );
-      if (!response) {
-        res.status(500).json({
+      const { page = 1, limit = 10, search = '', email } = req.query;
+      
+      console.log("Query params:", { page, limit, email, search });
+      
+      if (!email) {
+        res.status(400).json({
           success: false,
-          message: "Something error! Couldn't fetch data!",
+          message: "Email is required",
         });
         return;
       }
+      
+      // Get transactions with just page, limit, and search
+      const result = await this.instructorService.getTransactionsList(
+        String(email),
+        Number(page),
+        Number(limit),
+        String(search)
+      );
+      
+      if (!result) {
+        res.status(404).json({
+          success: false,
+          message: "No transactions found or instructor doesn't exist",
+        });
+        return;
+      }
+      
+      // Return the properly formatted response
       res.status(200).json({
         success: true,
-        message: "fetched transactions data!",
+        message: "Fetched transactions data successfully",
         data: {
-          data: response,
-          total: response?.length,
+          data: result.transactions,
+          total: result.total
         },
       });
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (error:any) {
+      console.log("Error in getTransactions controller:", error);
+      res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching transactions",
+        error: error.message
+      });
     }
   }
   async updatePlanPrice(req: Request, res: Response): Promise<void> {

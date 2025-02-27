@@ -1,6 +1,12 @@
 import mongoose, { Schema, Document, model } from "mongoose";
 import { ObjectId } from "mongodb";
 
+
+export interface IInstructorDTO{
+  username:string,
+  email:string,
+  password:string
+}
 export interface IInstructor extends Document {
   _id: ObjectId;
   username: string;

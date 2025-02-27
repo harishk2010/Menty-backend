@@ -1,3 +1,4 @@
+import { TransactionsResult } from "../../types/types";
 import { IInstructor, ITransaction } from "../../models/instructorModel";
 
 export interface IInstructorService {
@@ -5,8 +6,12 @@ export interface IInstructorService {
   getInstructorData(email: string): Promise<IInstructor | null>;
   getInstructorDataById(instructorId: string): Promise<IInstructor | null>;
   updateProfile(id: string, data: object): Promise<IInstructor | null>;
-  getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null>;
-  updatePassword(email: string, password: string): Promise<IInstructor | null>;
+  getTransactionsList(
+    email: string, 
+    page: number, 
+    limit: number, 
+    search: string
+  ): Promise<TransactionsResult | null>;  updatePassword(email: string, password: string): Promise<IInstructor | null>;
   updatePlanPrice(instructorId:string,planPrice: number): Promise<IInstructor | null>;
   getInstructors(): Promise<IInstructor[] | null>;
 }

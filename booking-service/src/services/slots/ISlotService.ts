@@ -9,7 +9,7 @@ export default interface ISlotService {
     startTime: string,
     endTime: string,
     price: number
-  ): Promise<ISlot>;
+  ): Promise<ISlot[]>;
   getInstructorSlots(
     instructorId: string,
   ): Promise<ISlot[]>;

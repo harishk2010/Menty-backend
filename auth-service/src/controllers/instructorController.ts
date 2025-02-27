@@ -379,12 +379,11 @@ export class InstructorController implements IInstructorControllers{
         const { name, email, password } = req.body;
       const ExistingInstructor=await this.instructorService.findByEmail(email)
       if (!ExistingInstructor) {
-        const user: any = await this.instructorService.googleLogin(name, email, password);
+        const user = await this.instructorService.googleLogin(name, email, password);
         console.log(user, "User after creation in controller Google");
         
         if (user) {
           await produce("add-instructor-data", user);
-          console.log(user.token, "User token");
           const role=user.role
           let id = user._id;
           const accesstoken = await this.JWT.accessToken({ email, role, id });

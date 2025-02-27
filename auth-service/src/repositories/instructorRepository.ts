@@ -1,4 +1,4 @@
-import { IInstructor } from "../models/instructorModel";
+import { IInstructor, IInstructorDTO } from "../models/instructorModel";
 import { GenericRepository } from "./GenericRepository";
 import InstructorModel from "../models/instructorModel";
 import  {IInstructorRepository}  from "../repositories/interfaces/IInstructorRepository";
@@ -12,7 +12,7 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
     return await this.findOne({ email });
   }
 
-  async createUser(userData: any): Promise<IInstructor | null> {
+  async createUser(userData: IInstructorDTO): Promise<IInstructor | null> {
     return await this.create(userData);
   }
 
@@ -32,17 +32,18 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
 
   async googleLogin(name: string, email: string, password: string): Promise<IInstructor | null> {
     const user = await this.findByEmail(email);
+    const username=name
 
     if (!user) {
       // Create a new user
-      const newUser = await this.createUser({ name, email, password });
+      const newUser = await this.createUser({ username, email, password });
       return newUser;
     }
 
     return user;
   }
 
-  async updateProfile(email: string, data: any): Promise<IInstructor | null> {
+  async updateProfile(email: string, data: {username:string, profilePicUrl:string}): Promise<IInstructor | null> {
 
     try {
         const instructor=await this.findOne({email})

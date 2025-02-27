@@ -128,6 +128,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/', chatRoutes);
 
 // Initialize socket handlers with error handling
+
 try {
   registerSocketHandlers(io);
   console.log('Socket handlers registered successfully');
@@ -211,3 +212,120 @@ const gracefulShutdown = async () => {
 start();
 
 export { app, io };
+
+
+
+// import express, { Application, NextFunction, Request, Response } from "express";
+// import { config } from "dotenv";
+// import cookieParser from "cookie-parser";
+// import cors from "cors";
+// import { createServer } from "http";
+// import { Server } from "socket.io";
+// import connectDB from "./config/db";
+// import registerSocketHandlers from "./socket/socketHandlers";
+// import consume from "./config/kafka/consumer";
+// import chatRoutes from "./routes/chatRoutes";
+// import  logger  from "./logger/logger"; // Assuming you have a logger utility
+
+// // Load environment variables
+// config();
+
+// const app: Application = express();
+// const httpServer = createServer(app);
+// const PORT: number = Number(process.env.PORT) || 5007;
+
+// // Socket.IO setup
+// const io = new Server(httpServer, {
+//   cors: {
+//     origin: process.env.FRONTEND_URL,
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true,
+//   },
+//   path: "/", // Custom path for Socket.IO
+//   allowEIO3: true, // Enable compatibility mode
+// });
+
+// // CORS configuration
+// const corsOptions = {
+//   origin: process.env.FRONTEND_URL,
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   credentials: true,
+// };
+
+// // Middleware
+// app.use(cookieParser());
+// app.use(cors(corsOptions));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+
+// // Health check route
+// app.get("/health", (req: Request, res: Response) => {
+//   res.status(200).json({ status: "ok", service: "Chat Service" });
+// });
+
+// // Routes
+// app.use("/", chatRoutes);
+
+// // Initialize socket handlers
+// registerSocketHandlers(io);
+// logger.info("Socket handlers registered successfully");
+
+// // Kafka consumer
+// consume()
+//   .then(() => {
+//     logger.info("Kafka consumer initialized successfully");
+//   })
+//   .catch((error) => {
+//     logger.error("Failed to initialize Kafka consumer:", error);
+//   });
+
+// // Error handling middleware
+// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+//   logger.error("Error:", err);
+//   res.status(500).json({ error: "Internal Server Error", message: err.message });
+// });
+
+// // Start the server
+// const start = async () => {
+//   try {
+//     // Database connection
+//     await connectDB();
+//     logger.info("Database connected successfully");
+
+//     // Server startup
+//     httpServer.listen(PORT, () => {
+//       logger.info(`🚀 Chat Service is running on port ${PORT}`);
+//       logger.info(`👉 Frontend URL: ${process.env.FRONTEND_URL}`);
+//       logger.info("📡 Socket.IO server initialized");
+//     });
+
+//     // Graceful shutdown
+//     process.on("SIGTERM", gracefulShutdown);
+//     process.on("SIGINT", gracefulShutdown);
+//   } catch (error) {
+//     logger.error("Failed to start server:", error);
+//     process.exit(1);
+//   }
+// };
+
+// // Graceful shutdown function
+// const gracefulShutdown = async () => {
+//   logger.info("Received shutdown signal");
+
+//   try {
+//     // Close Socket.IO connections
+//     io.close();
+//     logger.info("Socket.IO server closed");
+
+//     // Close HTTP server
+//     httpServer.close(() => {
+//       logger.info("HTTP server closed");
+//       process.exit(0);
+//     });
+//   } catch (error) {
+//     logger.error("Error during shutdown:", error);
+//     process.exit(1);
+//   }
+// };
+
+// start();

@@ -43,7 +43,7 @@ async function consume() {
             default:
               console.warn(`No handler for topic: ${topic}`);
           }
-        } catch (error: any) {
+        } catch (error:any) {
           console.error(
             `Error processing message from topic ${topic}:`,
             error.message

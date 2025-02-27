@@ -2,6 +2,7 @@ import { IInstructor, ITransaction } from "../../models/instructorModel";
 import { IInstructorService } from "./IInstructorService";
 import { InstructorRepository } from "../../repostories/instructor/instructorRepository";
 import { IInstructorRepository } from "../../repostories/instructor/IInstructorRepository";
+import { TransactionsResult } from "../../types/types";
 
 export class InstructorServices implements IInstructorService {
   private instructorRepository: IInstructorRepository;
@@ -87,12 +88,23 @@ export class InstructorServices implements IInstructorService {
    * @param itemsPerPage - Number of items per page.
    * @returns A list of transactions.
    */
-  async getTransactionsList(email: string, currentPage: number, itemsPerPage: number): Promise<ITransaction[] | null> {
+  async getTransactionsList(
+    email: string,
+    page: number,
+    limit: number,
+    search: string = ''
+  ): Promise<TransactionsResult | null> {
     try {
-      const response = await this.instructorRepository.getTransactionsList(email, currentPage, itemsPerPage);
-      return response;
+      const result = await this.instructorRepository.getTransactionsList(
+        email,
+        page,
+        limit,
+        search
+      );
+      
+      return result;
     } catch (error) {
-      console.error("Error in getTransactionsList:", error);
+      console.error("Error in getTransactionsList service:", error);
       throw error;
     }
   }

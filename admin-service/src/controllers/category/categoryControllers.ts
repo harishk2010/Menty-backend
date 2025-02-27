@@ -1,177 +1,87 @@
 import { NextFunction, Request, Response } from "express";
 import { ICategoryControllers } from "./ICategoryContollers";
-import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import { ICategoryService } from "../../services/category/ICategoryService";
-import produce from "../../config/kafka/producer";
-import { ICategoryModel } from "../../models/categoryModel";
 
 export class CategoryContoller implements ICategoryControllers {
-  private categoryService: ICategoryService;
-
-  constructor(categoryService: ICategoryService) {
-    this.categoryService = categoryService;
+  private categoryService: ICategoryService
+  constructor( categoryService: ICategoryService) {
+    this.categoryService=categoryService
   }
 
-  async addCategory(req: Request, res: Response ,next:NextFunction): Promise<void> {
+  async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
-      // console.log("inside add category controller")
       const { categoryName } = req.body;
-      console.log("inside add category controller",categoryName)
-
-      //find category name
-      const existingCategory = await this.categoryService.findCategoryByName(
-        categoryName
-      );
+      const existingCategory = await this.categoryService.findCategoryByName(categoryName);
       if (existingCategory) {
-        res.status(409).send({
-          success: false,
-          message: "Category already exits",
-        });
+        res.status(409).send({ success: false, message: "Category already exists" });
         return;
       }
-      console.log("existiing",existingCategory)
-      const createdCategory = await this.categoryService.addCategory(
-        categoryName
-      );
-      console.log("createdCategory",createdCategory)
+
+      const createdCategory = await this.categoryService.addCategory(categoryName);
       if (createdCategory) {
-        res.status(201).send({
-          success: true,
-          message: "Category added Successfully!",
-          data: createdCategory,
-        });
+        res.status(201).send({ success: true, message: "Category added successfully!", data: createdCategory });
       } else {
-        res.status(500).send({
-          success: false,
-          message: "Could not create Category!",
-          
-        });
+        res.status(500).send({ success: false, message: "Could not create category!" });
       }
     } catch (error) {
-      // console.log(error);
-      // throw error;
-      next(error)
+      next(error);
     }
   }
 
-  async editCategory(req:Request ,res:Response, next:NextFunction):Promise<void>{
+  async editCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-
-      const { categoryName , id}=req.body
-      const existingCategory = await this.categoryService.findCategoryByName(
-        categoryName
-      );
+      const { categoryName, id } = req.body;
+      const existingCategory = await this.categoryService.findCategoryByName(categoryName);
       if (existingCategory) {
-        res.send({
-          success: false,
-          message: "Category already exits",
-        });
+        res.status(409).send({ success: false, message: "Category already exists" });
         return;
       }
-      console.log("existiing",existingCategory)
-      const updatedCategory=await this.categoryService.updateCategory(id,categoryName)
-      if(updatedCategory){
-        res.status(200).send({
-          success:true,
-          message:"Category Updated",
-          data:updatedCategory
-        })
-      }else{
-        res.status(500).send({
-          success:false,
-          message:"Category Not Updated",
-          data:updatedCategory
-        })
-      }
-      
-    } catch (error) {
-      console.log(error)
-      next(error)
-    }
 
+      const updatedCategory = await this.categoryService.updateCategory(id, categoryName);
+      if (updatedCategory) {
+        res.status(200).send({ success: true, message: "Category updated", data: updatedCategory });
+      } else {
+        res.status(500).send({ success: false, message: "Category not updated" });
+      }
+    } catch (error) {
+      next(error);
+    }
   }
-  async getAllCategory(req:Request ,res:Response, next:NextFunction):Promise<void>{
+
+  async getAllCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-
-      const Categories=await this.categoryService.getAllCategory()
-
-      res.status(200).send({
-        success:true,
-        message:"Fetched Categories",
-        data:Categories
-      })
-    
-      
+      const categories = await this.categoryService.getAllCategory();
+      res.status(200).send({ success: true, message: "Fetched categories", data: categories });
     } catch (error) {
-      console.log(error)
-      next(error)
+      next(error);
     }
   }
-  async listOrUnlistCategory(req:Request ,res:Response, next:NextFunction):Promise<void>{
+
+  async listOrUnlistCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const { id } = req.params;
+      const response = await this.categoryService.listOrUnlistCategory(id);
 
-      const { id }=req.params
+      if (!response) throw new Error("Internal server error");
 
-      const response=await this.categoryService.listOrUnlistCategory(id)
-
-      if(!response){
-       throw new Error("Internal server error")
-      }
-      if(response?.isListed){
-        res.status(200).send({
-          success:true,
-          message:`Listed ${response.categoryName}`,
-          data:response
-        })
-
-      }else{
-        res.status(200).send({
-          success:true,
-          message:`UnListed ${response?.categoryName}`,
-          data:response
-        })
-      }
-      
-    
-      
+      const message = response.isListed ? `Listed ${response.categoryName}` : `Unlisted ${response.categoryName}`;
+      res.status(200).send({ success: true, message, data: response });
     } catch (error) {
-      console.log(error)
-      next(error)
+      next(error);
     }
   }
-  async findCategoryById(req:Request ,res:Response, next:NextFunction):Promise<void>{
+
+  async findCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const { categoryId } = req.params;
+      const response = await this.categoryService.findCategoryById(categoryId);
 
-      const { categoryId }=req.params
-  
+      if (!response) throw new Error("Internal server error");
 
-      const response=await this.categoryService.findCategoryById(categoryId)
-
-      if(!response){
-       throw new Error("Internal server error")
-      }
-      if(response?.isListed){
-        res.status(200).send({
-          success:true,
-          message:`Listed ${response.categoryName}`,
-          data:response
-        })
-
-      }else{
-        res.status(200).send({
-          success:true,
-          message:`UnListed ${response?.categoryName}`,
-          data:response
-        })
-      }
-      
-    
-      
+      const message = response.isListed ? `Listed ${response.categoryName}` : `Unlisted ${response.categoryName}`;
+      res.status(200).send({ success: true, message, data: response });
     } catch (error) {
-      console.log(error)
-      next(error)
+      next(error);
     }
   }
-  
 }

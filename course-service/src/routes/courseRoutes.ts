@@ -28,6 +28,14 @@ router
   .route("/courses")
   .get(courseController.getAllCourses.bind(courseController));
 router
+  .route("/paginatedCourses")
+  .get(courseController.getPaginatedCourses.bind(courseController));
+  router.get('/courses/categories', courseController.getCourseCategories.bind(courseController));
+router
+  .route("/filteredCourses")
+  .get(courseController.getFilteredInstructorCourses.bind(courseController));
+
+router
   .route("/payment")
   .post(authenticateToken,courseController.buyCourse.bind(courseController));
 
@@ -56,6 +64,9 @@ router
 router
   .route("/chapterCompleted/:chapterId")
   .put(authenticateToken,courseController.chapterVideoEnd.bind(courseController));
+router
+  .route("/delete/:courseId")
+  .delete(authenticateToken,courseController.deleteCourse.bind(courseController));
 
 const courseRoutes = router;
 export default courseRoutes;

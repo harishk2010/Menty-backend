@@ -9,6 +9,13 @@ export interface ITransaction {
   date: Date;
 }
 
+export interface IStudentDTO{
+  username:string;
+  email:string;
+  password:string
+
+}
+
 export interface IUser extends Document {
   _id: ObjectId;
   username: string;

@@ -4,6 +4,7 @@ import { CourseRepository } from "../../repositories/course/courseRepository";
 import { IChapter } from "../../models/chapterModel";
 import { IPurchasedCourse } from "../../models/purchasedModel";
 import { ICourseRepository } from "../../repositories/course/ICourseRepository";
+import { CoursesResult } from "../../Types/updateRequestType";
 
 export class CourseService implements ICourseService {
   private courseRepository: ICourseRepository;
@@ -35,6 +36,40 @@ export class CourseService implements ICourseService {
   async getChaptersById(id: string): Promise<IChapter[] | null> {
     return await this.courseRepository.getChapterById(id);
   }
+  async getInstructorCoursesList(
+    instructorId: string, 
+    page: number, 
+    limit: number,
+    search: string = '',
+    sortField: string = 'lastUpdated',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Promise<CoursesResult | null> {
+    try {
+      const result = await this.courseRepository.getInstructorCoursesList(
+        instructorId, 
+        page, 
+        limit,
+        search,
+        sortField,
+        sortOrder
+      );
+      
+      return result;
+    } catch (error) {
+      console.error("Error in getInstructorCoursesList service:", error);
+      throw error;
+    }
+  }
+  async getPaginatedCourses(
+    page: number = 1,
+    limit: number = 10,
+    search: string = "",
+    sort: string = "popular",
+    category: string[] = [],
+    level: string[] = []
+  ): Promise<{ courses: ICourse[]; currentPage: number; totalPages: number; totalCourses: number }> {
+    return await this.courseRepository.getPaginatedCourses(page, limit, search, sort, category, level);
+  }
 
   async buyCourse(
     userId: string,
@@ -52,6 +87,9 @@ export class CourseService implements ICourseService {
 
   async chapterVideoEnd(chapterId: string): Promise<any> {
     return await this.courseRepository.chapterVideoEnd(chapterId);
+  }
+  async deleteCourseById(courseId: string): Promise<any> {
+    return await this.courseRepository.deleteCourseById(courseId)
   }
   async getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null> {
     try {

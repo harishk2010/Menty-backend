@@ -1,4 +1,4 @@
-import UserModel from "../models/userModel";
+import UserModel, { IStudentDTO } from "../models/userModel";
 import { IUser } from "../models/userModel";
 import { GenericRepository } from "./GenericRepository";
 import { IStudentRepository } from "./interfaces/IStudentRepository";
@@ -12,7 +12,7 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
     return await this.findOne({ email });
   }
 
-  async createUser(userData: any): Promise<IUser | null> {
+  async createUser(userData: IStudentDTO): Promise<IUser | null> {
     return await this.create(userData);
   }
 
@@ -35,17 +35,18 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
 
   async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
     const user = await this.findByEmail(email);
+    const username=name
 
     if (!user) {
       // Create a new user
-      const newUser = await this.createUser({ name, email, password });
+      const newUser = await this.createUser({ username, email, password });
       return newUser;
     }
 
     return user;
   }
 
-  async updateProfile(email: string, data: any): Promise<IUser | null> {
+  async updateProfile(email: string, data: IUser): Promise<IUser | null> {
     try {
 
         const student=await this.findOne({email})

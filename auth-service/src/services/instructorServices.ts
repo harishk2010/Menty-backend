@@ -14,7 +14,7 @@ export class InstructorServices implements IInstructorServices {
     return await this.instructorRepository.findByEmail(email);
   }
 
-  async createUser(userData: any): Promise<IInstructor | null> {
+  async createUser(userData: IInstructor): Promise<IInstructor | null> {
     return await this.instructorRepository.createUser(userData);
   }
 

@@ -1,75 +1,21 @@
-
-import { ICategoryModel } from "../../models/categoryModel";
-import { ICategoryBaseRepository } from "../baseRepository/category/ICategoryBaseRepository";
-import { CategoryBaseRepository } from "../baseRepository/category/categoryBaseRepository";
+import { CategoryModel, ICategoryModel } from "../../models/categoryModel";
+import { GenericRepository } from "../GenericRepository";
+import { Model } from "mongoose";
 import { ICategoryRepository } from "./ICategoryRepository";
 
-export class CategoryRepository implements ICategoryRepository {
-    private categoryBaseRepository:ICategoryBaseRepository
-    constructor(categoryBaseRepository:ICategoryBaseRepository){
-        this.categoryBaseRepository=categoryBaseRepository
-    }
-    async  findCategoryByName(categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            let response =await this.categoryBaseRepository.findCategoryByName(categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async  findCategoryById(categoryId:string):Promise<ICategoryModel | null>{
-        try {
-            
-            let response =await this.categoryBaseRepository.findCategoryById(categoryId)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async  addCategory(categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            let response =await this.categoryBaseRepository.addCategory(categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async  updateCategory(id:string,categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            let response =await this.categoryBaseRepository.updateCategory(id,categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async  getAllCategory():Promise<ICategoryModel[]>{
-        try {
-            let response =await this.categoryBaseRepository.getAllCategory()
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async  listOrUnlistCategory(id:string):Promise<ICategoryModel | null>{
-        try {
-            let response =await this.categoryBaseRepository.listOrUnlistCategory(id)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    
+export class CategoryRepository extends GenericRepository<ICategoryModel> implements ICategoryRepository {
+  constructor() {
+    super(CategoryModel);
+  }
 
+  async findCategoryByName(categoryName: string): Promise<ICategoryModel | null> {
+    return this.findOne({ categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") } });
+  }
+
+  async listOrUnlistCategory(id: string): Promise<ICategoryModel | null> {
+    const category = await this.findById(id);
+    if (!category) throw new Error("No category found");
+
+    return this.update(id, { isListed: !category.isListed });
+  }
 }

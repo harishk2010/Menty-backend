@@ -3,6 +3,7 @@ import { IChapterControllers } from "../chapter/IChapterControllers";
 import { IChapterService } from "../../services/chapter/IChapterService";
 import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
+import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 
 export class ChapterController implements IChapterControllers {
   constructor(private chapterService: IChapterService) {}
@@ -128,7 +129,17 @@ export class ChapterController implements IChapterControllers {
       }
 
       const chapters = await this.chapterService.getAllChapters(courseId);
-      res.status(200).json({ message: "Chapters fetched successfully", success: true, data: chapters });
+
+      const signedChapters= await Promise.all(chapters.map(async(chapter)=>{
+        const chapterObj = chapter.toObject();
+        const signedUrl=await generateSignedUrl(chapterObj.videoUrl)
+        return {
+          ...chapterObj,videoUrl:signedUrl
+        }
+      }))
+      console.log(signedChapters)
+      
+      res.status(200).json({ message: "Chapters fetched successfully", success: true, data: signedChapters });
     } catch (error) {
       next(error);
     }

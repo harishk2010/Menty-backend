@@ -19,9 +19,9 @@ export class SlotService implements ISlotService {
     startTime: string,
     endTime: string,
     price: number
-  ): Promise<ISlot> {
- try {
-    const rule = new RRule({
+  ): Promise<ISlot[]> {
+    try {
+      const rule = new RRule({
         freq: RRule.WEEKLY,
         interval: 1,
         byweekday: days,
@@ -29,25 +29,43 @@ export class SlotService implements ISlotService {
         until: new Date(endDate),
       });
   
-      const slots = rule.all().map((date) => ({
+      const slotDates = rule.all();
+  
+      // Generate slot objects
+      const slots = slotDates.map((date) => ({
         instructorId,
         startTime: new Date(`${date.toISOString().split("T")[0]}T${startTime}`),
         endTime: new Date(`${date.toISOString().split("T")[0]}T${endTime}`),
         price,
       }));
-      // const createdSlots: ISlot[] = [];
+  
+      // **Check for existing slots before inserting**
+      const existingSlots = await this.slotRepository.findAll({
+        instructorId,
+        startTime: { $in: slots.map(slot => slot.startTime) },
+        endTime: { $in: slots.map(slot => slot.endTime) }
+      });
+  
+      // Filter out duplicates
+      const newSlots = slots.filter(slot =>
+        !existingSlots.some(existingSlot =>
+          existingSlot.startTime.getTime() === slot.startTime.getTime() &&
+          existingSlot.endTime.getTime() === slot.endTime.getTime()
+        )
+      );
+  
+      // Insert only new (non-duplicate) slots
       const createdSlots = await Promise.all(
-          slots.map(slot => this.slotRepository.create(slot as Partial<ISlot>))
-        );
-      //   return createdSlots;
-    return createdSlots as unknown as ISlot;
- } catch (error) {
-    console.log(error)
-    throw error
- }
-
-    // return this.slotRepository.create(slots );
+        newSlots.map(slot => this.slotRepository.create(slot as Partial<ISlot>))
+      );
+  
+      return createdSlots;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
+  
 
   async getInstructorSlots(instructorId: string): Promise<ISlot[]> {
       try {

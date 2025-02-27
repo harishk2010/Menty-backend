@@ -6,11 +6,12 @@ import getId from "../../utils/getId";
 import { IChapterService } from "../../services/chapter/IChapterService";
 import { ChapterService } from "../../services/chapter/chapterService";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
-import { ICourse } from "../../models/courseModel";
+import { CourseModel, ICourse } from "../../models/courseModel";
 import { QuizModel } from "../../models/quizModel";
 import kafka from "@/config/kafka/kafkaConfig";
-import { ChapterModel } from "../../models/chapterModel";
+import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
+import { IBoughtCourses } from "../../Types/updateRequestType";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -66,6 +67,57 @@ export class CourseContoller implements ICourseControllers {
     try {
       const courses = await this.courseService.getAllCourses();
       res.status(200).json(courses);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getPaginatedCourses(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Extract query parameters with defaults
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const search = (req.query.search as string) || "";
+      const sort = (req.query.sort as string) || "popular";
+      console.log(`category:|\ ${req.query.category} \|, search:|\ ${req.query.search} \|,sort:|\ ${req.query.sort} \|, level:|\ ${req.query.level} \|`)
+      
+      // Handle array parameters
+      let category: string[] = [];
+      let level: string[] = [];
+      
+      if (req.query.category) {
+        category = Array.isArray(req.query.category) 
+          ? req.query.category as string[]
+          : [req.query.category as string];
+      }
+      
+      if (req.query.level) {
+        level = Array.isArray(req.query.level)
+          ? req.query.level as string[]
+          : [req.query.level as string];
+      }
+      
+      // Get paginated, sorted, and filtered courses
+      const result = await this.courseService.getPaginatedCourses(
+        page,
+        limit,
+        search,
+        sort,
+        category,
+        level
+      );
+      
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getCourseCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Fetch all unique categories from listed courses
+      const categories = await CourseModel.distinct('category', { isListed: true });
+      
+      res.status(200).json({success:true,message:"fetched course categories!", data:categories });
     } catch (error) {
       next(error);
     }
@@ -168,7 +220,8 @@ export class CourseContoller implements ICourseControllers {
     }
   }
 
-  public async buyCourse(req: Request, res: Response, next:NextFunction): Promise<any> {
+
+  public async buyCourse(req: Request, res: Response, next:NextFunction): Promise<void> {
     try {
       const { courseId, txnid ,amount ,courseName } = req.body;
       console.log(req.body,"=====================\\\\\\\\")
@@ -183,7 +236,7 @@ export class CourseContoller implements ICourseControllers {
       const chapters = await this.courseService.getChaptersById(String(courseId));
       if (!chapters || chapters.length === 0) throw new Error("Chapters not found");
 
-      const completedChapters = chapters.map((chapter: any) => ({ chapterId: chapter._id, isCompleted: false }));
+      const completedChapters = chapters.map((chapter: IChapter) => ({ chapterId: chapter._id, isCompleted: false }));
       const userId = await getId("accessToken", req);
       const quizId=isCourseExist.quizId
       const response = await this.courseService.buyCourse(String(userId),String(quizId), String(isCourseExist._id), completedChapters, String(txnid));
@@ -202,6 +255,8 @@ export class CourseContoller implements ICourseControllers {
     try {
       const {instructorId}=req.params
       const response=await this.courseService.getInstructorCourses(instructorId)
+      
+      
       if(response){
         res.status(200).json({
           success:true,
@@ -223,7 +278,67 @@ export class CourseContoller implements ICourseControllers {
     }
   }
 
-  public async getBoughtCourses(req: Request, res: Response, next:NextFunction): Promise<any> {
+  async getFilteredInstructorCourses(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+     
+      const { 
+        instructorId,
+        page = 1, 
+        limit = 10, 
+        search = '', 
+        sortField = 'lastUpdated', 
+        sortOrder = 'desc' 
+      } = req.query;
+      
+      console.log("Query params:", { page, limit, instructorId, search, sortField, sortOrder });
+      
+      if (!instructorId) {
+        res.status(400).json({
+          success: false,
+          message: "Instructor ID is required",
+        });
+        return;
+      }
+      
+      // Get courses with pagination, search, and sort parameters
+      const result = await this.courseService.getInstructorCoursesList(
+        String(instructorId),
+        Number(page),
+        Number(limit),
+        String(search),
+        String(sortField),
+        String(sortOrder) as 'asc' | 'desc'
+      );
+     
+      
+      if (!result) {
+        res.status(404).json({
+          success: false,
+          message: "No courses found or instructor doesn't exist",
+        });
+        return;
+      }
+      
+      // Return the properly formatted response
+      res.status(200).json({
+        success: true,
+        message: "Fetched courses data successfully",
+        data: {
+          data: result.courses,
+          total: result.total
+        },
+      });
+    } catch (error:any) {
+      console.log("Error in getInstructorCourses controller:", error);
+      res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching courses",
+        error: error.message
+      });
+    }
+  }
+
+  public async getBoughtCourses(req: Request, res: Response, next:NextFunction): Promise<void> {
     try {
       const { page = 1, limit = 4 } = req.query;
       const pageNumber = parseInt(page as string, 10);
@@ -237,10 +352,10 @@ export class CourseContoller implements ICourseControllers {
       const userId = await getId("accessToken", req);
       const response = await this.courseService.getBoughtCourses(String(userId), pageNumber, limitNumber);
 
-      response.courses = response.courses.map((course: any) => ({
+      response.courses = response.courses.map((course: IBoughtCourses) => ({
         _id: course._id,
         courseDetails: {
-          courseName: course.courseId.courseName,
+          courseName: course?.courseId.courseName,
           level: course.courseId.level,
           thumbnailUrl: course.courseId.thumbnailUrl,
           quizId:course.courseId.quizId
@@ -282,7 +397,7 @@ export class CourseContoller implements ICourseControllers {
   //     next(error);
   //   }
   // }
-  public async coursePlay(req: Request, res: Response, next: NextFunction): Promise<any> {
+  public async coursePlay(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       console.log("inside  course play ")
@@ -303,23 +418,45 @@ export class CourseContoller implements ICourseControllers {
       if (!purchasedCourse) throw new Error("Purchased course not found");
   
       const courseData = purchasedCourse.courseId as unknown as ICourse;
-      const chaptersData = courseData?.fullVideo?.map((video: any) => video.chapterId);
-      if(!chaptersData) throw new Error("Internal Error")
+      // const chaptersData:string[] = courseData?.fullVideo?.map((video: { chapterId: string }) => video.chapterId as string);
+      // if(!chaptersData) throw new Error("Internal Error")
   
-      // Generate signed URLs for each chapter's videoUrl
+      // // Generate signed URLs for each chapter's videoUrl
+      // const chaptersWithSignedUrls = await Promise.all(
+      //   chaptersData.map(async (chapter: IChapter) => {
+      //     if (chapter.videoUrl) {
+      //       // Generate a signed URL for the video
+      //       const signedUrl = await generateSignedUrl(chapter.videoUrl);
+      //       return {
+      //         ...chapter.toObject(), // Convert Mongoose document to plain object
+      //         videoUrl: signedUrl, // Replace videoUrl with the signed URL
+      //       };
+      //     }
+      //     return chapter;
+      //   })
+      // );
+      const chaptersData: string[] = courseData?.fullVideo?.map(
+        (video: { chapterId: string }) => video.chapterId
+      ) ?? [];
+      
+      if (chaptersData.length === 0) throw new Error("Internal Error");
+      
+      // Fetch full chapter details from the database
+      const chapters: IChapter[] = await ChapterModel.find({ _id: { $in: chaptersData } });
+      
       const chaptersWithSignedUrls = await Promise.all(
-        chaptersData.map(async (chapter: any) => {
+        chapters.map(async (chapter: IChapter) => {
           if (chapter.videoUrl) {
-            // Generate a signed URL for the video
             const signedUrl = await generateSignedUrl(chapter.videoUrl);
             return {
               ...chapter.toObject(), // Convert Mongoose document to plain object
               videoUrl: signedUrl, // Replace videoUrl with the signed URL
             };
           }
-          return chapter;
+          return chapter.toObject();
         })
       );
+      
   
       res.status(200).json({
         success: true,
@@ -358,129 +495,22 @@ export class CourseContoller implements ICourseControllers {
     }
   }
 
-  // public async addQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
-  //   try {
+ async deleteCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
+   try {
+    const {courseId}=req.params
+    const deletedCourse=await this.courseService.deleteCourseById(courseId)
+    res.status(200).json({
+      success:true,
+      message:"Course Deleted!",
+      data:deletedCourse
 
-  //     const quizData=req.body
+    })
 
-     
-  //     const savedQuiz = await QuizModel.create(quizData);
-  //     const courseData = await this.courseService.getCourseById(quizData.courseId);
-  //     if (!courseData) throw new Error("No course found");
-
-  //     const updatedCourseData = { ...courseData.toObject(), quizId:savedQuiz._id};
-      
-     
-
-  //       await this.courseService.updateCourse(String(savedQuiz.courseId),updatedCourseData)
-      
-
-  //     res.status(201).json({
-  //       success:true,
-  //       message:"Quiz added to the Course",
-  //       data:savedQuiz
-
-  //     });
-
-
-      
-  //   } catch (error) {
-  //     console.log(error)
-  //     throw error
-  //   }
-  // }
-  // public async editQuiz(req:Request,res:Response,nxt:NextFunction):Promise<void>{
-  //   try {
-  //     console.log(req.params,req.body,"bodyyy")
-  //     const updatedQuiz = await QuizModel.findByIdAndUpdate(
-  //       req.params.id,
-  //       req.body,
-  //       {
-  //         new: true,
-          
-  //       }
-  //     );
-  //     console.log(updatedQuiz,"updateddd")
-  //     if (!updatedQuiz) {
-  //       res.status(404).json({ 
-  //         success:false,
-  //         message: "Quiz not found" });
-  //       return;
-  //     }
-  //     res.status(200).json({
-  //       success:true,
-  //       message:"updated quizz successfully!",
-  //       data:updatedQuiz});
-  //   } catch (error:any) {
-  //     res.status(500).json({ message: error.message });
-  //   }
-  // }
-  // public async getQuiz(req:Request,res:Response,next:NextFunction):Promise<void>{
-  //   try {
-
-  //     const {quizId}=req.params
-
-  //     console.log(quizId,"quizID")
-     
-  //     const savedQuiz = await QuizModel.findById(quizId);
-  //     console.log("saved",savedQuiz)
-  //     res.status(201).json({
-  //       success:true,
-  //       message:"Quiz added to the Course",
-  //       data:savedQuiz
-
-  //     });
-
-
-      
-  //   } catch (error) {
-  //     console.log(error)
-  //     throw error
-  //   }
-  // }
-
-  // public async submitResult(req: Request, res: Response, next: NextFunction): Promise<void> {
-  //   try {
-
-  //     const {courseId}=req.params
-  //     const {score,total}=req.body
-  //     console.log(score,total,"=====>final score")
-
-  //     if(!courseId)  throw new Error("courseId not found");
-  //     // if(!score || !total)  throw new Error("finalscore not found");
-  //     const userId = await getId("accessToken", req);
-  //     const percentage=(score/total)*100
-  //     const Pass=percentage>40
-  //     if(Pass){
-  //       const courseData = await PurchasedCourseModel.findOneAndUpdate({
-  //         courseId,userId
-  //       },{
-  //         isCourseCompleted:true
-  //       },{
-  //         new:true
-  //       })
-  //       // await this.courseService.updateCourse(courseId,{})
-  //       res.status(200).json({
-  //         success:true,
-  //         message:"Course Cmmpleted!",
-  //         data:courseData
-  //       })
-  //     }else{
-  //       res.json({
-  //         success:false,
-  //         message:"Retry Quiz!"
-  //       })
-  //       return
-  //     }
-
-
-      
-      
-  //   } catch (error) {
-  //     console.log(error)
-  //     throw error
-  //   }
-  // }
+    
+   } catch (error) {
+    next(error)
+   }
+ }
 
 
 }

@@ -78,6 +78,7 @@ services.forEach(({ context, path }) => {
         createProxyMiddleware({
             target: path,
             changeOrigin: true,
+            ws:true
         })
     );
 });

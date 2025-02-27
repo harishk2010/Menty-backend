@@ -1,74 +1,36 @@
-import { response } from 'express'
-import { ICategoryModel } from '../../models/categoryModel'
-import { ICategoryRepository } from '../../repositories/category/ICategoryRepository'
-import {ICategoryService} from '../category/ICategoryService'
+import { ICategoryRepository } from "../../repositories/category/ICategoryRepository";
+import { ICategoryModel } from "../../models/categoryModel";
+import { CategoryRepository } from "../../repositories/category/categoryRepository";
+import { ICategoryService } from "./ICategoryService";
 
-export class CategoryService implements ICategoryService{
-    
-    private categoryRepository:ICategoryRepository
-    constructor(categoryRepository:ICategoryRepository){
+export class CategoryService implements ICategoryService {
+    private categoryRepository: ICategoryRepository
+  
+    constructor( categoryRepository: ICategoryRepository) {
         this.categoryRepository=categoryRepository
     }
 
-    async findCategoryByName(categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            const response=this.categoryRepository.findCategoryByName(categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async findCategoryById(categoryId:string):Promise<ICategoryModel | null>{
-        try {
-            const response=this.categoryRepository.findCategoryById(categoryId)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async addCategory(categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            const response=this.categoryRepository.addCategory(categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async updateCategory(id:string,categoryName:string):Promise<ICategoryModel | null>{
-        try {
-            const response=this.categoryRepository.updateCategory(id,categoryName)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async getAllCategory():Promise<ICategoryModel[] >{
-        try {
-            const response=this.categoryRepository.getAllCategory()
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-    async listOrUnlistCategory(id:string):Promise<ICategoryModel | null >{
-        try {
-            const response=this.categoryRepository.listOrUnlistCategory(id)
-            return response
-            
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
+  async findCategoryByName(categoryName: string): Promise<ICategoryModel | null> {
+    return this.categoryRepository.findCategoryByName(categoryName);
+  }
 
+  async findCategoryById(categoryId: string): Promise<ICategoryModel | null> {
+    return this.categoryRepository.findById(categoryId);
+  }
+
+  async addCategory(categoryName: string): Promise<ICategoryModel | null> {
+    return this.categoryRepository.create({ categoryName });
+  }
+
+  async updateCategory(id: string, categoryName: string): Promise<ICategoryModel | null> {
+    return this.categoryRepository.update(id, { categoryName });
+  }
+
+  async getAllCategory(): Promise<ICategoryModel[]> {
+    return this.categoryRepository.findAll();
+  }
+
+  async listOrUnlistCategory(id: string): Promise<ICategoryModel | null> {
+    return this.categoryRepository.listOrUnlistCategory(id);
+  }
 }

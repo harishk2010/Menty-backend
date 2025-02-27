@@ -1,3 +1,5 @@
+import { ITransaction } from "../models/instructorModel";
+
 export interface IMulterFile {
     originalname: string;
     buffer: Buffer;
@@ -11,3 +13,7 @@ export interface IMulterFile {
     status:string
   };
   
+  export interface TransactionsResult {
+    transactions: ITransaction[];
+    total: number;
+  }
