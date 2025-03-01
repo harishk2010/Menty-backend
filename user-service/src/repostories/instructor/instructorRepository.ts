@@ -2,7 +2,7 @@ import { IInstructor, ITransaction } from "../../models/instructorModel";
 import { GenericRepository } from "../GenericRepository";
 import InstructorModel from "../../models/instructorModel";
 import { IInstructorRepository } from "./IInstructorRepository";
-import { TransactionsResult } from "../../types/types";
+import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
 export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
   constructor() {
@@ -61,6 +61,84 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
       };
     } catch (error) {
       console.error("Error in getTransactionsList repository:", error);
+      throw error;
+    }
+  }
+  async getMentorExpertise(): Promise<string[]> {
+    try {
+      // Get unique expertise values from all mentors
+      const result = await InstructorModel.distinct('expertise', { isBlocked: false });
+      return result.filter(Boolean); // Filter out null/empty values
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getPaginatedMentors(
+    page: number, 
+    limit: number, 
+    search: string, 
+    sort: string, 
+    expertise: string[]
+  ): Promise<PaginatedMentors> {
+    try {
+      const skip = (page - 1) * limit;
+      
+      // Build filter object
+      let filter: any = { isBlocked: false };
+      
+      // Add search functionality
+      if (search) {
+        filter.$or = [
+          { username: { $regex: search, $options: 'i' } },
+          { expertise: { $regex: search, $options: 'i' } },
+          { skills: { $regex: search, $options: 'i' } }
+        ];
+      }
+      
+      // Add expertise filter
+      if (expertise && expertise.length > 0) {
+        filter.expertise = { $in: expertise.map(exp => new RegExp(exp, 'i')) };
+      }
+      
+      // Determine sort order
+      let sortOption: any = {};
+      switch (sort) {
+        case "price-low":
+          sortOption = { planPrice: 1 };
+          break;
+        case "price-high":
+          sortOption = { planPrice: -1 };
+          break;
+        case "expertise":
+          sortOption = { expertise: 1 };
+          break;
+        case "newest":
+          sortOption = { createdAt: -1 };
+          break;
+        case "verified":
+        default:
+          sortOption = { isVerified: -1, username: 1 };
+          break;
+      }
+      
+      // Execute query with pagination and sorting
+      const mentors = await InstructorModel.find(filter)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .exec();
+      
+      // Get total count for pagination
+      const totalMentors = await InstructorModel.countDocuments(filter);
+      
+      return {
+        mentors,
+        currentPage: page,
+        totalPages: Math.ceil(totalMentors / limit),
+        totalMentors
+      };
+    } catch (error) {
       throw error;
     }
   }

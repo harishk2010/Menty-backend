@@ -36,6 +36,34 @@ export class StudentController implements IStudentControllers {
       
     }
   }
+
+  
+
+
+
+  public async searchStudents(req: Request, res: Response): Promise<void> {
+    const { q: query, role, page = 1, limit = 10 } = req.query;
+    console.log(req.params,)
+
+    console.log(page,"queryyyy")
+
+    try {
+      const result = await this.studentService.searchStudents(
+        query as string,
+        role as string,
+        parseInt(page as string),
+        parseInt(limit as string)
+      );
+
+      res.status(200).json({
+        success:true,
+        message:"got the admin Users!",
+        data:result
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: (error as Error).message });
+    }
+  }
   public async getStudentDataById(req: Request, res: Response):  Promise<void> {
     try {
       const { studentId } = req.params;

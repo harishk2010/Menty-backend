@@ -112,6 +112,11 @@ export class CourseContoller implements ICourseControllers {
       next(error);
     }
   }
+
+  
+
+
+
   async getCourseCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Fetch all unique categories from listed courses

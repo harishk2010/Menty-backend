@@ -19,13 +19,13 @@ interface AuthenticatedRequest extends Request {
 
 
 const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
-    console.log('Auth middleware entered');
+    // console.log('Auth middleware entered');
 
     const theAccessToken = req.cookies['accessToken'];
     const refreshToken = req.cookies['refreshToken'];
 
-    console.log('Cookies received:', req.cookies);
-    console.log('accessToken:', theAccessToken);
+    // console.log('Cookies received:', req.cookies);
+    // console.log('accessToken:', theAccessToken);
 
     if (!theAccessToken) {
         return res.status(401).json({ failToken: true, message: 'No access token provided' });
@@ -34,7 +34,7 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
     try {
         
         const accessPayload = jwt.verify(theAccessToken, JWT_SECRET) as AuthenticatedRequest['user'];
-        console.log('Access token verified:', accessPayload);
+        // console.log('Access token verified:', accessPayload);
 
         
         req.user = accessPayload;

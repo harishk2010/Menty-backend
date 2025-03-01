@@ -1,5 +1,5 @@
 import { IUser } from "../../models/userModel";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { InstructorServices } from "../../services/instructor/instructorServices";
 import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
@@ -34,6 +34,54 @@ export class InstructorController implements IInstructorControllers {
       console.log(error);
     }
   }
+  async getMentorExpertise(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const expertise = await this.instructorService.getMentorExpertise();
+      
+      res.status(200).json({
+        success: true,
+        data: expertise
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getPaginatedMentors(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Extract query parameters with defaults
+      console.log("pagiii")
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 6;
+      const search = (req.query.search as string) || "";
+      const sort = (req.query.sort as string) || "verified";
+      console.log(`expertise:|\ ${req.query.expertise} \|, search:|\ ${req.query.search} \|, sort:|\ ${req.query.sort} \|`);
+      
+      // Handle array parameters for expertise
+      let expertise: string[] = [];
+      
+      if (req.query.expertise) {
+        expertise = Array.isArray(req.query.expertise) 
+          ? req.query.expertise as string[]
+          : [req.query.expertise as string];
+      }
+      
+      // Get paginated, sorted, and filtered mentors
+      const result = await this.instructorService.getPaginatedMentors(
+        page,
+        limit,
+        search,
+        sort,
+        expertise
+      );
+      console.log(result,"result")
+      
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
   async getInstructorById(req: Request, res: Response): Promise<void> {
     try {
       const { instructorId } = req.params;

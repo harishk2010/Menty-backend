@@ -2,7 +2,7 @@ import { IInstructor, ITransaction } from "../../models/instructorModel";
 import { IInstructorService } from "./IInstructorService";
 import { InstructorRepository } from "../../repostories/instructor/instructorRepository";
 import { IInstructorRepository } from "../../repostories/instructor/IInstructorRepository";
-import { TransactionsResult } from "../../types/types";
+import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
 export class InstructorServices implements IInstructorService {
   private instructorRepository: IInstructorRepository;
@@ -24,6 +24,16 @@ export class InstructorServices implements IInstructorService {
       console.error("Error in createInstructor:", error);
       throw error;
     }
+  }
+
+  async getPaginatedMentors(
+    page: number = 1,
+    limit: number = 6,
+    search: string = "",
+    sort: string = "verified",
+    expertise: string[] = []
+  ): Promise<PaginatedMentors> {
+    return await this.instructorRepository.getPaginatedMentors(page, limit, search, sort, expertise);
   }
 
   /**
@@ -123,6 +133,9 @@ export class InstructorServices implements IInstructorService {
       console.error("Error in updatePassword:", error);
       throw error;
     }
+  }
+  async getMentorExpertise(): Promise<string[]> {
+    return await this.instructorRepository.getMentorExpertise();
   }
 
   /**

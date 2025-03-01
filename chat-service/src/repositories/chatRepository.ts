@@ -14,6 +14,10 @@ export class ChatRepository extends GenericRepository<IChat> implements IChatRep
     return await this.findOne({ bookingId });
   }
 
+  // async createChat(data: {bookingId: string,studendId:string,instructorId:string, messages: IMessage[]}): Promise<IChat | null> {
+  //   return await this.create(data);
+  // }
+
   async addMessage(chatId: string, message: IMessage): Promise<IChat | null> {
     return await this.updateOne(
       { _id: chatId },

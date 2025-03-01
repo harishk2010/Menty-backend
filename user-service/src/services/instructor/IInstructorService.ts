@@ -1,4 +1,4 @@
-import { TransactionsResult } from "../../types/types";
+import { PaginatedMentors, TransactionsResult } from "../../types/types";
 import { IInstructor, ITransaction } from "../../models/instructorModel";
 
 export interface IInstructorService {
@@ -14,4 +14,12 @@ export interface IInstructorService {
   ): Promise<TransactionsResult | null>;  updatePassword(email: string, password: string): Promise<IInstructor | null>;
   updatePlanPrice(instructorId:string,planPrice: number): Promise<IInstructor | null>;
   getInstructors(): Promise<IInstructor[] | null>;
+  getMentorExpertise(): Promise<string[]>
+   getPaginatedMentors(
+        page: number, 
+        limit: number, 
+        search: string, 
+        sort: string, 
+        expertise: string[]
+      ): Promise<PaginatedMentors>
 }

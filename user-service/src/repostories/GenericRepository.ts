@@ -1,4 +1,5 @@
-import { Model, Document } from "mongoose";
+import { PaginationResult } from "../types/types";
+import { Model, Document, FilterQuery } from "mongoose";
 
 export interface IGenericRepository<T extends Document> {
   create(payload: Partial<T>): Promise<T>;

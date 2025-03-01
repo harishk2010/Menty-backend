@@ -32,6 +32,7 @@ export class BookingController implements IBookingController{
         if(booking){
 
           produce('update-instructor-wallet',{instructorId:req.body.instructorId,txnid:req.body.txnid,amount:instructorShare,type:'credit',description:`Payment Received for BookingId:${booking._id}`})
+          produce('add-booking',booking)
         }
         console.log(booking,"booked")
         res.status(201).json({ success: true, message:"booked!",data:booking });

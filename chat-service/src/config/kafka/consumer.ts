@@ -1,3 +1,4 @@
+import { chatController } from "../dependencyInjector";
 import kafka from "./kafkaConfig";
 
 async function consume() {
@@ -11,7 +12,7 @@ async function consume() {
 
     await consumer.subscribe({
       topics: [
-        // "add-student",
+        "add-booking",
         // "password-reset-student",
         // "add-instructor",
         // "password-reset-instructor",
@@ -33,10 +34,10 @@ async function consume() {
           }
 
           switch (topic) {
-            // case "add-student":
-            //   await studentController.addStudent(messageValue);
-            //   console.log("Processed add-student event:", messageValue);
-            //   break;
+            case "add-booking":
+              await chatController.addBooking(messageValue);
+              console.log("Processed add-student event:", messageValue);
+              break;
 
 
 

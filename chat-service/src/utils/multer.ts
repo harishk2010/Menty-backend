@@ -19,6 +19,8 @@ const getFolderName = (fieldname: string) => {
     name = "thumbnail";
   } else if (fieldname == "demoVideos") {
     name = "demoVideos";
+  }  else if (fieldname == "chat") {
+    name = "demoVideos";
   } else {
     name = "chapterVideo";
   }

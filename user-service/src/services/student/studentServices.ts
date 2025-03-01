@@ -2,6 +2,8 @@ import { IUser } from "../../models/userModel";
 import { IStudentService } from "./IStudentService";
 import { StudentRepository } from "../../repostories/student/studentRepository";
 import { IStudentRepository } from "../../repostories/student/IStudentRepository";
+import { FilterQuery } from "mongoose";
+import { PaginationResult, SearchOptions } from "@/types/types";
 
 export class StudentServices implements IStudentService {
   private studentRepository: IStudentRepository;
@@ -50,6 +52,20 @@ export class StudentServices implements IStudentService {
       console.error("Error in updateProfile:", error);
       throw error;
     }
+  }
+  async searchStudents(
+    query: string,
+    role: string,
+    page: number,
+    limit: number
+  ): Promise<{ success: boolean; data: IUser[]; pagination: PaginationResult<IUser>["pagination"] }> {
+    const result = await this.studentRepository.searchUsers(query, role, page, limit);
+
+    return {
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+    };
   }
 
   async updatePassword(email: string, password: string): Promise<IUser | null> {

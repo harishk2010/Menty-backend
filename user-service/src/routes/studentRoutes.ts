@@ -14,6 +14,7 @@ router.get('/getStudents',authenticateToken,studentController.getStudents.bind(s
 router.get('/student/:studentId',authenticateToken,studentController.getStudentDataById.bind(studentController))
 router.patch('/blockStudent/:email',studentController.blockStudent.bind(studentController))
 router.get('/:email',authenticateToken,studentController.getStudent.bind(studentController))
+router.get('/search',authenticateToken, studentController.searchStudents.bind(studentController));
 
 const studentRoutes=router
 export default studentRoutes

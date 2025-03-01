@@ -16,7 +16,8 @@ router.patch('/blockInstructor/:email',instructorController.blockInstructor.bind
 router.put('/updatePlanPrice/:instructorId',authenticateToken,instructorController.updatePlanPrice.bind(instructorController))
 router.get('/instructor/:instructorId',authenticateToken,instructorController.getInstructorById.bind(instructorController))
 router.get('/:email',authenticateToken,instructorController.getInstructor.bind(instructorController))
-
+router.get('/get/paginatedMentors',authenticateToken, instructorController.getPaginatedMentors.bind(instructorController));
+router.get('/expertise',authenticateToken, instructorController.getMentorExpertise.bind(instructorController));
 
 const instructorRoutes=router
 export default instructorRoutes
