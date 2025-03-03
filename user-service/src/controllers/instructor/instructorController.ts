@@ -6,9 +6,10 @@ import bcrypt from "bcrypt";
 import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
 
-import { IInstructorControllers } from "./IInstructorController";
-import { IInstructorService } from "../../services/instructor/IInstructorService";
+import { IInstructorControllers } from "../../interfaces/IInstructorController";
+import { IInstructorService } from "../../interfaces/IInstructorService";
 import { IInstructor } from "../../models/instructorModel";
+import { InstructorUpdateStatus, InstructorWallet, ResetPassword } from "../../types/types";
 
 export class InstructorController implements IInstructorControllers {
   private instructorService: IInstructorService;
@@ -36,6 +37,7 @@ export class InstructorController implements IInstructorControllers {
   }
   async getMentorExpertise(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log("inside cntrl")
       const expertise = await this.instructorService.getMentorExpertise();
       
       res.status(200).json({
@@ -194,7 +196,7 @@ export class InstructorController implements IInstructorControllers {
     try {
       const { planPrice } = req.body;
       const { instructorId } = req.params;
-      console.log(planPrice,instructorId)
+      console.log(planPrice,instructorId,"planpriceee")
       const response = await this.instructorService.updatePlanPrice(
         instructorId,
         planPrice
@@ -206,7 +208,7 @@ export class InstructorController implements IInstructorControllers {
         });
         return;
       }
-      console.log(response)
+      console.log(response,"changeddd")
       res.status(200).json({
         success: true,
         message: "Updated PlanPrice!",
@@ -320,7 +322,7 @@ export class InstructorController implements IInstructorControllers {
   }
 
   ///kafka consume
-  async passwordReset(data: any): Promise<IInstructor | null> {
+  async passwordReset(data: ResetPassword): Promise<IInstructor | null> {
     try {
       const { password, email } = data;
       const response = await this.instructorService.updatePassword(
@@ -333,7 +335,7 @@ export class InstructorController implements IInstructorControllers {
       throw error;
     }
   }
-  async updateVerifyStatus(data: any): Promise<IInstructor | null> {
+  async updateVerifyStatus(data: InstructorUpdateStatus): Promise<IInstructor | null> {
     try {
       let email = data.emailID;
       let status = data.status;
@@ -370,7 +372,7 @@ export class InstructorController implements IInstructorControllers {
     }
   }
 
-  async approveRequest(data: any): Promise<IInstructor | null> {
+  async approveRequest(data: {emailID:string,status:string}): Promise<IInstructor | null> {
     try {
       let email = data.emailID;
       let status = data.status;
@@ -410,7 +412,7 @@ export class InstructorController implements IInstructorControllers {
     }
   }
 
-  async updateWallet(data: any): Promise<IInstructor | null> {
+  async updateWallet(data: InstructorWallet): Promise<IInstructor | null> {
     try {
       const { txnid, amount, description, type, instructorId } = data;
       console.log(data,"wallet instructor")

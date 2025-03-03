@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BookingService } from "../../services/booking/bookingService";
-import IBookingController from "./IBookingController";
-import IBookingService from "../../services/booking/IBookingService";
+import IBookingController from "../../interfaces/IBookingController";
+import IBookingService from "../../interfaces/IBookingService";
 import { error } from "console";
 import produce from "../../config/kafka/producer";
 

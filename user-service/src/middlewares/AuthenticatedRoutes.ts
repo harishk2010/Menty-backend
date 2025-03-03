@@ -63,13 +63,13 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                     return res.status(401).json({ message: 'Session expired. Please log in again.' });
                 }
 
-                console.log('Refresh token verified:', refreshPayload);
+                // console.log('Refresh token verified:', refreshPayload);
 
                              
                 const newAccessToken =await accessToken(
                     {email:refreshPayload.email, role: refreshPayload.role },
                 );
-                console.log('New access token generated:', newAccessToken);
+                // console.log('New access token generated:', newAccessToken);
 
                 // Set new Access Token in cookies
                 res.cookie('accessToken', newAccessToken, {
@@ -89,12 +89,12 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                     return res.status(401).json({ message: 'Session expired. Please log in again.' });
                 }
 
-                console.log('Invalid refresh token:', refreshErr.message);
+                // console.log('Invalid refresh token:', refreshErr.message);
                 return res.status(401).json({ message: 'Invalid refresh token. Please log in.' });
             }
         }
 
-        console.log('Invalid access token:', err.message);
+        // console.log('Invalid access token:', err.message);
         return res.status(400).json({ message: 'Invalid access token. Please log in.' });
     }
 };

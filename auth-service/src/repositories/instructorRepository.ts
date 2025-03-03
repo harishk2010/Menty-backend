@@ -1,7 +1,7 @@
 import { IInstructor, IInstructorDTO } from "../models/instructorModel";
 import { GenericRepository } from "./GenericRepository";
 import InstructorModel from "../models/instructorModel";
-import  {IInstructorRepository}  from "../repositories/interfaces/IInstructorRepository";
+import  {IInstructorRepository}  from "../interface/IInstructorRepository";
 
 export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
   constructor() {

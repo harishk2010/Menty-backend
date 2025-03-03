@@ -1,7 +1,7 @@
-import { ICategoryRepository } from "../../repositories/category/ICategoryRepository";
+import { ICategoryRepository } from "../../interfaces/ICategoryRepository";
 import { ICategoryModel } from "../../models/categoryModel";
 import { CategoryRepository } from "../../repositories/category/categoryRepository";
-import { ICategoryService } from "./ICategoryService";
+import { ICategoryService } from "../../interfaces/ICategoryService";
 
 export class CategoryService implements ICategoryService {
     private categoryRepository: ICategoryRepository

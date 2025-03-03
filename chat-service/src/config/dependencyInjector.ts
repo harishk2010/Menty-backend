@@ -1,9 +1,9 @@
 import { ChatController } from "../controllers/chatController"
-import { IChatController } from "../controllers/IChatController"
+import { IChatController } from "../interfaces/IChatController"
 import { ChatRepository } from "../repositories/chatRepository"
-import { IChatRepository } from "../repositories/IChatRepository"
+import { IChatRepository } from "../interfaces/IChatRepository"
 import { ChatService } from "../services/chatService"
-import { IChatService } from "../services/IChatService"
+import { IChatService } from "../interfaces/IChatService"
 
 
 

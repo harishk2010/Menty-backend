@@ -1,7 +1,7 @@
 import { ICourse } from "../../models/courseModel";
 import { GenericRepository } from "../GenericRepository";
 import {CourseModel} from "../../models/courseModel";
-import { ICourseRepository } from "./ICourseRepository";
+import { ICourseRepository } from "../../interfaces/ICourseRepository";
 import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 import { QuizModel } from "../../models/quizModel";

@@ -53,9 +53,9 @@
 //   }
 // }
 // services/chatService.ts
-import { IChatService } from '../services/IChatService';
+import { IChatService } from '../interfaces/IChatService';
 import { IChat, IMessage } from '../models/chatModel';
-import { IChatRepository } from '../repositories/IChatRepository';
+import { IChatRepository } from '../interfaces/IChatRepository';
 
 export class ChatService implements IChatService {
   private chatRepository: IChatRepository;
@@ -84,6 +84,7 @@ export class ChatService implements IChatService {
 
   async addMessage(bookingId: string, messageData: Partial<IMessage>,chatData: { studentId: string, instructorId: string }): Promise<IChat | null> {
     let chat = await this.chatRepository.findByBookingId(bookingId);
+    
     
     // If not, create a new chat
     if (!chat) {

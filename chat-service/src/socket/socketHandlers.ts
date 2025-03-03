@@ -394,7 +394,7 @@ interface MessageResponse {
 // Active users and typing state management
 const activeUsers = new Map<string, string>();
 const typingTimeouts = new Map<string, NodeJS.Timeout>();
-const TYPING_TIMEOUT = 3000; // 3 seconds
+const TYPING_TIMEOUT = 1000; // 3 seconds
 
 // Utility functions
 const emitActiveUsersUpdate = (io: Server) => {
@@ -463,14 +463,13 @@ export default function registerSocketHandlers(io: Server) {
     
     if (senderType === 'student') {
       studentId = sender;
-      // You need to get the instructorId from somewhere - perhaps the booking?
-      // For now, we'll need to query the booking
-      const bookingDetails = await BookingModel.findById(bookingId); // You'll need to implement this
+      
+      const bookingDetails = await BookingModel.findById(bookingId); 
       instructorId = bookingDetails?.instructorId;
     } else {
       instructorId = sender;
-      // Similarly, get the studentId from the booking
-      const bookingDetails = await BookingModel.findById(bookingId); // You'll need to implement this
+    
+      const bookingDetails = await BookingModel.findById(bookingId); 
       studentId = bookingDetails?.studentId;
     }
         // Create message response
@@ -486,7 +485,7 @@ export default function registerSocketHandlers(io: Server) {
         
         // IMPORTANT: Save message to database
         try {
-          // Create messageData object for database
+        
           const messageData = {
             content: message,
             sender: sender,
@@ -497,14 +496,13 @@ export default function registerSocketHandlers(io: Server) {
             createdAt: new Date()
           };
           
-          // Save to database using chatService
+        
           // await chatService.addMessage(bookingId, messageData);
           const chatData= { studentId:String(studentId), instructorId:String(instructorId) }
           await chatService.addMessage(bookingId, messageData, chatData);
           console.log("Message saved to database:", messageData);
         } catch (dbError) {
           console.error("Error saving message to database:", dbError);
-          // Continue with socket emission even if DB save fails
         }
         
         console.log(messageResponse);

@@ -1,7 +1,7 @@
 import { IChapter } from "../../models/chapterModel";
-import { IChapterService } from "./IChapterService";
+import { IChapterService } from "../../interfaces/IChapterService";
 import { ChapterRepository } from "../../repositories/chapter/chapterRepository";
-import { IChapterRepository } from "@/repositories/chapter/IChapterRepository";
+import { IChapterRepository } from "@/interfaces/IChapterRepository";
 
 export class ChapterService implements IChapterService {
   private chapterRepository: IChapterRepository;

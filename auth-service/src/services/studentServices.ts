@@ -1,7 +1,7 @@
 import { IUser } from "../models/userModel";
-import  IStudentServices  from "./interfaces/IStudentServices";
+import  IStudentServices  from "../interface/IStudentServices";
 import { StudentRepository } from "../repositories/studentRepository";
-import { IStudentRepository } from "../repositories/interfaces/IStudentRepository";
+import { IStudentRepository } from "../interface/IStudentRepository";
 
 export class StudentServices implements IStudentServices {
   private studentRepository: IStudentRepository;

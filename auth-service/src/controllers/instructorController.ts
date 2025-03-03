@@ -10,9 +10,9 @@ import {
 } from "../utils/tokenOptions";
 import { NextFunction } from "http-proxy-middleware/dist/types";
 import produce from "../config/kafka/producer";
-import IInstructorControllers from "./interfaces/IInstructorController";
-import IInstructorServices from "../services/interfaces/IIntstuctorServices";
-import IOtpServices from "../services/interfaces/IOtpService";
+import IInstructorControllers from "../interface/IInstructorController";
+import IInstructorServices from "../interface/IIntstuctorServices";
+import IOtpServices from "../interface/IOtpService";
 // import  from '../utils/jwt'
 
 export class InstructorController implements IInstructorControllers{

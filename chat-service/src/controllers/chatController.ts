@@ -53,8 +53,8 @@
 // }
 // controller/chatController.ts
 import { Request, Response } from 'express';
-import { IChatController } from './IChatController';
-import { IChatService } from '../services/IChatService';
+import { IChatController } from '../interfaces/IChatController';
+import { IChatService } from '../interfaces/IChatService';
 import upload from '../utils/multer';
 import { BookingModel, IBooking } from '../models/bookingModel';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -124,7 +124,7 @@ export class ChatController implements IChatController {
 
   async uploadChatImage(req: Request, res: Response): Promise<void> {
     const uploadSingle = upload.single('chat');
-    console.log("chat-image",uploadSingle)
+    // console.log("chat-image",uploadSingle)
     
     uploadSingle(req, res, async (err: any) => {
       if (err) {

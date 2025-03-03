@@ -26,14 +26,14 @@ router.route("/updateCourse/:courseId").post(
 
 router
   .route("/courses")
-  .get(courseController.getAllCourses.bind(courseController));
+  .get(authenticateToken,courseController.getAllCourses.bind(courseController));
 router
   .route("/paginatedCourses")
-  .get(courseController.getPaginatedCourses.bind(courseController));
+  .get(authenticateToken,courseController.getPaginatedCourses.bind(courseController));
   router.get('/courses/categories', courseController.getCourseCategories.bind(courseController));
 router
   .route("/filteredCourses")
-  .get(courseController.getFilteredInstructorCourses.bind(courseController));
+  .get(authenticateToken,courseController.getFilteredInstructorCourses.bind(courseController));
 
 router
   .route("/payment")

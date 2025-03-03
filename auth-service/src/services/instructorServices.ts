@@ -1,7 +1,7 @@
 import { IInstructor } from "../models/instructorModel";
-import  IInstructorServices  from "../services/interfaces/IIntstuctorServices";
+import  IInstructorServices  from "../interface/IIntstuctorServices";
 import { InstructorRepository } from "../repositories/instructorRepository";
-import { IInstructorRepository } from "../repositories/interfaces/IInstructorRepository";
+import { IInstructorRepository } from "../interface/IInstructorRepository";
 
 export class InstructorServices implements IInstructorServices {
   private instructorRepository: IInstructorRepository;

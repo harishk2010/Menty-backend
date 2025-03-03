@@ -1,8 +1,8 @@
-import { IVerificationService } from "./IVerificationService";
+import { IVerificationService } from "../../interfaces/IVerificationService";
 import { VerificationRepository } from "../../repostories/verification/verificationRepository";
 import { IVerificationModel } from "../../models/verificationModel";
 import { updateRequestType } from "../../types/types";
-import { IVerificationRepository } from "../../repostories/verification/IVerificationRepository";
+import { IVerificationRepository } from "../../interfaces/IVerificationRepository";
 
 export class VerificationService implements IVerificationService {
   private verificationRepository: IVerificationRepository;

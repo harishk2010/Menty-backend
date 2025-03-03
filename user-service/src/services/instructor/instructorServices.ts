@@ -1,7 +1,7 @@
 import { IInstructor, ITransaction } from "../../models/instructorModel";
-import { IInstructorService } from "./IInstructorService";
+import { IInstructorService } from "../../interfaces/IInstructorService";
 import { InstructorRepository } from "../../repostories/instructor/instructorRepository";
-import { IInstructorRepository } from "../../repostories/instructor/IInstructorRepository";
+import { IInstructorRepository } from "../../interfaces/IInstructorRepository";
 import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
 export class InstructorServices implements IInstructorService {

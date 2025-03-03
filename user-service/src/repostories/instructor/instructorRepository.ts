@@ -1,7 +1,7 @@
 import { IInstructor, ITransaction } from "../../models/instructorModel";
 import { GenericRepository } from "../GenericRepository";
 import InstructorModel from "../../models/instructorModel";
-import { IInstructorRepository } from "./IInstructorRepository";
+import { IInstructorRepository } from "../../interfaces/IInstructorRepository";
 import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
 export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
@@ -68,6 +68,7 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
     try {
       // Get unique expertise values from all mentors
       const result = await InstructorModel.distinct('expertise', { isBlocked: false });
+      console.log(result,"result")
       return result.filter(Boolean); // Filter out null/empty values
     } catch (error) {
       throw error;

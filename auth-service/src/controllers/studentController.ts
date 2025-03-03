@@ -4,9 +4,9 @@ import { OtpGenerate } from "../utils/otpGenerator";
 import { JwtService } from "../utils/jwt";
 import { IUser } from "@/models/userModel";
 import produce from "../config/kafka/producer";
-import IStudentServices from "../services/interfaces/IStudentServices";
-import IStudentControllers from "./interfaces/IStudentControllers";
-import IOtpServices from "@/services/interfaces/IOtpService";
+import IStudentServices from "../interface/IStudentServices";
+import IStudentControllers from "../interface/IStudentControllers";
+import IOtpServices from "@/interface/IOtpService";
 // import  from '../utils/jwt'
 
 export class StudentController implements IStudentControllers{

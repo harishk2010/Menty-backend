@@ -1,9 +1,9 @@
 
-import { ICategoryRepository } from "../repositories/category/ICategoryRepository"
+import { ICategoryRepository } from "../interfaces/ICategoryRepository"
 import { CategoryRepository } from "../repositories/category/categoryRepository"
-import { ICategoryService } from "../services/category/ICategoryService"
+import { ICategoryService } from "../interfaces/ICategoryService"
 import { CategoryService } from "../services/category/categoryService"
-import { ICategoryControllers } from "../controllers/category/ICategoryContollers"
+import { ICategoryControllers } from "../interfaces/ICategoryContollers"
 import { CategoryContoller } from "../controllers/category/categoryControllers"
 
 

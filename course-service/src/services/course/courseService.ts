@@ -1,9 +1,9 @@
 import { ICourse } from "../../models/courseModel";
-import { ICourseService } from "./ICourseService";
+import { ICourseService } from "../../interfaces/ICourseService";
 import { CourseRepository } from "../../repositories/course/courseRepository";
 import { IChapter } from "../../models/chapterModel";
 import { IPurchasedCourse } from "../../models/purchasedModel";
-import { ICourseRepository } from "../../repositories/course/ICourseRepository";
+import { ICourseRepository } from "../../interfaces/ICourseRepository";
 import { CoursesResult } from "../../Types/updateRequestType";
 
 export class CourseService implements ICourseService {

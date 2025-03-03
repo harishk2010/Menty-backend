@@ -4,8 +4,8 @@ import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
 import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
-import { IStudentControllers } from "./IStudentController";
-import { IStudentService } from "../../services/student/IStudentService";
+import { IStudentControllers } from "../../interfaces/IStudentController";
+import { IStudentService } from "../../interfaces/IStudentService";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentService;
@@ -227,7 +227,7 @@ export class StudentController implements IStudentControllers {
 
 
   ///kafka consume
-  async passwordReset(data:any):Promise<IUser | null>{
+  async passwordReset(data:{password:string,email:string}):Promise<IUser | null>{
     try {
       const {password,email}=data
       const response = await this.studentService.updatePassword(

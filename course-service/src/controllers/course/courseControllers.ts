@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { ICourseControllers } from "../course/ICourseControllers";
-import { ICourseService } from "../../services/course/ICourseService";
+import { ICourseControllers } from "../../interfaces/ICourseControllers";
+import { ICourseService } from "../../interfaces/ICourseService";
 import produce from "../../config/kafka/producer";
 import getId from "../../utils/getId";
-import { IChapterService } from "../../services/chapter/IChapterService";
+import { IChapterService } from "../../interfaces/IChapterService";
 import { ChapterService } from "../../services/chapter/chapterService";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 import { CourseModel, ICourse } from "../../models/courseModel";

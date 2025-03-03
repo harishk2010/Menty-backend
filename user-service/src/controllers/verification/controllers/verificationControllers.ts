@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { IVerificationControllers } from "./IVerificationControllers";
+import { IVerificationControllers } from "../../../interfaces/IVerificationControllers";
 import { uploadToS3Bucket } from "../../../utils/s3Bucket";
-import { IVerificationService } from "../../../services/verification/IVerificationService";
+import { IVerificationService } from "../../../interfaces/IVerificationService";
 import produce from "../../../config/kafka/producer";
 import { instructorController } from "../../../config/dependencyInjector";
 // import { VerificationService } from "@/services/verificationService";

@@ -1,7 +1,7 @@
 import { IUser } from "../../models/userModel";
-import { IStudentService } from "./IStudentService";
+import { IStudentService } from "../../interfaces/IStudentService";
 import { StudentRepository } from "../../repostories/student/studentRepository";
-import { IStudentRepository } from "../../repostories/student/IStudentRepository";
+import { IStudentRepository } from "../../interfaces/IStudentRepository";
 import { FilterQuery } from "mongoose";
 import { PaginationResult, SearchOptions } from "@/types/types";
 
