@@ -1,7 +1,7 @@
 import { IInstructor, ITransaction } from "../../models/instructorModel";
 import { GenericRepository } from "../GenericRepository";
 import InstructorModel from "../../models/instructorModel";
-import { IInstructorRepository } from "../../interfaces/IInstructorRepository";
+import { IInstructorRepository } from "../interfaces/IInstructorRepository";
 import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
 export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {

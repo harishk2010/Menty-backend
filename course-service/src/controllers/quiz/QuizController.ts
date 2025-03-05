@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IQuizService } from "../../interfaces/IQuizService";
+import { IQuizService } from "../../services/interfaces/IQuizService";
 import getId from "../../utils/getId";
 import { CourseService } from "@/services/course/courseService";
 import { CourseContoller } from "../course/courseControllers";

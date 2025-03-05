@@ -1,7 +1,7 @@
 import UserModel, { IStudentDTO } from "../models/userModel";
 import { IUser } from "../models/userModel";
 import { GenericRepository } from "./GenericRepository";
-import { IStudentRepository } from "../interface/IStudentRepository";
+import { IStudentRepository } from "./interfaces/IStudentRepository";
 
 export class StudentRepository extends GenericRepository<IUser> implements IStudentRepository {
   constructor() {

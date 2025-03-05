@@ -1,23 +1,29 @@
-import { ICourseService } from "../interfaces/ICourseService"
-import { ICourseControllers } from "../interfaces/ICourseControllers"
+import { ICourseService } from "../services/interfaces/ICourseService"
+import { ICourseControllers } from "../controllers/interfaces/ICourseControllers"
 import { CourseContoller } from "../controllers/course/courseControllers"
 import { CourseService } from "../services/course/courseService"
-import { ICourseRepository } from "../interfaces/ICourseRepository"
+import { ICourseRepository } from "../repositories/interfaces/ICourseRepository"
 import { CourseRepository } from "../repositories/course/courseRepository"
 
-import { IChapterControllers } from "../interfaces/IChapterControllers"
+import { IChapterControllers } from "../controllers/interfaces/IChapterControllers"
 import { ChapterController } from "../controllers/chapter/chapterControllers"
-import { IChapterService } from "../interfaces/IChapterService"
+import { IChapterService } from "../services/interfaces/IChapterService"
 import { ChapterService } from "../services/chapter/chapterService"
-import { IChapterRepository } from "../interfaces/IChapterRepository"
+import { IChapterRepository } from "../repositories/interfaces/IChapterRepository"
 import { ChapterRepository } from "../repositories/chapter/chapterRepository"
 
-import { IQuizRepository } from "../interfaces/IQuizRepository"
+import { IQuizRepository } from "../repositories/interfaces/IQuizRepository"
 import { QuizRepository } from "../repositories/quiz/QuizRepository"
-import { IQuizService } from "../interfaces/IQuizService"
+import { IQuizService } from "../services/interfaces/IQuizService"
 import { QuizService } from "../services/quiz/QuizService"
-import { IQuizController } from "../interfaces/IQuizController"
+import { IQuizController } from "../controllers/interfaces/IQuizController"
 import { QuizController } from "../controllers/quiz/QuizController"
+import { IReviewRepository } from "../repositories/interfaces/IReviewRepository"
+import { ReviewRepository } from "../repositories/review/reviewRepository"
+import { IReviewService } from "../services/interfaces/IReviewService"
+import { ReviewService } from "../services/review/reviewServices"
+import { IReviewController } from "../controllers/interfaces/IReviewControllers"
+import { ReviewController } from "../controllers/review/reviewControllers"
 
 // const courseBaseRepository:ICourseBaseRepository=new CourseBaseRepository()
 const courseRepository:ICourseRepository=new CourseRepository()
@@ -34,4 +40,10 @@ const quizRepository:IQuizRepository=new QuizRepository()
 const quizService:IQuizService=new QuizService(quizRepository)
 const quizController:IQuizController=new QuizController(quizService)
 
-export { courseController,chapterController ,quizController}
+//reviewsAndRatings
+
+const reviewRepository:IReviewRepository=new ReviewRepository()
+const reviewService:IReviewService=new ReviewService(reviewRepository)
+const reviewController:IReviewController=new ReviewController(reviewService)
+
+export { courseController,chapterController ,quizController,reviewController}

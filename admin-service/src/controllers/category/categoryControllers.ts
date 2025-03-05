@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { ICategoryControllers } from "../../interfaces/ICategoryContollers";
-import { ICategoryService } from "../../interfaces/ICategoryService";
+import { ICategoryControllers } from "../interfaces/ICategoryContollers";
+import { ICategoryService } from "../../services/interfaces/ICategoryService";
 
 export class CategoryContoller implements ICategoryControllers {
   private categoryService: ICategoryService

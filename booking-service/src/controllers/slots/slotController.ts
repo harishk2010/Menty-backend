@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { SlotService } from "../../services/slots/slotService";
-import ISlotController from "../../interfaces/ISlotController";
-import ISlotService from "../../interfaces/ISlotService";
+import ISlotController from "../interfaces/ISlotController";
+import ISlotService from "../../services/interfaces/ISlotService";
 
 
 

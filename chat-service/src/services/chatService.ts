@@ -53,9 +53,9 @@
 //   }
 // }
 // services/chatService.ts
-import { IChatService } from '../interfaces/IChatService';
+import { IChatService } from './interfaces/IChatService';
 import { IChat, IMessage } from '../models/chatModel';
-import { IChatRepository } from '../interfaces/IChatRepository';
+import { IChatRepository } from '../repositories/interfaces/IChatRepository';
 
 export class ChatService implements IChatService {
   private chatRepository: IChatRepository;

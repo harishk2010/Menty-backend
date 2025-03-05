@@ -1,7 +1,7 @@
 import { CategoryModel, ICategoryModel } from "../../models/categoryModel";
 import { GenericRepository } from "../GenericRepository";
 import { Model } from "mongoose";
-import { ICategoryRepository } from "../../interfaces/ICategoryRepository";
+import { ICategoryRepository } from "../interfaces/ICategoryRepository";
 
 export class CategoryRepository extends GenericRepository<ICategoryModel> implements ICategoryRepository {
   constructor() {

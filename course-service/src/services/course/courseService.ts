@@ -1,10 +1,11 @@
 import { ICourse } from "../../models/courseModel";
-import { ICourseService } from "../../interfaces/ICourseService";
+import { ICourseService } from "../interfaces/ICourseService";
 import { CourseRepository } from "../../repositories/course/courseRepository";
 import { IChapter } from "../../models/chapterModel";
 import { IPurchasedCourse } from "../../models/purchasedModel";
-import { ICourseRepository } from "../../interfaces/ICourseRepository";
+import { ICourseRepository } from "../../repositories/interfaces/ICourseRepository";
 import { CoursesResult } from "../../Types/updateRequestType";
+import UserModel, { IUser } from "../../models/userModel";
 
 export class CourseService implements ICourseService {
   private courseRepository: ICourseRepository;
@@ -100,5 +101,9 @@ export class CourseService implements ICourseService {
       
     }
     
+  }
+  async createStudent(payload: IUser): Promise<any> {
+    console.log(payload,"paloadd")
+    return UserModel.create(payload)
   }
 }

@@ -1,7 +1,7 @@
-import { Iotp } from "../interface/otp"
 
-import otpModel from "../models/otpModel"
-import IOtpRepository from "../interface/IOtpRespoitory"
+
+import otpModel,{ Iotp } from "../models/otpModel"
+import IOtpRepository from "./interfaces/IOtpRespoitory"
 
 import { GenericRepository } from "./GenericRepository"
 

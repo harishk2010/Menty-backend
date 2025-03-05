@@ -1,6 +1,6 @@
 import { GenericRepository } from '../repositories/GenericRepository';
 import { Chat, IChat, IMessage } from '../models/chatModel';
-import { IChatRepository } from '../interfaces/IChatRepository';
+import { IChatRepository } from './interfaces/IChatRepository';
 import { UpdateQuery } from 'mongoose';
 
 export class ChatRepository extends GenericRepository<IChat> implements IChatRepository {

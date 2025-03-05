@@ -53,8 +53,8 @@
 // }
 // controller/chatController.ts
 import { Request, Response } from 'express';
-import { IChatController } from '../interfaces/IChatController';
-import { IChatService } from '../interfaces/IChatService';
+import { IChatController } from './interfaces/IChatController';
+import { IChatService } from '../services/interfaces/IChatService';
 import upload from '../utils/multer';
 import { BookingModel, IBooking } from '../models/bookingModel';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';

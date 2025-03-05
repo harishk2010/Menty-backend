@@ -1,7 +1,7 @@
-import { IBookingRepository } from "../../interfaces/IBookingRepository";
+import { IBookingRepository } from "../../repositories/interfaces/IBookingRepository";
 import { IBooking } from "../../models/bookingModel";
 import { BookingRepository } from "../../repositories/booking/bookingRepository";
-import IBookingService from "../../interfaces/IBookingService";
+import IBookingService from "../interfaces/IBookingService";
 import { SlotModel } from "../../models/slotModel";
 
 export class BookingService implements IBookingService{

@@ -12,3 +12,13 @@ export interface StudentProfile {
 export interface StudentStatus {
   isBlocked: string;
 }
+export interface mentorSignup{
+  email:string;
+  password:string
+}
+export interface otpGenerateI {
+  createOtpDigit(length?: number): Promise<string>;
+}
+export interface IEmail {
+  sentEmailVerification(name: string, email: string, verification: string) : Promise <boolean>
+}

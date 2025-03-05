@@ -1,4 +1,4 @@
-import { otpGenerateI } from "../interface/otpGenerateI";
+import { otpGenerateI } from "../types/types";
 
 export class OtpGenerate implements otpGenerateI {
     async createOtpDigit(): Promise<string> {

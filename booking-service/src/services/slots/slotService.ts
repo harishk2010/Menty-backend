@@ -1,8 +1,8 @@
 import { SlotRepository } from "../../repositories/slots/slotRepository";
 import { RRule } from "rrule";
-import ISlotService from "../../interfaces/ISlotService";
+import ISlotService from "../interfaces/ISlotService";
 import { ISlot } from "../../models/slotModel";
-import ISlotRepository from "../../interfaces/ISlotRepository";
+import ISlotRepository from "../../repositories/interfaces/ISlotRepository";
 
 export class SlotService implements ISlotService {
   private slotRepository: ISlotRepository;

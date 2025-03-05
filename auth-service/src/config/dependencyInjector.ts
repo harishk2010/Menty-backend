@@ -1,23 +1,23 @@
-import  IInstructorControllers  from "../interface/IInstructorController"
+import  IInstructorControllers  from "../services/interfaces/IInstructorController"
 import { InstructorController } from "../controllers/instructorController"
-import  IInstructorServices  from "../interface/IIntstuctorServices"
+import  IInstructorServices  from "../services/interfaces/IIntstuctorServices"
 import { InstructorServices } from "../services/instructorServices"
-import  {IInstructorRepository} from "../interface/IInstructorRepository"
+import  {IInstructorRepository} from "../repositories/interfaces/IInstructorRepository"
 import { InstructorRepository } from "../repositories/instructorRepository"
 
-import { IStudentRepository } from "../interface/IStudentRepository"
+import { IStudentRepository } from "../repositories/interfaces/IStudentRepository"
 import  {StudentRepository}  from "../repositories/studentRepository"
-import  IStudentServices  from "../interface/IStudentServices"
+import  IStudentServices  from "../services/interfaces/IStudentServices"
 import { StudentServices } from "../services/studentServices"
-import  IStudentControllers  from "../interface/IStudentControllers"
+import  IStudentControllers  from "../controllers/interfaces/IStudentControllers"
 import { StudentController } from "../controllers/studentController"
 
 import { OtpRespository } from "../repositories/otpRespository"
-import IOtpRepository from "../interface/IOtpRespoitory"
+import IOtpRepository from "../repositories/interfaces/IOtpRespoitory"
 
 import {  OtpService } from "../services/otpService"
-import IOtpServices from "../interface/IOtpService"
-import { IAdminControllers } from "../interface/IAdminControllers"
+import IOtpServices from "../services/interfaces/IOtpService"
+import { IAdminControllers } from "../controllers/interfaces/IAdminControllers"
 import { AdminController } from "../controllers/adminController"
 
 

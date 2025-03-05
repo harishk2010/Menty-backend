@@ -6,8 +6,8 @@ import bcrypt from "bcrypt";
 import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
 
-import { IInstructorControllers } from "../../interfaces/IInstructorController";
-import { IInstructorService } from "../../interfaces/IInstructorService";
+import { IInstructorControllers } from "../interfaces/IInstructorController";
+import { IInstructorService } from "../../services/interfaces/IInstructorService";
 import { IInstructor } from "../../models/instructorModel";
 import { InstructorUpdateStatus, InstructorWallet, ResetPassword } from "../../types/types";
 

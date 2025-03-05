@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { ICourseControllers } from "../../interfaces/ICourseControllers";
-import { ICourseService } from "../../interfaces/ICourseService";
+import { ICourseControllers } from "../interfaces/ICourseControllers";
+import { ICourseService } from "../../services/interfaces/ICourseService";
 import produce from "../../config/kafka/producer";
 import getId from "../../utils/getId";
-import { IChapterService } from "../../interfaces/IChapterService";
+import { IChapterService } from "../../services/interfaces/IChapterService";
 import { ChapterService } from "../../services/chapter/chapterService";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
 import { CourseModel, ICourse } from "../../models/courseModel";
@@ -12,6 +12,7 @@ import kafka from "@/config/kafka/kafkaConfig";
 import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 import { IBoughtCourses } from "../../Types/updateRequestType";
+import { IUser } from "../../models/userModel";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -516,6 +517,16 @@ export class CourseContoller implements ICourseControllers {
     next(error)
    }
  }
+ public async addStudent(payload: IUser):  Promise<void> {
+  try {
+    let response = await this.courseService.createStudent(payload);
+
+  } catch (error) {
+    console.log(error);
+    throw error;
+    
+  }
+}
 
 
 }

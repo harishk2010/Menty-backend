@@ -1,3 +1,4 @@
+import { courseController } from "../dependencyInjector";
 import kafka from "./kafkaConfig";
 
 async function consume() {
@@ -11,7 +12,7 @@ async function consume() {
 
     await consumer.subscribe({
       topics: [
-        // "add-student",
+        "add-student",
         // "password-reset-student",
         // "add-instructor",
         // "password-reset-instructor",
@@ -33,10 +34,10 @@ async function consume() {
           }
 
           switch (topic) {
-            // case "add-student":
-            //   await studentController.addStudent(messageValue);
-            //   console.log("Processed add-student event:", messageValue);
-            //   break;
+            case "add-student":
+              await courseController.addStudent(messageValue);
+              console.log("Processed add-student event:", messageValue);
+              break;
 
 
 

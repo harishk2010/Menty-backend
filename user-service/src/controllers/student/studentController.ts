@@ -4,8 +4,8 @@ import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
 import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
-import { IStudentControllers } from "../../interfaces/IStudentController";
-import { IStudentService } from "../../interfaces/IStudentService";
+import { IStudentControllers } from "../interfaces/IStudentController";
+import { IStudentService } from "../../services/interfaces/IStudentService";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentService;

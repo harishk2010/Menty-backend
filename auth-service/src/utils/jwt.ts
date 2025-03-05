@@ -1,6 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { config } from "dotenv";
-import { IInstructor } from "@/models/instructorModel";
 
 // Load environment variables
 config();

@@ -1,9 +1,9 @@
 import { IUser } from "../../models/userModel";
-import { IStudentService } from "../../interfaces/IStudentService";
+import { IStudentService } from "../interfaces/IStudentService";
 import { StudentRepository } from "../../repostories/student/studentRepository";
-import { IStudentRepository } from "../../interfaces/IStudentRepository";
+import { IStudentRepository } from "../../repostories/interfaces/IStudentRepository";
 import { FilterQuery } from "mongoose";
-import { PaginationResult, SearchOptions } from "@/types/types";
+import { PaginationResult, SearchOptions } from "../../types/types";
 
 export class StudentServices implements IStudentService {
   private studentRepository: IStudentRepository;

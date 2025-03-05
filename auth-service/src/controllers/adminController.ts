@@ -1,6 +1,6 @@
 import { JwtService } from "../utils/jwt";
 import { Request, Response } from "express";
-import { IAdminControllers } from "../interface/IAdminControllers";
+import { IAdminControllers } from "./interfaces/IAdminControllers";
 
 export class AdminController implements IAdminControllers{
      private JWT: JwtService;

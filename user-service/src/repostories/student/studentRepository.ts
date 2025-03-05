@@ -1,7 +1,7 @@
 import { IUser } from "../../models/userModel";
 import { GenericRepository } from "../GenericRepository";
 import UserModel from "../../models/userModel";
-import { IStudentRepository } from "../../interfaces/IStudentRepository";
+import { IStudentRepository } from "../interfaces/IStudentRepository";
 import { FilterQuery } from "mongoose";
 import { PaginationResult } from "../../types/types";
 

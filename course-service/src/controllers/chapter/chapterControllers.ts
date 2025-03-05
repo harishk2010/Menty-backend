@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { IChapterControllers } from "../../interfaces/IChapterControllers";
-import { IChapterService } from "../../interfaces/IChapterService";
+import { IChapterControllers } from "../interfaces/IChapterControllers";
+import { IChapterService } from "../../services/interfaces/IChapterService";
 import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";

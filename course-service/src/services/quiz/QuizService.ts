@@ -1,8 +1,8 @@
 import { IQuiz } from "../../models/quizModel";
-import { IQuizService } from "../../interfaces/IQuizService";
+import { IQuizService } from "../interfaces/IQuizService";
 import { QuizRepository } from "../../repositories/quiz/QuizRepository";
 import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
-import { IQuizRepository } from "../../interfaces/IQuizRepository";
+import { IQuizRepository } from "../../repositories/interfaces/IQuizRepository";
 
 export class QuizService implements IQuizService {
   private quizRepository: IQuizRepository;
