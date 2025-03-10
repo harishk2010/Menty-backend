@@ -4,7 +4,10 @@ import InstructorModel from "../../models/instructorModel";
 import { IInstructorRepository } from "../interfaces/IInstructorRepository";
 import { PaginatedMentors, TransactionsResult } from "../../types/types";
 
-export class InstructorRepository extends GenericRepository<IInstructor> implements IInstructorRepository {
+export class InstructorRepository
+  extends GenericRepository<IInstructor>
+  implements IInstructorRepository
+{
   constructor() {
     super(InstructorModel);
   }
@@ -13,27 +16,31 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
     email: string,
     page: number,
     limit: number,
-    search: string = ''
+    search: string = ""
   ): Promise<TransactionsResult | null> {
     try {
       // Find the instructor first
       const instructor = await InstructorModel.findOne({ email });
-      
-      if (!instructor || !instructor.wallet || !instructor.wallet.transactions) {
+
+      if (
+        !instructor ||
+        !instructor.wallet ||
+        !instructor.wallet.transactions
+      ) {
         return null;
       }
-      
+
       // Filter transactions by search term if provided
       let filteredTransactions = instructor.wallet.transactions;
-      
+
       if (search) {
         const searchLower = search.toLowerCase();
-        filteredTransactions = filteredTransactions.filter(txn => {
+        filteredTransactions = filteredTransactions.filter((txn) => {
           const txnid = txn.txnid?.toLowerCase() ?? "";
           const description = txn.description?.toLowerCase() ?? "";
           const type = txn.type?.toLowerCase() ?? "";
           const amount = txn.amount?.toString() ?? "";
-      
+
           return (
             txnid.includes(searchLower) ||
             description.includes(searchLower) ||
@@ -42,22 +49,23 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
           );
         });
       }
-      
-      // Get total count for pagination
+
       const total = filteredTransactions.length;
-      
-      // Sort by date descending (most recent first)
-      filteredTransactions.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
+
+      filteredTransactions.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       );
-      
+
       // Apply pagination
       const skip = (page - 1) * limit;
-      const paginatedTransactions = filteredTransactions.slice(skip, skip + limit);
-      
+      const paginatedTransactions = filteredTransactions.slice(
+        skip,
+        skip + limit
+      );
+
       return {
         transactions: paginatedTransactions,
-        total
+        total,
       };
     } catch (error) {
       console.error("Error in getTransactionsList repository:", error);
@@ -66,9 +74,9 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
   }
   async getMentorExpertise(): Promise<string[]> {
     try {
-      // Get unique expertise values from all mentors
-      const result = await InstructorModel.distinct('expertise', { isBlocked: false });
-      console.log(result,"result")
+      const result = await InstructorModel.distinct("expertise", {
+        isBlocked: false,
+      });
       return result.filter(Boolean); // Filter out null/empty values
     } catch (error) {
       throw error;
@@ -76,32 +84,34 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
   }
 
   async getPaginatedMentors(
-    page: number, 
-    limit: number, 
-    search: string, 
-    sort: string, 
+    page: number,
+    limit: number,
+    search: string,
+    sort: string,
     expertise: string[]
   ): Promise<PaginatedMentors> {
     try {
       const skip = (page - 1) * limit;
-      
+
       // Build filter object
       let filter: any = { isBlocked: false };
-      
+
       // Add search functionality
       if (search) {
         filter.$or = [
-          { username: { $regex: search, $options: 'i' } },
-          { expertise: { $regex: search, $options: 'i' } },
-          { skills: { $regex: search, $options: 'i' } }
+          { username: { $regex: search, $options: "i" } },
+          { expertise: { $regex: search, $options: "i" } },
+          { skills: { $regex: search, $options: "i" } },
         ];
       }
-      
+
       // Add expertise filter
       if (expertise && expertise.length > 0) {
-        filter.expertise = { $in: expertise.map(exp => new RegExp(exp, 'i')) };
+        filter.expertise = {
+          $in: expertise.map((exp) => new RegExp(exp, "i")),
+        };
       }
-      
+
       // Determine sort order
       let sortOption: any = {};
       switch (sort) {
@@ -122,29 +132,32 @@ export class InstructorRepository extends GenericRepository<IInstructor> impleme
           sortOption = { isVerified: -1, username: 1 };
           break;
       }
-      
+
       // Execute query with pagination and sorting
       const mentors = await InstructorModel.find(filter)
         .sort(sortOption)
         .skip(skip)
         .limit(limit)
         .exec();
-      
+
       // Get total count for pagination
       const totalMentors = await InstructorModel.countDocuments(filter);
-      
+
       return {
         mentors,
         currentPage: page,
         totalPages: Math.ceil(totalMentors / limit),
-        totalMentors
+        totalMentors,
       };
     } catch (error) {
       throw error;
     }
   }
 
-  async updatePassword(email: string, password: string): Promise<IInstructor | null> {
+  async updatePassword(
+    email: string,
+    password: string
+  ): Promise<IInstructor | null> {
     try {
       const response = await InstructorModel.findOneAndUpdate(
         { email },

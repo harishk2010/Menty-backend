@@ -29,7 +29,10 @@ export class VerificationService implements IVerificationService {
     return await this.verificationRepository.findOne({ email });
   }
 
-  async approveRequest(email: string, status: string): Promise<IVerificationModel | null> {
+  async approveRequest(
+    email: string,
+    status: string
+  ): Promise<IVerificationModel | null> {
     return await this.verificationRepository.approveRequest(email, status);
   }
 
@@ -37,7 +40,10 @@ export class VerificationService implements IVerificationService {
     return await this.verificationRepository.findAll();
   }
 
-  async updateRequest(email: string, data: updateRequestType): Promise<IVerificationModel | null> {
+  async updateRequest(
+    email: string,
+    data: updateRequestType
+  ): Promise<IVerificationModel | null> {
     return await this.verificationRepository.updateRequest(email, data);
   }
 }

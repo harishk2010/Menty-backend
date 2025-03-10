@@ -9,7 +9,9 @@ export interface IGenericRepository<T extends Document> {
   delete(id: string): Promise<T | null>;
 }
 
-export class GenericRepository<T extends Document> implements IGenericRepository<T> {
+export class GenericRepository<T extends Document>
+  implements IGenericRepository<T>
+{
   private model: Model<T>;
 
   constructor(model: Model<T>) {
@@ -37,6 +39,6 @@ export class GenericRepository<T extends Document> implements IGenericRepository
   }
 
   async delete(id: string): Promise<T | null> {
-   return await this.model.findByIdAndDelete(id);
+    return await this.model.findByIdAndDelete(id);
   }
 }

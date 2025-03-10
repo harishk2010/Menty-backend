@@ -20,13 +20,11 @@ interface AuthenticatedRequest extends Request {
 
 
 const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
-    // console.log('Auth middleware entered');
-
+  
     const accessToken = req.cookies['accessToken'];
     const refreshToken = req.cookies['refreshToken'];
 
-    // console.log('Cookies received:', req.cookies);
-    // console.log('accessToken:', accessToken);
+    
 
     if (!accessToken) {
         return res.status(401).json({ failToken: true, message: 'No access token provided' });
@@ -35,17 +33,14 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
     try {
         // Verify Access Token
         const accessPayload = jwt.verify(accessToken, JWT_SECRET) as AuthenticatedRequest['user'];
-        // console.log('Access token verified:', accessPayload);
 
         // If valid, attach payload to request and proceed
         req.user = accessPayload;
         return next();
     } catch (err: any) {
         if (err.name === 'TokenExpiredError') {
-            console.log('Access token expired');
 
             if (!refreshToken) {
-                // console.log('No refresh token provided');
                 return res.status(401).json({ failToken: true, message: 'No refresh token provided' });
             }
 
@@ -57,13 +52,11 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                 }
 
                 // Check if the refresh token is expired
-                const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+                const currentTime = Math.floor(Date.now() / 1000); 
                 if (refreshPayload.exp && refreshPayload.exp < currentTime) {
-                    console.log('Refresh token expired');
                     return res.status(401).json({ message: 'Session expired. Please log in again.' });
                 }
 
-                // console.log('Refresh token verified:', refreshPayload);
 
                 // Generate a new Access Token
                 const jwtt=new JwtService()
@@ -71,9 +64,7 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                     {email:refreshPayload.email, role: refreshPayload.role },
                    
                 );
-                // console.log('New access token generated:', newAccessToken);
 
-                // Set new Access Token in cookies
                 res.cookie('accessToken', newAccessToken, {
                     httpOnly: true,
                   
@@ -87,7 +78,6 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                 return next();
             } catch (refreshErr: any) {
                 if (refreshErr.name === 'TokenExpiredError') {
-                    console.log('Refresh token expired');
                     return res.status(401).json({ message: 'Session expired. Please log in again.' });
                 }
 
@@ -96,7 +86,6 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
             }
         }
 
-        console.log('Invalid access token:', err.message);
         return res.status(400).json({ message: 'Invalid access token. Please log in.' });
     }
 };

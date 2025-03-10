@@ -6,11 +6,13 @@ export interface IGenericRepository<T extends Document> {
   findOne(filter: object): Promise<T | null>;
   findAll(filter?: object): Promise<T[]>;
   update(id: string, data: Partial<T>): Promise<T | null>;
-  updateOne(filter: object,data:Partial<T>): Promise<T | null>
+  updateOne(filter: object, data: Partial<T>): Promise<T | null>;
   delete(id: string): Promise<T | null>;
 }
 
-export class GenericRepository<T extends Document> implements IGenericRepository<T> {
+export class GenericRepository<T extends Document>
+  implements IGenericRepository<T>
+{
   private model: Model<T>;
 
   constructor(model: Model<T>) {
@@ -32,8 +34,11 @@ export class GenericRepository<T extends Document> implements IGenericRepository
   async findAll(filter: object = {}): Promise<T[]> {
     return await this.model.find(filter);
   }
-  async updateOne(filter: object,data:Partial<T>): Promise<T | null> {
-    return await this.model.findOneAndUpdate(filter, data, { new: true, upsert: true });
+  async updateOne(filter: object, data: Partial<T>): Promise<T | null> {
+    return await this.model.findOneAndUpdate(filter, data, {
+      new: true,
+      upsert: true,
+    });
   }
 
   async update(id: string, data: Partial<T>): Promise<T | null> {
@@ -41,6 +46,6 @@ export class GenericRepository<T extends Document> implements IGenericRepository
   }
 
   async delete(id: string): Promise<T | null> {
-   return await this.model.findByIdAndDelete(id);
+    return await this.model.findByIdAndDelete(id);
   }
 }

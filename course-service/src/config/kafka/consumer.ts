@@ -1,9 +1,10 @@
-import { courseController } from "../dependencyInjector";
+import {
+  courseController,
+  instructorDashboardController,
+} from "../dependencyInjector";
 import kafka from "./kafkaConfig";
 
 async function consume() {
-  // const studentController = new StudentController();
-  // const instructorController=new InstructorController()
   const consumer = kafka.consumer({ groupId: "course-service" });
 
   try {
@@ -11,16 +12,10 @@ async function consume() {
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: [
-        "add-student",
-        // "password-reset-student",
-        // "add-instructor",
-        // "password-reset-instructor",
-      ],
+      topics: ["add-student", "update-profile-student"],
       fromBeginning: true,
     });
 
-    console.log("Course-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {
@@ -36,10 +31,10 @@ async function consume() {
           switch (topic) {
             case "add-student":
               await courseController.addStudent(messageValue);
-              console.log("Processed add-student event:", messageValue);
               break;
-
-
+            case "update-profile-student":
+              await instructorDashboardController.updateProfile(messageValue);
+              break;
 
             default:
               console.warn(`No handler for topic: ${topic}`);

@@ -18,9 +18,8 @@ export class NotificationControllers implements INotificationControllers {
       const { name, email, otp } = data;
 
       await this.sendEmail.sentEmailVerification(name, email, otp);
-      console.log("OTP email has been sent");
     } catch (error) {
-      console.log(error);
+      throw error
     }
   }
   async sendForgotEmail(data: { email: string; otp: string }):Promise<void> {
@@ -29,17 +28,16 @@ export class NotificationControllers implements INotificationControllers {
       await this.sendForgotPasswordEmail.sendEmailVerification(email, otp);
       console.log("Forgot OTP email has been sent");
     } catch (error) {
-      console.log(error);
+      throw error
     }
   }
   async sendVerifiedInstructorEmail(data: { email: string; username: string }):Promise<void> {
     try {
       const { email,username } = data;
-      console.log(email,username,"mail>>>")
       await this.sendVerifiedEmail.sentEmailVerification(username,email);
       console.log("Forgot OTP email has been sent");
     } catch (error) {
-      console.log(error);
+      throw error
     }
   }
 }

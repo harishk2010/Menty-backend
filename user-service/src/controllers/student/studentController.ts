@@ -9,43 +9,29 @@ import { IStudentService } from "../../services/interfaces/IStudentService";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentService;
-  constructor(studentService:IStudentService) {
+  constructor(studentService: IStudentService) {
     this.studentService = studentService;
   }
 
-  public async addStudent(payload: IUser):  Promise<void> {
+  public async addStudent(payload: IUser): Promise<void> {
     try {
       let response = await this.studentService.createStudent(payload);
-
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
-  public async getStudent(req: Request, res: Response):  Promise<void> {
+  public async getStudent(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.params;
-      // console.log(email,"get Student Data")
       let response = await this.studentService.getStudentData(email);
-      // console.log(response)
       res.json(response);
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
-
-  
-
-
 
   public async searchStudents(req: Request, res: Response): Promise<void> {
     const { q: query, role, page = 1, limit = 10 } = req.query;
-    console.log(req.params,)
-
-    console.log(page,"queryyyy")
 
     try {
       const result = await this.studentService.searchStudents(
@@ -56,48 +42,42 @@ export class StudentController implements IStudentControllers {
       );
 
       res.status(200).json({
-        success:true,
-        message:"got the admin Users!",
-        data:result
+        success: true,
+        message: "got the admin Users!",
+        data: result,
       });
     } catch (error) {
-      res.status(500).json({ success: false, message: (error as Error).message });
+      res
+        .status(500)
+        .json({ success: false, message: (error as Error).message });
     }
   }
-  public async getStudentDataById(req: Request, res: Response):  Promise<void> {
+  public async getStudentDataById(req: Request, res: Response): Promise<void> {
     try {
       const { studentId } = req.params;
-      // console.log(email,"get Student Data")
       let response = await this.studentService.getStudentDataById(studentId);
-      // console.log(response)
       res.json(response);
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
 
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {
       const { _id, username, mobile } = req.body;
-      console.log(req.body, "update Student Data");
-      console.log(req.file, "update Student Data");
 
       let profilePicUrl = "No Picture";
       let response;
-      
+
       if (req.file) {
-        console.log("with profile pic")
         profilePicUrl = await uploadToS3Bucket(req.file, "students");
-        
+
         response = await this.studentService.updateProfile(_id, {
           username,
           mobile,
           profilePicUrl,
         });
       } else {
-        console.log("without profile pic")
         response = await this.studentService.updateProfile(_id, {
           username,
           mobile,
@@ -105,7 +85,7 @@ export class StudentController implements IStudentControllers {
       }
 
       if (response) {
-        await produce("update-profile-student",response)
+        await produce("update-profile-student", response);
         res.status(200).json({
           success: true,
           message: "Profile Updated!",
@@ -118,9 +98,7 @@ export class StudentController implements IStudentControllers {
         });
       }
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
 
@@ -147,7 +125,10 @@ export class StudentController implements IStudentControllers {
           hashedPassword
         );
         if (response) {
-          await produce("update-password-student",{email,password:hashedPassword})
+          await produce("update-password-student", {
+            email,
+            password: hashedPassword,
+          });
           res.status(200).json({
             success: true,
             message: "Password Updated",
@@ -165,80 +146,71 @@ export class StudentController implements IStudentControllers {
         });
       }
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
 
-  public async getStudents(req:Request,res:Response):Promise<void>{
+  public async getStudents(req: Request, res: Response): Promise<void> {
     try {
-    
-      const students=await this.studentService.getStudents()
-      console.log(students,"students allll")
-       res.status(200).json({
-        users:students
-      })
+      const students = await this.studentService.getStudents();
+      res.status(200).json({
+        users: students,
+      });
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
-  public async blockStudent(req:Request,res:Response):Promise<void>{
+  public async blockStudent(req: Request, res: Response): Promise<void> {
     try {
-      const { email }=req.params
+      const { email } = req.params;
 
-      const studentData=await this.studentService.getStudentData(email)
+      const studentData = await this.studentService.getStudentData(email);
 
-      if(!studentData){
-        throw new Error("No user found")
+      if (!studentData) {
+        throw new Error("No user found");
       }
-      let id = studentData?._id?.toString(); // Ensure id is a string or null
+      let id = studentData?._id?.toString();
 
       if (!id) {
-          throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing");
       }
-      const isBlocked=!studentData?.isBlocked
- 
-      const studentStatus=await this.studentService.updateProfile(id,{isBlocked})
-      await produce("block-student",{email,isBlocked})
+      const isBlocked = !studentData?.isBlocked;
 
-      if(studentStatus?.isBlocked){
-        res.status(200).json({
-          success:true,
-          message:"Student Blocked"
-        })
-      }else{
-        res.status(200).json({
-          success:true,
-          message:"Student UnBlocked"
-        })
+      const studentStatus = await this.studentService.updateProfile(id, {
+        isBlocked,
+      });
+      await produce("block-student", { email, isBlocked });
 
+      if (studentStatus?.isBlocked) {
+        res.status(200).json({
+          success: true,
+          message: "Student Blocked",
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "Student UnBlocked",
+        });
       }
-      
     } catch (error) {
-      console.log(error);
       throw error;
-      
-      
     }
   }
 
-
   ///kafka consume
-  async passwordReset(data:{password:string,email:string}):Promise<IUser | null>{
+  async passwordReset(data: {
+    password: string;
+    email: string;
+  }): Promise<IUser | null> {
     try {
-      const {password,email}=data
+      const { password, email } = data;
       const response = await this.studentService.updatePassword(
         email,
         password
       );
-      return response
+      return response;
     } catch (error) {
-      console.log(error);
       throw error;
-      
     }
   }
 }

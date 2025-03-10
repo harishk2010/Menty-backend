@@ -9,14 +9,23 @@ export interface ICourseService {
   updateCourse(courseId: string, courseData: ICourse): Promise<ICourse | null>;
   getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>;
   getAllCourses(): Promise<ICourse[]>;
-  getPaginatedCourses( page: number ,
-    limit: number ,
-    search: string ,
+  getPaginatedCourses(
+    page: number,
+    limit: number,
+    search: string,
     sort: string,
-    category: string[] ,
-    level: string[] ):Promise<Paginatedcourses>
+    category: string[],
+    level: string[]
+  ): Promise<Paginatedcourses>;
   getInstructorCourses(instructorId: string): Promise<ICourse[]>;
-  getInstructorCoursesList(instructorId:string,page:number,limit:number,search:string,sortField:string,sortOrder:"asc" | "desc"): Promise<CoursesResult | null>
+  getInstructorCoursesList(
+    instructorId: string,
+    page: number,
+    limit: number,
+    search: string,
+    sortField: string,
+    sortOrder: "asc" | "desc"
+  ): Promise<CoursesResult | null>;
   getCourseById(id: string): Promise<ICourse | null>;
   getChaptersById(id: string): Promise<IChapter[] | null>;
   buyCourse(
@@ -24,10 +33,11 @@ export interface ICourseService {
     quizId: string,
     courseId: string,
     completedChapters: any,
-    txnid: string
+    txnid: string,
+    price: Number
   ): Promise<IPurchasedCourse | null>;
   getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
   chapterVideoEnd(chapterId: string): Promise<any>;
   deleteCourseById(courseId: string): Promise<any>;
-  createStudent(payload:IUser): Promise<any>
+  createStudent(payload: IUser): Promise<any>;
 }

@@ -11,11 +11,6 @@ export class InstructorServices implements IInstructorService {
     this.instructorRepository = instructorRepository;
   }
 
-  /**
-   * Create a new instructor.
-   * @param payload - Instructor data to create.
-   * @returns The created instructor.
-   */
   async createInstructor(payload: object): Promise<IInstructor | null> {
     try {
       const response = await this.instructorRepository.create(payload);
@@ -33,14 +28,15 @@ export class InstructorServices implements IInstructorService {
     sort: string = "verified",
     expertise: string[] = []
   ): Promise<PaginatedMentors> {
-    return await this.instructorRepository.getPaginatedMentors(page, limit, search, sort, expertise);
+    return await this.instructorRepository.getPaginatedMentors(
+      page,
+      limit,
+      search,
+      sort,
+      expertise
+    );
   }
 
-  /**
-   * Get instructor data by email.
-   * @param email - Email of the instructor.
-   * @returns The instructor data.
-   */
   async getInstructorData(email: string): Promise<IInstructor | null> {
     try {
       const response = await this.instructorRepository.findOne({ email });
@@ -50,9 +46,14 @@ export class InstructorServices implements IInstructorService {
       throw error;
     }
   }
-  async updatePlanPrice(instructorId:string,planPrice: number): Promise<IInstructor | null> {
+  async updatePlanPrice(
+    instructorId: string,
+    planPrice: number
+  ): Promise<IInstructor | null> {
     try {
-      const response = await this.instructorRepository.update(instructorId,{planPrice});
+      const response = await this.instructorRepository.update(instructorId, {
+        planPrice,
+      });
       return response;
     } catch (error) {
       console.error("Error in updatePlanPrice:", error);
@@ -60,12 +61,9 @@ export class InstructorServices implements IInstructorService {
     }
   }
 
-  /**
-   * Get instructor data by ID.
-   * @param instructorId - ID of the instructor.
-   * @returns The instructor data.
-   */
-  async getInstructorDataById(instructorId: string): Promise<IInstructor | null> {
+  async getInstructorDataById(
+    instructorId: string
+  ): Promise<IInstructor | null> {
     try {
       const response = await this.instructorRepository.findById(instructorId);
       return response;
@@ -75,12 +73,6 @@ export class InstructorServices implements IInstructorService {
     }
   }
 
-  /**
-   * Update instructor profile.
-   * @param id - ID of the instructor.
-   * @param data - Data to update.
-   * @returns The updated instructor data.
-   */
   async updateProfile(id: string, data: object): Promise<IInstructor | null> {
     try {
       const response = await this.instructorRepository.update(id, data);
@@ -91,18 +83,11 @@ export class InstructorServices implements IInstructorService {
     }
   }
 
-  /**
-   * Get a list of transactions for an instructor.
-   * @param email - Email of the instructor.
-   * @param currentPage - Current page number for pagination.
-   * @param itemsPerPage - Number of items per page.
-   * @returns A list of transactions.
-   */
   async getTransactionsList(
     email: string,
     page: number,
     limit: number,
-    search: string = ''
+    search: string = ""
   ): Promise<TransactionsResult | null> {
     try {
       const result = await this.instructorRepository.getTransactionsList(
@@ -111,7 +96,7 @@ export class InstructorServices implements IInstructorService {
         limit,
         search
       );
-      
+
       return result;
     } catch (error) {
       console.error("Error in getTransactionsList service:", error);
@@ -119,15 +104,15 @@ export class InstructorServices implements IInstructorService {
     }
   }
 
-  /**
-   * Update an instructor's password.
-   * @param email - Email of the instructor.
-   * @param password - New password.
-   * @returns The updated instructor data.
-   */
-  async updatePassword(email: string, password: string): Promise<IInstructor | null> {
+  async updatePassword(
+    email: string,
+    password: string
+  ): Promise<IInstructor | null> {
     try {
-      const response = await this.instructorRepository.updatePassword(email, password);
+      const response = await this.instructorRepository.updatePassword(
+        email,
+        password
+      );
       return response;
     } catch (error) {
       console.error("Error in updatePassword:", error);
@@ -138,10 +123,6 @@ export class InstructorServices implements IInstructorService {
     return await this.instructorRepository.getMentorExpertise();
   }
 
-  /**
-   * Get all instructors.
-   * @returns A list of all instructors.
-   */
   async getInstructors(): Promise<IInstructor[] | null> {
     try {
       const response = await this.instructorRepository.findAll();

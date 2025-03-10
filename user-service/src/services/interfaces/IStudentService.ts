@@ -1,6 +1,5 @@
 import { PaginationResult, SearchOptions } from "../../types/types";
 import { IUser } from "../../models/userModel";
-import { Request, Response } from "express";
 
 export interface IStudentService {
   createStudent(payload: IUser): Promise<IUser | null>;
@@ -11,7 +10,11 @@ export interface IStudentService {
     role: string,
     page: number,
     limit: number
-  ): Promise<{ success: boolean; data: IUser[]; pagination: PaginationResult<IUser>["pagination"] }>
+  ): Promise<{
+    success: boolean;
+    data: IUser[];
+    pagination: PaginationResult<IUser>["pagination"];
+  }>;
   updateProfile(id: string, data: object): Promise<IUser | null>;
   updatePassword(email: string, password: string): Promise<IUser | null>;
   getStudents(): Promise<IUser[]>;

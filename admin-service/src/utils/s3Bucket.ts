@@ -1,5 +1,4 @@
 import AWS from "aws-sdk";
-import { IMulterFile } from "../utils/multer";
 
 export async function uploadToS3Bucket(
   file: Express.Multer.File,

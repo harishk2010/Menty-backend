@@ -3,7 +3,10 @@ import { IUser } from "../models/userModel";
 import { GenericRepository } from "./GenericRepository";
 import { IStudentRepository } from "./interfaces/IStudentRepository";
 
-export class StudentRepository extends GenericRepository<IUser> implements IStudentRepository {
+export class StudentRepository
+  extends GenericRepository<IUser>
+  implements IStudentRepository
+{
   constructor() {
     super(UserModel);
   }
@@ -18,27 +21,28 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
 
   async resetPassword(email: string, password: string): Promise<IUser | null> {
     try {
+      const student = await this.findOne({ email });
+      if (!student) {
+        throw new Error("No Student data found");
+      }
+      const studentId = student._id as unknown as string;
 
-        const student=await this.findOne({email})
-        if(!student){
-            throw new Error("No Student data found")
-        }
-        const studentId=(student._id as unknown as string)
-        
-        const response=await this.update(studentId, { password });
-        return response
+      const response = await this.update(studentId, { password });
+      return response;
     } catch (error) {
-        throw error
-        
+      throw error;
     }
   }
 
-  async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
+  async googleLogin(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<IUser | null> {
     const user = await this.findByEmail(email);
-    const username=name
+    const username = name;
 
     if (!user) {
-      // Create a new user
       const newUser = await this.createUser({ username, email, password });
       return newUser;
     }
@@ -48,18 +52,16 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
 
   async updateProfile(email: string, data: IUser): Promise<IUser | null> {
     try {
+      const student = await this.findOne({ email });
+      if (!student) {
+        throw new Error("No Student data found");
+      }
+      const studentId = student._id as unknown as string;
 
-        const student=await this.findOne({email})
-        if(!student){
-            throw new Error("No Student data found")
-        }
-        const studentId=(student._id as unknown as string)
-        
-        const response=await this.update(studentId, data);
-        return response
+      const response = await this.update(studentId, data);
+      return response;
     } catch (error) {
-        throw error
-        
+      throw error;
     }
   }
 }

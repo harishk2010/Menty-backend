@@ -1,7 +1,10 @@
 import { IQuiz } from "../../models/quizModel";
 import { IQuizService } from "../interfaces/IQuizService";
 import { QuizRepository } from "../../repositories/quiz/QuizRepository";
-import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
+import {
+  IPurchasedCourse,
+  PurchasedCourseModel,
+} from "../../models/purchasedModel";
 import { IQuizRepository } from "../../repositories/interfaces/IQuizRepository";
 
 export class QuizService implements IQuizService {

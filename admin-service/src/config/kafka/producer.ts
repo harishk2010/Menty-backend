@@ -7,7 +7,6 @@ async function produce(topic: string, value: object): Promise<void> {
   });
 
   try {
-    console.log("Connecting to Auth-Service Producer...");
     await producer.connect();
 
     const messageValue =
@@ -18,13 +17,10 @@ async function produce(topic: string, value: object): Promise<void> {
       topic,
       messages: [{ value: messageValue }],
     });
-
-    console.log("Message sent successfully from Auth-Producer.");
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("Error in Auth-Producer:", error.message, error.stack);
   } finally {
     await producer.disconnect();
-    console.log("verification-Producer disconnected.");
   }
 }
 

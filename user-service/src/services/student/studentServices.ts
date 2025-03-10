@@ -12,7 +12,6 @@ export class StudentServices implements IStudentService {
     this.studentRepository = studentRepository;
   }
 
-  
   async createStudent(payload: IUser): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.create(payload);
@@ -22,7 +21,6 @@ export class StudentServices implements IStudentService {
       throw error;
     }
   }
-
 
   async getStudentData(email: string): Promise<IUser | null> {
     try {
@@ -43,7 +41,6 @@ export class StudentServices implements IStudentService {
     }
   }
 
-
   async updateProfile(id: string, data: object): Promise<IUser | null> {
     try {
       const response = await this.studentRepository.update(id, data);
@@ -58,8 +55,17 @@ export class StudentServices implements IStudentService {
     role: string,
     page: number,
     limit: number
-  ): Promise<{ success: boolean; data: IUser[]; pagination: PaginationResult<IUser>["pagination"] }> {
-    const result = await this.studentRepository.searchUsers(query, role, page, limit);
+  ): Promise<{
+    success: boolean;
+    data: IUser[];
+    pagination: PaginationResult<IUser>["pagination"];
+  }> {
+    const result = await this.studentRepository.searchUsers(
+      query,
+      role,
+      page,
+      limit
+    );
 
     return {
       success: true,
@@ -70,7 +76,10 @@ export class StudentServices implements IStudentService {
 
   async updatePassword(email: string, password: string): Promise<IUser | null> {
     try {
-      const response = await this.studentRepository.updatePassword(email, password);
+      const response = await this.studentRepository.updatePassword(
+        email,
+        password
+      );
       return response;
     } catch (error) {
       console.error("Error in updatePassword:", error);

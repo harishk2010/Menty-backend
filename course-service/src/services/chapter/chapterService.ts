@@ -1,7 +1,6 @@
-import { IChapter } from "../../models/chapterModel";
+import { CreateChapterDTO, IChapter } from "../../models/chapterModel";
 import { IChapterService } from "../interfaces/IChapterService";
-import { ChapterRepository } from "../../repositories/chapter/chapterRepository";
-import { IChapterRepository } from "@/repositories/interfaces/IChapterRepository";
+import { IChapterRepository } from "../../repositories/interfaces/IChapterRepository";
 
 export class ChapterService implements IChapterService {
   private chapterRepository: IChapterRepository;
@@ -14,7 +13,10 @@ export class ChapterService implements IChapterService {
     return await this.chapterRepository.create(chapterData);
   }
 
-  async updateChapter(chapterId: string, chapterData: Partial<IChapter>): Promise<IChapter | null> {
+  async updateChapter(
+    chapterId: string,
+    chapterData: Partial<IChapter>
+  ): Promise<IChapter | null> {
     return await this.chapterRepository.update(chapterId, chapterData);
   }
 

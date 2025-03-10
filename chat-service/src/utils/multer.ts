@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// ✅ Use `S3Client` instead of `S3`
 const s3 = new S3Client({
   region: process.env.BUCKET_REGION!,
   credentials: {
@@ -19,14 +18,13 @@ const getFolderName = (fieldname: string) => {
     name = "thumbnail";
   } else if (fieldname == "demoVideos") {
     name = "demoVideos";
-  }  else if (fieldname == "chat") {
+  } else if (fieldname == "chat") {
     name = "demoVideos";
   } else {
     name = "chapterVideo";
   }
   return name;
 };
-// ✅ Use `multer-s3` for direct S3 uploads
 const upload = multer({
   storage: multerS3({
     s3,
@@ -40,7 +38,7 @@ const upload = multer({
     },
   }),
   limits: {
-    fileSize: 1024 * 1024 * 100, // 100MB file limit
+    fileSize: 1024 * 1024 * 100,
   },
 });
 

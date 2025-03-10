@@ -39,9 +39,6 @@ app.use('/student', studentRoutes)
 app.use('/admin', adminRoutes)
 
 consume()
-app.get('/', (req, res) => {
-    res.json('auth service is running ')
-})
 
 
 const start = async() => {

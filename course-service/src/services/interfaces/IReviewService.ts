@@ -1,10 +1,10 @@
-import { IReview } from '../../models/reviewModel';
+import { IReview } from "../../models/reviewModel";
 
 export interface IReviewService {
   createReview(
-    userId: string, 
-    courseId: string, 
-    rating: number, 
+    userId: string,
+    courseId: string,
+    rating: number,
     comment?: string
   ): Promise<IReview>;
 

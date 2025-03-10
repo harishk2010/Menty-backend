@@ -4,64 +4,59 @@ import { BookingRepository } from "../../repositories/booking/bookingRepository"
 import IBookingService from "../interfaces/IBookingService";
 import { SlotModel } from "../../models/slotModel";
 
-export class BookingService implements IBookingService{
+export class BookingService implements IBookingService {
   private bookingRepository: IBookingRepository;
 
   constructor(bookingRepository: IBookingRepository) {
-    this.bookingRepository = bookingRepository
+    this.bookingRepository = bookingRepository;
   }
 
-  async bookSlot(studentId: string, slotId: string, instructorId: string):Promise<IBooking | null> {
+  async bookSlot(
+    studentId: string,
+    slotId: string,
+    instructorId: string
+  ): Promise<IBooking | null> {
     try {
-      // return this.bookingRepository.updateOne({slotId},{
-      //   studentId,
-        
-      //   instructorId,
-      //   status: "confirmed",
-      // });
-      const response=await this.bookingRepository.create({studentId,slotId,instructorId,status:"confirmed"})
-      await SlotModel.findByIdAndUpdate(slotId,{isBooked:true})
-      return response
+      const response = await this.bookingRepository.create({
+        studentId,
+        slotId,
+        instructorId,
+        status: "confirmed",
+      });
+      await SlotModel.findByIdAndUpdate(slotId, { isBooked: true });
+      return response;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
   async getBookingBySlotId(slotId: string): Promise<IBooking | null> {
     try {
-      return await this.bookingRepository.findOne({slotId})
-      
+      return await this.bookingRepository.findOne({ slotId });
     } catch (error) {
-      throw error
-      
+      throw error;
     }
   }
   async getBookingsByStudentId(studentId: string): Promise<IBooking[] | null> {
     try {
-      return await this.bookingRepository.findAll({studentId})
-      
+      return await this.bookingRepository.findAll({ studentId });
     } catch (error) {
-      throw error
-      
+      throw error;
     }
-    
   }
-  async getBookingsByInstructorId(instructorId: string): Promise<IBooking[] | null> {
+  async getBookingsByInstructorId(
+    instructorId: string
+  ): Promise<IBooking[] | null> {
     try {
-      return await this.bookingRepository.findAll({instructorId})
-      
+      return await this.bookingRepository.findAll({ instructorId });
     } catch (error) {
-      throw error
-      
+      throw error;
     }
-    
   }
   async getBookindDataById(bookingId: string): Promise<IBooking | null> {
     try {
-      return await this.bookingRepository.findById(bookingId)
-      
+      return await this.bookingRepository.findById(bookingId);
     } catch (error) {
-      throw error
-      
+      throw error;
     }
   }
 }

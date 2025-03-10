@@ -12,10 +12,8 @@ export const isInstructor = async (
       res.status(401).send("Acess Forbidden No access Token");
       return;
     }
-    console.log(Token);
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
-    console.log(decode, "isIns");
     if (decode) {
       if (decode.role !== "instructor") {
         res.status(401).send("Access Forbidden");
@@ -25,7 +23,6 @@ export const isInstructor = async (
 
     next();
 
-    // next()
   } catch (error) {
     throw error;
   }
@@ -41,10 +38,8 @@ export const isStudent = async (
       res.status(401).send("Acess Forbidden No access Token");
       return;
     }
-    console.log(Token);
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
-    console.log(decode, "isStudent");
     if (decode) {
       if (decode.role !== "student") {
         res.status(401).send("Access Forbidden");
@@ -54,7 +49,6 @@ export const isStudent = async (
 
     next();
 
-    // next()
   } catch (error) {
     throw error;
   }
@@ -70,10 +64,8 @@ export const isAdmin = async (
       res.status(401).send("Acess Forbidden No access Token");
       return;
     }
-    console.log(Token);
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
-    console.log(decode, "isAdmin");
     if (decode) {
       if (decode.role !== "admin") {
         res.status(401).send("Access Forbidden");
@@ -83,7 +75,6 @@ export const isAdmin = async (
 
     next();
 
-    // next()
   } catch (error) {
     throw error;
   }

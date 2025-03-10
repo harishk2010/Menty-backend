@@ -1,5 +1,5 @@
 import { IInstructor } from "../models/instructorModel";
-import  IInstructorServices  from "./interfaces/IIntstuctorServices";
+import IInstructorServices from "./interfaces/IIntstuctorServices";
 import { InstructorRepository } from "../repositories/instructorRepository";
 import { IInstructorRepository } from "../repositories/interfaces/IInstructorRepository";
 
@@ -18,11 +18,18 @@ export class InstructorServices implements IInstructorServices {
     return await this.instructorRepository.createUser(userData);
   }
 
-  async resetPassword(email: string, password: string): Promise<IInstructor | null> {
+  async resetPassword(
+    email: string,
+    password: string
+  ): Promise<IInstructor | null> {
     return await this.instructorRepository.resetPassword(email, password);
   }
 
-  async googleLogin(name: string, email: string, password: string): Promise<IInstructor | null> {
+  async googleLogin(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<IInstructor | null> {
     return await this.instructorRepository.googleLogin(name, email, password);
   }
 

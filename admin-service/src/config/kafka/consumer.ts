@@ -1,25 +1,17 @@
+import { adminController } from "../dependencyInjector";
 import kafka from "./kafkaConfig";
 
 async function consume() {
-  // const studentController = new StudentController();
-  // const instructorController=new InstructorController()
   const consumer = kafka.consumer({ groupId: "admin-service" });
 
   try {
-    console.log("Connecting to User-Service Consumer...");
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: [
-        // "add-student",
-        // "password-reset-student",
-        // "add-instructor",
-        // "password-reset-instructor",
-      ],
+      topics: ["update-admin-wallet", "create-admin-data"],
       fromBeginning: true,
     });
 
-    console.log("Admin-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {
@@ -33,17 +25,18 @@ async function consume() {
           }
 
           switch (topic) {
-            // case "add-student":
-            //   await studentController.addStudent(messageValue);
-            //   console.log("Processed add-student event:", messageValue);
-            //   break;
+            case "update-admin-wallet":
+              await adminController.updateWallet(messageValue);
+              break;
+            case "create-admin-data":
+              await adminController.createAdmin(messageValue);
 
-
+              break;
 
             default:
               console.warn(`No handler for topic: ${topic}`);
           }
-        } catch (error:any) {
+        } catch (error: any) {
           console.error(
             `Error processing message from topic ${topic}:`,
             error.message

@@ -12,7 +12,11 @@ const BookingSchema = new Schema<IBooking>({
   studentId: { type: String, required: true },
   slotId: { type: String, required: true },
   instructorId: { type: String, required: true },
-  status: { type: String, enum: [ "confirmed", "cancelled"], default: "confirmed" },
+  status: {
+    type: String,
+    enum: ["confirmed", "cancelled"],
+    default: "confirmed",
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

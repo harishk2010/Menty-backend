@@ -2,25 +2,16 @@ import { chatController } from "../dependencyInjector";
 import kafka from "./kafkaConfig";
 
 async function consume() {
-  // const studentController = new StudentController();
-  // const instructorController=new InstructorController()
   const consumer = kafka.consumer({ groupId: "chat-service" });
 
   try {
-    console.log("Connecting to Couser-Service Consumer...");
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: [
-        "add-booking",
-        // "password-reset-student",
-        // "add-instructor",
-        // "password-reset-instructor",
-      ],
+      topics: ["add-booking"],
       fromBeginning: true,
     });
 
-    console.log("Chat-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {
@@ -36,10 +27,8 @@ async function consume() {
           switch (topic) {
             case "add-booking":
               await chatController.addBooking(messageValue);
-              console.log("Processed add-student event:", messageValue);
+
               break;
-
-
 
             default:
               console.warn(`No handler for topic: ${topic}`);

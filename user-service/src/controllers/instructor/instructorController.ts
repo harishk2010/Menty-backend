@@ -1,6 +1,4 @@
-import { IUser } from "../../models/userModel";
 import { NextFunction, Request, Response } from "express";
-import { InstructorServices } from "../../services/instructor/instructorServices";
 import { uploadToS3Bucket } from "../../utils/s3Bucket";
 import bcrypt from "bcrypt";
 import verifyToken from "../../utils/jwt";
@@ -9,7 +7,11 @@ import produce from "../../config/kafka/producer";
 import { IInstructorControllers } from "../interfaces/IInstructorController";
 import { IInstructorService } from "../../services/interfaces/IInstructorService";
 import { IInstructor } from "../../models/instructorModel";
-import { InstructorUpdateStatus, InstructorWallet, ResetPassword } from "../../types/types";
+import {
+  InstructorUpdateStatus,
+  InstructorWallet,
+  ResetPassword,
+} from "../../types/types";
 
 export class InstructorController implements IInstructorControllers {
   private instructorService: IInstructorService;
@@ -21,53 +23,53 @@ export class InstructorController implements IInstructorControllers {
     try {
       let response = await this.instructorService.createInstructor(payload);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
   public async getInstructor(req: Request, res: Response): Promise<any> {
     try {
       const { email } = req.params;
-      console.log(email, "get Instructor Data");
       let response = await this.instructorService.getInstructorData(email);
-      // console.log(response)
       res.json(response);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
-  async getMentorExpertise(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getMentorExpertise(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
-      console.log("inside cntrl")
       const expertise = await this.instructorService.getMentorExpertise();
-      
+
       res.status(200).json({
         success: true,
-        data: expertise
+        data: expertise,
       });
     } catch (error) {
       next(error);
     }
   }
-  async getPaginatedMentors(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getPaginatedMentors(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
-      // Extract query parameters with defaults
-      console.log("pagiii")
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 6;
       const search = (req.query.search as string) || "";
       const sort = (req.query.sort as string) || "verified";
-      console.log(`expertise:|\ ${req.query.expertise} \|, search:|\ ${req.query.search} \|, sort:|\ ${req.query.sort} \|`);
-      
-      // Handle array parameters for expertise
+
       let expertise: string[] = [];
-      
+
       if (req.query.expertise) {
-        expertise = Array.isArray(req.query.expertise) 
-          ? req.query.expertise as string[]
+        expertise = Array.isArray(req.query.expertise)
+          ? (req.query.expertise as string[])
           : [req.query.expertise as string];
       }
-      
-      // Get paginated, sorted, and filtered mentors
+
       const result = await this.instructorService.getPaginatedMentors(
         page,
         limit,
@@ -75,40 +77,33 @@ export class InstructorController implements IInstructorControllers {
         sort,
         expertise
       );
-      console.log(result,"result")
-      
+
       res.status(200).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-
   async getInstructorById(req: Request, res: Response): Promise<void> {
     try {
       const { instructorId } = req.params;
-      console.log(instructorId, "get Instructor Data by id");
       let response = await this.instructorService.getInstructorDataById(
         instructorId
       );
-      // console.log(response)
       res.json(response);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
   public async updateProfile(req: Request, res: Response): Promise<any> {
     try {
       const { _id, username, mobile, expertise, skills } = req.body;
-      console.log(req.body, "update Instructor Data");
-      console.log(req.file, "update Instructor Data");
 
       let profilePicUrl = "No Picture";
       let response;
 
       if (req.file) {
-        console.log("with profile pic");
         profilePicUrl = await uploadToS3Bucket(req.file, "Instructors");
 
         response = await this.instructorService.updateProfile(_id, {
@@ -117,7 +112,6 @@ export class InstructorController implements IInstructorControllers {
           profilePicUrl,
         });
       } else {
-        console.log("without profile pic");
         response = await this.instructorService.updateProfile(_id, {
           username,
           mobile,
@@ -140,16 +134,13 @@ export class InstructorController implements IInstructorControllers {
         });
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
   public async getTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const { page = 1, limit = 10, search = '', email } = req.query;
-      
-      console.log("Query params:", { page, limit, email, search });
-      
+      const { page = 1, limit = 10, search = "", email } = req.query;
+
       if (!email) {
         res.status(400).json({
           success: false,
@@ -157,15 +148,14 @@ export class InstructorController implements IInstructorControllers {
         });
         return;
       }
-      
-      // Get transactions with just page, limit, and search
+
       const result = await this.instructorService.getTransactionsList(
         String(email),
         Number(page),
         Number(limit),
         String(search)
       );
-      
+
       if (!result) {
         res.status(404).json({
           success: false,
@@ -173,22 +163,20 @@ export class InstructorController implements IInstructorControllers {
         });
         return;
       }
-      
-      // Return the properly formatted response
+
       res.status(200).json({
         success: true,
         message: "Fetched transactions data successfully",
         data: {
           data: result.transactions,
-          total: result.total
+          total: result.total,
         },
       });
-    } catch (error:any) {
-      console.log("Error in getTransactions controller:", error);
+    } catch (error: any) {
       res.status(500).json({
         success: false,
         message: "An error occurred while fetching transactions",
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -196,7 +184,6 @@ export class InstructorController implements IInstructorControllers {
     try {
       const { planPrice } = req.body;
       const { instructorId } = req.params;
-      console.log(planPrice,instructorId,"planpriceee")
       const response = await this.instructorService.updatePlanPrice(
         instructorId,
         planPrice
@@ -208,7 +195,6 @@ export class InstructorController implements IInstructorControllers {
         });
         return;
       }
-      console.log(response,"changeddd")
       res.status(200).json({
         success: true,
         message: "Updated PlanPrice!",
@@ -216,7 +202,6 @@ export class InstructorController implements IInstructorControllers {
         data: response,
       });
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -265,25 +250,23 @@ export class InstructorController implements IInstructorControllers {
         });
       }
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
   public async getInstructors(req: Request, res: Response) {
     try {
       const Instructors = await this.instructorService.getInstructors();
-      console.log(Instructors, "Instructors allll");
       res.status(200).json({
         users: Instructors,
       });
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
   public async blockInstructor(req: Request, res: Response) {
     try {
       const { email } = req.params;
-      console.log(email, "instructorrrrrr");
 
       const InstructorData = await this.instructorService.getInstructorData(
         email
@@ -292,10 +275,10 @@ export class InstructorController implements IInstructorControllers {
       if (!InstructorData) {
         throw new Error("No user found");
       }
-      let id = InstructorData?._id?.toString(); // Ensure id is a string or null
+      let id = InstructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing");
       }
       const isBlocked = !InstructorData?.isBlocked;
 
@@ -316,7 +299,6 @@ export class InstructorController implements IInstructorControllers {
         });
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -331,26 +313,24 @@ export class InstructorController implements IInstructorControllers {
       );
       return response;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
-  async updateVerifyStatus(data: InstructorUpdateStatus): Promise<IInstructor | null> {
+  async updateVerifyStatus(
+    data: InstructorUpdateStatus
+  ): Promise<IInstructor | null> {
     try {
       let email = data.emailID;
       let status = data.status;
 
-      console.log(email, status, "emailstatus");
-
       const instructorData = await this.instructorService.getInstructorData(
         email
       );
-      console.log(instructorData, "inssss");
       let response;
-      let id = instructorData?._id?.toString(); // Ensure id is a string or null
+      let id = instructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing");
       }
 
       if (status === "approved") {
@@ -367,25 +347,26 @@ export class InstructorController implements IInstructorControllers {
 
       return response;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
 
-  async approveRequest(data: {emailID:string,status:string}): Promise<IInstructor | null> {
+  async approveRequest(data: {
+    emailID: string;
+    status: string;
+  }): Promise<IInstructor | null> {
     try {
       let email = data.emailID;
       let status = data.status;
 
-      console.log(email, status);
       const instructorData = await this.instructorService.getInstructorData(
         email
       );
       let response;
-      let id = instructorData?._id?.toString(); // Ensure id is a string or null
+      let id = instructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing"); // Handle the undefined case
+        throw new Error("Instructor ID is missing");
       }
       if (status === "approved") {
         const isVerified = true;
@@ -407,7 +388,6 @@ export class InstructorController implements IInstructorControllers {
       }
       return response;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -415,7 +395,6 @@ export class InstructorController implements IInstructorControllers {
   async updateWallet(data: InstructorWallet): Promise<IInstructor | null> {
     try {
       const { txnid, amount, description, type, instructorId } = data;
-      console.log(data,"wallet instructor")
       const instructorDetails =
         await this.instructorService.getInstructorDataById(instructorId);
       if (!instructorDetails) {
@@ -434,15 +413,12 @@ export class InstructorController implements IInstructorControllers {
           transactions: [...transactions, { amount, description, txnid, type }],
         };
       }
-      console.log(walletDetails, "wallet");
       const response = await this.instructorService.updateProfile(
         instructorId,
         { wallet: walletDetails }
       );
-      console.log(response);
       return response;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }

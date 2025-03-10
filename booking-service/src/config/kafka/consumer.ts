@@ -1,25 +1,16 @@
 import kafka from "./kafkaConfig";
 
 async function consume() {
-  // const studentController = new StudentController();
-  // const instructorController=new InstructorController()
   const consumer = kafka.consumer({ groupId: "booking-service" });
 
   try {
-    console.log("Connecting to Couser-Service Consumer...");
     await consumer.connect();
 
     await consumer.subscribe({
-      topics: [
-        // "add-student",
-        // "password-reset-student",
-        // "add-instructor",
-        // "password-reset-instructor",
-      ],
+      topics: [],
       fromBeginning: true,
     });
 
-    console.log("Course-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {
@@ -33,13 +24,6 @@ async function consume() {
           }
 
           switch (topic) {
-            // case "add-student":
-            //   await studentController.addStudent(messageValue);
-            //   console.log("Processed add-student event:", messageValue);
-            //   break;
-
-
-
             default:
               console.warn(`No handler for topic: ${topic}`);
           }

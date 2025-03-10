@@ -4,13 +4,15 @@ import { CategoryRepository } from "../../repositories/category/categoryReposito
 import { ICategoryService } from "../interfaces/ICategoryService";
 
 export class CategoryService implements ICategoryService {
-    private categoryRepository: ICategoryRepository
-  
-    constructor( categoryRepository: ICategoryRepository) {
-        this.categoryRepository=categoryRepository
-    }
+  private categoryRepository: ICategoryRepository;
 
-  async findCategoryByName(categoryName: string): Promise<ICategoryModel | null> {
+  constructor(categoryRepository: ICategoryRepository) {
+    this.categoryRepository = categoryRepository;
+  }
+
+  async findCategoryByName(
+    categoryName: string
+  ): Promise<ICategoryModel | null> {
     return this.categoryRepository.findCategoryByName(categoryName);
   }
 
@@ -22,7 +24,10 @@ export class CategoryService implements ICategoryService {
     return this.categoryRepository.create({ categoryName });
   }
 
-  async updateCategory(id: string, categoryName: string): Promise<ICategoryModel | null> {
+  async updateCategory(
+    id: string,
+    categoryName: string
+  ): Promise<ICategoryModel | null> {
     return this.categoryRepository.update(id, { categoryName });
   }
 

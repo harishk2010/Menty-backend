@@ -12,18 +12,28 @@ export interface ICourseRepository extends IGenericRepository<ICourse> {
     quizId: string,
     courseId: string,
     completedChapters: any,
-    txnid: string
+    txnid: string,
+    price: Number
   ): Promise<IPurchasedCourse | null>;
-  getPaginatedCourses( page: number ,
-      limit: number ,
-      search: string ,
-      sort: string,
-      category: string[] ,
-      level: string[] ):Promise<Paginatedcourses>
-        getInstructorCoursesList(instructorId:string,page:number,limit:number,search:string,sortField:string,sortOrder:"asc" | "desc"): Promise<CoursesResult | null>
-      
+  getPaginatedCourses(
+    page: number,
+    limit: number,
+    search: string,
+    sort: string,
+    category: string[],
+    level: string[]
+  ): Promise<Paginatedcourses>;
+  getInstructorCoursesList(
+    instructorId: string,
+    page: number,
+    limit: number,
+    search: string,
+    sortField: string,
+    sortOrder: "asc" | "desc"
+  ): Promise<CoursesResult | null>;
+
   getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
   chapterVideoEnd(chapterId: string): Promise<any>;
-  getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>
-  deleteCourseById(courseId: string): Promise<ICourse | null>
+  getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>;
+  deleteCourseById(courseId: string): Promise<ICourse | null>;
 }

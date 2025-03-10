@@ -15,7 +15,7 @@ export async function uploadToS3Bucket(
       Key: `${folderName}s/${Date.now()}_${file.originalname}`,
       Body: file.buffer,
       ContentType: file.mimetype,
-    //   ACL: "public-read",
+      //   ACL: "public-read",
     };
 
     AWS.config.update({

@@ -10,7 +10,9 @@ export interface IGenericRepository<T extends Document> {
   delete(id: string): Promise<void>;
 }
 
-export class GenericRepository<T extends Document> implements IGenericRepository<T> {
+export class GenericRepository<T extends Document>
+  implements IGenericRepository<T>
+{
   private model: Model<T>;
 
   constructor(model: Model<T>) {

@@ -1,9 +1,12 @@
 import { IQuiz } from "../../models/quizModel";
 import { GenericRepository } from "../GenericRepository";
-import {QuizModel} from "../../models/quizModel";
+import { QuizModel } from "../../models/quizModel";
 import { IQuizRepository } from "../interfaces/IQuizRepository";
 
-export class QuizRepository extends GenericRepository<IQuiz> implements IQuizRepository {
+export class QuizRepository
+  extends GenericRepository<IQuiz>
+  implements IQuizRepository
+{
   constructor() {
     super(QuizModel);
   }

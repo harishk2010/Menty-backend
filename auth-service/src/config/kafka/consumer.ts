@@ -1,11 +1,9 @@
 import kafka from "./kafkaConfig";
-import { studentController ,instructorController } from "../dependencyInjector";
+import { studentController, instructorController } from "../dependencyInjector";
 async function consume() {
-
   const consumer = kafka.consumer({ groupId: "auth-service" });
 
   try {
-    console.log("Connecting to User-Service Consumer...");
     await consumer.connect();
 
     await consumer.subscribe({
@@ -20,7 +18,6 @@ async function consume() {
       fromBeginning: true,
     });
 
-    console.log("User-Service Consumer is running...");
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
         try {
@@ -36,31 +33,31 @@ async function consume() {
           switch (topic) {
             case "update-password-student":
               await studentController.updatePassword(messageValue);
-              console.log("Processed add-student event:", messageValue);
+
               break;
 
             case "update-profile-student":
               await studentController.updateProfile(messageValue);
-              console.log("Processing add-instructor event:", messageValue);
+
               break;
             case "block-student":
               await studentController.blockStudent(messageValue);
-              console.log("Processing add-instructor event:", messageValue);
+
               break;
 
-              //instructor
+            //instructor
             case "update-password-instructor":
               await instructorController.updatePassword(messageValue);
-              console.log("Processed add-student event:", messageValue);
+
               break;
 
             case "update-profile-instructor":
               await instructorController.updateProfile(messageValue);
-              console.log("Processing add-instructor event:", messageValue);
+
               break;
             case "block-instructor":
               await instructorController.blockInstructor(messageValue);
-              console.log("Processing add-instructor event:", messageValue);
+
               break;
 
             default:

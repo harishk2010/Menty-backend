@@ -61,3 +61,47 @@ export interface InstructorWallet {
   type: string;
   instructorId: string;
 }
+
+// Dashboard Types
+export interface AdminStatistics {
+  totalStudents: {
+    count: number;
+    newThisMonth: number;
+  };
+  totalInstructors: {
+    count: number;
+    newThisMonth: number;
+    topEarners: number;
+  };
+  totalRevenue: number;
+  pendingInstructorApplications: number;
+}
+
+export interface InstructorDetail {
+  id: string;
+  username: string;
+  email: string;
+  expertise: string;
+  walletBalance: number;
+  totalStudents: number;
+}
+
+export interface StudentDetail {
+  id: string;
+  username: string;
+  email: string;
+  studiedHours: number;
+  createdAt: string;
+}
+
+export interface RevenueDataPoint {
+  name: string;
+  value: number;
+}
+
+export interface AdminDashboardData {
+  statistics: AdminStatistics;
+  monthlyRevenueData: RevenueDataPoint[];
+  topInstructors: InstructorDetail[];
+  recentStudents: StudentDetail[];
+}

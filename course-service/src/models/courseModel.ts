@@ -1,7 +1,7 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 interface IDemoVideo {
-  type: 'video';
+  type: "video";
   url: string;
 }
 
@@ -29,21 +29,25 @@ export interface ICourse extends Document {
 }
 
 const demoVideoSchema = new Schema<IDemoVideo>({
-  type: { type: String, enum: ['video'], required: true },
+  type: { type: String, enum: ["video"], required: true },
   url: { type: String, required: true },
 });
 
 const CourseSchema = new Schema<ICourse>(
   {
     courseName: { type: String, required: true },
-    mentorId: { type: Schema.Types.ObjectId, required:true, ref: 'Instructor' },
-    categoryId: { type: Schema.Types.ObjectId, ref: 'Category'},
-    quizId: { type: Schema.Types.ObjectId, ref: 'Quiz'},
+    mentorId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Instructor",
+    },
+    categoryId: { type: Schema.Types.ObjectId, ref: "Category" },
+    quizId: { type: Schema.Types.ObjectId, ref: "Quiz" },
     description: { type: String, required: true },
     demoVideo: demoVideoSchema,
     fullVideo: [
       {
-        chapterId: { type: Schema.Types.ObjectId, ref: 'Chapter' },
+        chapterId: { type: Schema.Types.ObjectId, ref: "Chapter" },
       },
     ],
     price: { type: Number, required: true },
@@ -57,4 +61,4 @@ const CourseSchema = new Schema<ICourse>(
   { timestamps: true }
 );
 
-export const CourseModel = model<ICourse>('Course', CourseSchema);
+export const CourseModel = model<ICourse>("Course", CourseSchema);

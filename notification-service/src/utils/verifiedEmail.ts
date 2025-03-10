@@ -1,38 +1,30 @@
 import { IEmail } from "../interface/Email";
-import nodeMailer from 'nodemailer';
+import nodeMailer from "nodemailer";
 
 export class SendVerifiedEmail implements IEmail {
-    async sentEmailVerification(username: string, email: string): Promise<any> {
-        // Log environment variables for debugging
-        console.log("Sender Email:", process.env.USER_EMAIL);
-        console.log("Recipient Email:", email);
+  async sentEmailVerification(username: string, email: string): Promise<any> {
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      throw new Error("Invalid recipient email address");
+    }
 
-        // Validate the recipient email
-        if (!email || typeof email !== 'string' || !email.includes('@')) {
-            throw new Error("Invalid recipient email address");
-        }
+    const transporter = nodeMailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.USER_EMAIL,
+        pass: process.env.USER_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
 
-        const transporter = nodeMailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.USER_EMAIL,
-                pass: process.env.USER_PASSWORD,
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
-
-        const sendVerificationEmail = async (
-            username: string,
-            toEmail: string
-        ) => {
-            const mailOptions = {
-                from: process.env.USER_EMAIL, // Sender email
-                to: toEmail, // Recipient email
-                subject: '🎉 Welcome to Menty - Your Account is Verified! 🎉',
-                text: `Hello ${username},\n\nYour account has been successfully verified. You can now access all the features of our e-learning platform.\n\nThanks,\nThe Menty Team`, // Plain-text fallback
-                html: `
+    const sendVerificationEmail = async (username: string, toEmail: string) => {
+      const mailOptions = {
+        from: process.env.USER_EMAIL, // Sender email
+        to: toEmail, // Recipient email
+        subject: "🎉 Welcome to Menty - Your Account is Verified! 🎉",
+        text: `Hello ${username},\n\nYour account has been successfully verified. You can now access all the features of our e-learning platform.\n\nThanks,\nThe Menty Team`, // Plain-text fallback
+        html: `
                     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; text-align: center; border-radius: 8px; background-color: #f7f7f7; background: url('https://cdn.wallpapersafari.com/13/89/wb4WOU.jpg') no-repeat center center; background-size: cover;">
                         <div style="background-color: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 8px; display: inline-block; width: 80%; max-width: 600px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                             <h2 style="color: #4CAF50; margin-bottom: 10px;">🎉 Welcome to Menty, ${username}! 🎉</h2>
@@ -67,18 +59,18 @@ export class SendVerifiedEmail implements IEmail {
                         </div>
                     </div>
                 `,
-            };
+      };
 
-            try {
-                const info = await transporter.sendMail(mailOptions);
-                console.log(`Email sent successfully: ${info.response}`);
-                return info;
-            } catch (error:any) {
-                console.error('Error sending email:', error);
-                throw new Error(`Failed to send verification email: ${error.message}`);
-            }
-        };
+      try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully: ${info.response}`);
+        return info;
+      } catch (error: any) {
+        console.error("Error sending email:", error);
+        throw new Error(`Failed to send verification email: ${error.message}`);
+      }
+    };
 
-        await sendVerificationEmail(username, email);
-    }
+    await sendVerificationEmail(username, email);
+  }
 }

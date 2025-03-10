@@ -1,13 +1,19 @@
 import { ICourse } from "../../models/courseModel";
 import { GenericRepository } from "../GenericRepository";
-import {CourseModel} from "../../models/courseModel";
+import { CourseModel } from "../../models/courseModel";
 import { ICourseRepository } from "../interfaces/ICourseRepository";
 import { ChapterModel, IChapter } from "../../models/chapterModel";
-import { IPurchasedCourse, PurchasedCourseModel } from "../../models/purchasedModel";
+import {
+  IPurchasedCourse,
+  PurchasedCourseModel,
+} from "../../models/purchasedModel";
 import { QuizModel } from "../../models/quizModel";
 import { Paginatedcourses } from "../../Types/updateRequestType";
 
-export class CourseRepository extends GenericRepository<ICourse> implements ICourseRepository {
+export class CourseRepository
+  extends GenericRepository<ICourse>
+  implements ICourseRepository
+{
   constructor() {
     super(CourseModel);
   }
@@ -21,22 +27,19 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
     }
   }
   async getInstructorCoursesList(
-    instructorId: string, 
-    page: number, 
+    instructorId: string,
+    page: number,
     limit: number,
-    search: string = '',
-    sortField: string = 'lastUpdated',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    search: string = "",
+    sortField: string = "lastUpdated",
+    sortOrder: "asc" | "desc" = "desc"
   ): Promise<{ courses: ICourse[]; total: number } | null> {
     try {
-      // Create base query for instructor's courses
       let query: any = { mentorId: instructorId };
-      
-      // Add search functionality across relevant fields
+
       if (search) {
-        // Create a regex search pattern that's case insensitive
-        const searchRegex = new RegExp(search, 'i');
-        
+        const searchRegex = new RegExp(search, "i");
+
         query = {
           $and: [
             { mentorId: instructorId },
@@ -45,72 +48,67 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
                 { courseName: searchRegex },
                 { category: searchRegex },
                 { level: searchRegex },
-                { description: searchRegex }
-                // Add other searchable fields as needed
-              ]
-            }
-          ]
+                { description: searchRegex },
+              ],
+            },
+          ],
         };
-        
-        // If search is numeric, also search price
+
         if (!isNaN(Number(search))) {
           query.$and[1].$or.push({ price: Number(search) });
         }
       }
-      
-      // Get total count for pagination
+
       const total = await CourseModel.countDocuments(query);
-      
-      // Create sort object
+
       const sort: any = {};
-      sort[sortField] = sortOrder === 'asc' ? 1 : -1;
-      
-      // Apply pagination and sorting
+      sort[sortField] = sortOrder === "asc" ? 1 : -1;
+
       const skip = (page - 1) * limit;
-      
+
       const courses = await CourseModel.find(query)
         .sort(sort)
         .skip(skip)
-        .limit(limit)
-        console.log(courses,"soursesss")
-        
-      
+        .limit(limit);
+
       return {
         courses,
-        total
+        total,
       };
     } catch (error) {
       console.error("Error in getInstructorCoursesList repository:", error);
       throw error;
     }
   }
-  async getPaginatedCourses(page: number, limit: number, search: string, sort: string, category: string[], level: string[]): Promise<Paginatedcourses> {
+  async getPaginatedCourses(
+    page: number,
+    limit: number,
+    search: string,
+    sort: string,
+    category: string[],
+    level: string[]
+  ): Promise<Paginatedcourses> {
     try {
       const skip = (page - 1) * limit;
-      
-      // Build filter object
+
       let filter: any = { isListed: true, isPublished: true };
-      
-      // Add search functionality
+
       if (search) {
         filter.$or = [
-          { courseName: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } },
-          { tags: { $in: [new RegExp(search, 'i')] } }
+          { courseName: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+          { tags: { $in: [new RegExp(search, "i")] } },
         ];
       }
-      
-      // Add category filter
+
       if (category && category.length > 0) {
         filter.category = { $in: category };
       }
-      
-      // Add level filter
+
       if (level && level.length > 0) {
         filter.level = { $in: level };
       }
-      
-      // Determine sort order
+
       let sortOption: any = {};
       switch (sort) {
         case "price-low":
@@ -130,22 +128,20 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
           sortOption = { studentsEnrolled: -1 };
           break;
       }
-      
-      // Execute query with pagination and sorting
+
       const courses = await CourseModel.find(filter)
         .sort(sortOption)
         .skip(skip)
         .limit(limit)
         .exec();
-      
-      // Get total count for pagination
+
       const totalCourses = await CourseModel.countDocuments(filter);
-      
+
       return {
         courses,
         currentPage: page,
         totalPages: Math.ceil(totalCourses / limit),
-        totalCourses
+        totalCourses,
       };
     } catch (error) {
       throw error;
@@ -166,7 +162,8 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
     quizId: string,
     courseId: string,
     completedChapters: any,
-    txnid: string
+    txnid: string,
+    price: Number
   ): Promise<IPurchasedCourse | null> {
     try {
       const courseDetails = await this.findById(courseId);
@@ -180,6 +177,7 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
           completedChapters,
           quizId,
           isCourseCompleted: false,
+          price,
         },
         { upsert: true, new: true }
       );
@@ -190,7 +188,11 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
     }
   }
 
-  async getBoughtCourses(userId: string, page: number, limit: number): Promise<any> {
+  async getBoughtCourses(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<any> {
     try {
       const skip = (page - 1) * limit;
 
@@ -201,7 +203,9 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
         .populate("courseId", "courseName level thumbnailUrl quizId")
         .exec();
 
-      const totalCourses = await PurchasedCourseModel.countDocuments({ userId });
+      const totalCourses = await PurchasedCourseModel.countDocuments({
+        userId,
+      });
 
       return {
         courses: response,
@@ -237,33 +241,30 @@ export class CourseRepository extends GenericRepository<ICourse> implements ICou
     }
   }
 
-  async getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null> {
+  async getBoughtCourseById(
+    courseId: string
+  ): Promise<IPurchasedCourse | null> {
     try {
       if (!courseId) throw new Error("Purchased courseId not Found");
-      const course=await PurchasedCourseModel.findById(courseId)
-      return course
-      
+      const course = await PurchasedCourseModel.findById(courseId);
+      return course;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
-  
+
   async deleteCourseById(courseId: string): Promise<ICourse | null> {
     try {
-      
       if (!courseId) throw new Error("Purchased courseId not Found");
-      const course=await CourseModel.findById(courseId)
-      if(course?.quizId){
-        await QuizModel.findOneAndDelete({courseId:course._id})
+      const course = await CourseModel.findById(courseId);
+      if (course?.quizId) {
+        await QuizModel.findOneAndDelete({ courseId: course._id });
       }
-      await ChapterModel.deleteMany({courseId})
-      const deletedCourse=await this.delete(courseId)
-      return deletedCourse
-      
+      await ChapterModel.deleteMany({ courseId });
+      const deletedCourse = await this.delete(courseId);
+      return deletedCourse;
     } catch (error) {
-      throw error
-      
+      throw error;
     }
-    
   }
 }

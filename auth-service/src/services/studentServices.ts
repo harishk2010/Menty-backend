@@ -1,5 +1,5 @@
 import { IUser } from "../models/userModel";
-import  IStudentServices  from "./interfaces/IStudentServices";
+import IStudentServices from "./interfaces/IStudentServices";
 import { IStudentRepository } from "../repositories/interfaces/IStudentRepository";
 
 export class StudentServices implements IStudentServices {
@@ -21,7 +21,11 @@ export class StudentServices implements IStudentServices {
     return await this.studentRepository.resetPassword(email, password);
   }
 
-  async googleLogin(name: string, email: string, password: string): Promise<IUser | null> {
+  async googleLogin(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<IUser | null> {
     return await this.studentRepository.googleLogin(name, email, password);
   }
 

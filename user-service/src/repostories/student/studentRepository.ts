@@ -5,7 +5,10 @@ import { IStudentRepository } from "../interfaces/IStudentRepository";
 import { FilterQuery } from "mongoose";
 import { PaginationResult } from "../../types/types";
 
-export class StudentRepository extends GenericRepository<IUser> implements IStudentRepository {
+export class StudentRepository
+  extends GenericRepository<IUser>
+  implements IStudentRepository
+{
   constructor() {
     super(UserModel);
   }
@@ -19,7 +22,6 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
     const skip = (page - 1) * limit;
     const filter: FilterQuery<IUser> = {};
 
-    // Build the search query
     if (query) {
       filter.$or = [
         { name: { $regex: query, $options: "i" } },
@@ -45,7 +47,6 @@ export class StudentRepository extends GenericRepository<IUser> implements IStud
       },
     };
   }
-
 
   async updatePassword(email: string, password: string): Promise<IUser | null> {
     try {
