@@ -1,23 +1,24 @@
 import upload from "../utils/multer";
 import { categoryController } from "../config/dependencyInjector";
 import express, { Request, Response, Router } from "express";
+import authenticateToken from "../middlewares/AuthenticatedRoutes";
 
 const router = Router();
 
 router
   .route("/category")
-  .post(categoryController.addCategory.bind(categoryController))
-  .put(categoryController.editCategory.bind(categoryController));
+  .post(authenticateToken,categoryController.addCategory.bind(categoryController))
+  .put(authenticateToken,categoryController.editCategory.bind(categoryController));
 
 router
   .route("/categories")
-  .get(categoryController.getAllCategory.bind(categoryController));
+  .get(authenticateToken,categoryController.getAllCategory.bind(categoryController));
 router
   .route("/listOrUnlist/:id")
-  .put(categoryController.listOrUnlistCategory.bind(categoryController));
+  .put(authenticateToken, categoryController.listOrUnlistCategory.bind(categoryController));
 router
   .route("/:categoryId")
-  .put(categoryController.findCategoryById.bind(categoryController));
+  .put(authenticateToken,categoryController.findCategoryById.bind(categoryController));
 
 const categoryRoutes = router;
 export default categoryRoutes;

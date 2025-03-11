@@ -40,7 +40,7 @@ router
     courseController.getPaginatedCourses.bind(courseController)
   );
 router.get(
-  "/courses/categories",
+  "/courses/categories",authenticateToken,
   courseController.getCourseCategories.bind(courseController)
 );
 router
@@ -56,7 +56,7 @@ router
 
 router
   .route("/course/:id")
-  .get(courseController.getCourseById.bind(courseController));
+  .get(authenticateToken,courseController.getCourseById.bind(courseController));
 router
   .route("/instructorCourses/:instructorId")
   .get(

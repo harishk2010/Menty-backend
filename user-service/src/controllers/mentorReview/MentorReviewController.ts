@@ -33,7 +33,7 @@ export class MentorReviewController implements IMentorReviewController {
           data: newReview,
         });
       } else {
-        res.status(500).json({
+        res.json({
           success: false,
           message: "Something Went Wrong",
         });

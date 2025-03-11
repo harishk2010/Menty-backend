@@ -14,6 +14,7 @@ router.post(
 );
 router.patch(
   "/updatePassword",
+  authenticateToken,
   isInstructor,
   instructorController.updatePassword.bind(instructorController)
 );
@@ -31,6 +32,7 @@ router.get(
 );
 router.patch(
   "/blockInstructor/:email",
+  authenticateToken,
   instructorController.blockInstructor.bind(instructorController)
 );
 router.put(

@@ -1,4 +1,5 @@
-import express, { Application } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
+
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import connectDB from "./config/db";
@@ -32,7 +33,11 @@ app.use("/mentorReview", mentorReviewRoutes);
 app.use("/admin", adminDashboardRoutes);
 
 consume();
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Error:", err.message);
 
+  res.status(500).json({ error: err.message||"Internal Server Error" });
+});
 app.use((req, res, next) => {
   console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
   next();

@@ -22,7 +22,8 @@ export class AdminController implements IAdminControllers {
 
       // Check credentials in one conditional block
       if (email !== adminEmail || password !== adminPassword) {
-        res.status(401).send({
+        console.log("error")
+        res.send({
           success: false,
           message: email !== adminEmail ? "Email Wrong" : "Password Wrong",
         });
