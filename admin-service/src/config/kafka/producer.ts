@@ -1,3 +1,4 @@
+import { KafkaError } from "@/utils/constants";
 import kafka from "./kafkaConfig";
 import { Partitioners } from "kafkajs";
 
@@ -18,7 +19,7 @@ async function produce(topic: string, value: object): Promise<void> {
       messages: [{ value: messageValue }],
     });
   } catch (error: any) {
-    console.error("Error in Auth-Producer:", error.message, error.stack);
+    console.error(KafkaError.PRODUCER_ERROR, error.message, error.stack);
   } finally {
     await producer.disconnect();
   }

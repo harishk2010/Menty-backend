@@ -6,6 +6,7 @@ import { PurchasedCourseModel } from "../../models/purchasedModel";
 import { ReviewModel } from "../../models/reviewModel";
 import UserModel from "../../models/userModel";
 import { ChapterModel } from "../../models/chapterModel";
+import { CourseErrorMessages } from "@/utils/constants";
 
 export class InstructorDashboardRepository
   implements IInstructorDashboardRepository
@@ -54,7 +55,7 @@ export class InstructorDashboardRepository
 
       return dashboardData;
     } catch (error) {
-      console.error("Error in getInstructorDashboardData:", error);
+     
       throw error;
     }
   }
@@ -87,7 +88,7 @@ export class InstructorDashboardRepository
         totalCompletions: completedCourses,
       };
     } catch (error) {
-      console.error("Error in getCourseAnalytics:", error);
+      
       throw error;
     }
   }
@@ -184,7 +185,7 @@ export class InstructorDashboardRepository
         monthlyGrowth,
       };
     } catch (error) {
-      console.error("Error in getStudentGrowth:", error);
+      
       throw error;
     }
   }
@@ -199,7 +200,7 @@ export class InstructorDashboardRepository
 
       for (const course of courses) {
         if (!course._id) {
-          throw new Error("No course found!");
+          throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
         }
         const purchasedEntries = await PurchasedCourseModel.find({
           courseId: course._id,
@@ -235,7 +236,7 @@ export class InstructorDashboardRepository
 
       return coursePerformance.sort((a, b) => b.students - a.students);
     } catch (error) {
-      console.error("Error in getCoursePerformance:", error);
+      
       throw error;
     }
   }
@@ -267,7 +268,7 @@ export class InstructorDashboardRepository
 
       return upcomingAppointments;
     } catch (error) {
-      console.error("Error in getUpcomingAppointments:", error);
+      
       throw error;
     }
   }

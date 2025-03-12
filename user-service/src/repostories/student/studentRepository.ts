@@ -57,7 +57,7 @@ export class StudentRepository
       );
       return response;
     } catch (error) {
-      console.error("Error in updatePassword:", error);
+      
       throw error;
     }
   }

@@ -3,10 +3,11 @@ import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
-
 import consume from "./config/kafka/consumer";
 import categoryRoutes from "./routes/categoryRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import { GeneralServerErrorMsg } from "./utils/constants";
+import { StatusCode } from "./utils/enums";
 
 config();
 
@@ -18,6 +19,7 @@ const corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
+
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -25,11 +27,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/category", categoryRoutes);
 app.use("/admin", adminRoutes);
+
 consume();
+
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err.message);
 
-  res.status(500).json({ error: "Internal Server Error" });
+  res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
 });
 
 app.use((req, res, next) => {
@@ -38,9 +47,15 @@ app.use((req, res, next) => {
 });
 
 const start = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
-  });
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(" Server startup failed:", error);
+    process.exit(1);
+  }
 };
+
 start();

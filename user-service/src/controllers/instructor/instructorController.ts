@@ -12,6 +12,8 @@ import {
   InstructorWallet,
   ResetPassword,
 } from "../../types/types";
+import { StatusCode, TransactionType, VerifiedStatus } from "@/utils/enums";
+import { AuthErrorMsg, InstructorErrorMessages, InstructorSuccessMessages } from "@/utils/constants";
 
 export class InstructorController implements IInstructorControllers {
   private instructorService: IInstructorService;
@@ -43,7 +45,7 @@ export class InstructorController implements IInstructorControllers {
     try {
       const expertise = await this.instructorService.getMentorExpertise();
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         data: expertise,
       });
@@ -78,7 +80,7 @@ export class InstructorController implements IInstructorControllers {
         expertise
       );
 
-      res.status(200).json(result);
+      res.status(StatusCode.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -122,15 +124,15 @@ export class InstructorController implements IInstructorControllers {
 
       if (response) {
         await produce("update-profile-instructor", response);
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Profile Updated!",
+          message: InstructorSuccessMessages.PROFILE_UPDATED,
           user: response,
         });
       } else {
         res.json({
           success: false,
-          message: "Not Updated!",
+          message: InstructorErrorMessages.PROFILE_UPDATE_FAILED,
         });
       }
     } catch (error) {
@@ -142,9 +144,9 @@ export class InstructorController implements IInstructorControllers {
       const { page = 1, limit = 10, search = "", email } = req.query;
 
       if (!email) {
-        res.status(400).json({
+        res.status(StatusCode.BAD_REQUEST).json({
           success: false,
-          message: "Email is required",
+          message: InstructorErrorMessages.EMAIL_REQUIRED,
         });
         return;
       }
@@ -157,27 +159,23 @@ export class InstructorController implements IInstructorControllers {
       );
 
       if (!result) {
-        res.status(404).json({
+        res.status(StatusCode.NOT_FOUND).json({
           success: false,
-          message: "No transactions found or instructor doesn't exist",
+          message: InstructorErrorMessages.TRANSACTIONS_NOT_FOUND,
         });
         return;
       }
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Fetched transactions data successfully",
+        message: InstructorSuccessMessages.TRANSACTIONS_FETCHED,
         data: {
           data: result.transactions,
           total: result.total,
         },
       });
     } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: "An error occurred while fetching transactions",
-        error: error.message,
-      });
+      throw error
     }
   }
   async updatePlanPrice(req: Request, res: Response): Promise<void> {
@@ -189,15 +187,15 @@ export class InstructorController implements IInstructorControllers {
         planPrice
       );
       if (!response) {
-        res.status(500).json({
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "Something error! Couldn't fetch data!",
+          message: InstructorErrorMessages.INTERNAL_SERVER_ERROR,
         });
         return;
       }
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Updated PlanPrice!",
+        message: InstructorSuccessMessages.PLAN_PRICE_UPDATED,
 
         data: response,
       });
@@ -211,12 +209,12 @@ export class InstructorController implements IInstructorControllers {
       const { currentPassword, newPassword } = req.body;
       const tokenData = await verifyToken(req.cookies["accessToken"]);
       if (!tokenData) {
-        throw new Error("Token expiered!");
+        throw new Error(AuthErrorMsg.ACCESS_TOKEN_EXPIRED);
       }
       let email = tokenData.email;
       const response = await this.instructorService.getInstructorData(email);
       if (!response) {
-        throw new Error("No user Found");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
 
       const oldPassword = response?.password;
@@ -233,20 +231,20 @@ export class InstructorController implements IInstructorControllers {
             email,
             password: hashedPassword,
           });
-          res.status(200).json({
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "Password Updated",
+            message: InstructorSuccessMessages.PASSWORD_UPDATED,
           });
         } else {
           res.json({
             success: false,
-            message: "Password Not Updated",
+            message: InstructorErrorMessages.PROFILE_UPDATE_FAILED,
           });
         }
       } else {
         res.json({
           success: false,
-          message: "Current Password is Wrong",
+          message: InstructorErrorMessages.CURRENT_PASSWORD_INCORRECT,
         });
       }
     } catch (error) {
@@ -257,7 +255,7 @@ export class InstructorController implements IInstructorControllers {
   public async getInstructors(req: Request, res: Response) {
     try {
       const Instructors = await this.instructorService.getInstructors();
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         users: Instructors,
       });
     } catch (error) {
@@ -273,12 +271,12 @@ export class InstructorController implements IInstructorControllers {
       );
 
       if (!InstructorData) {
-        throw new Error("No user found");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       let id = InstructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_ID_MISSING);
       }
       const isBlocked = !InstructorData?.isBlocked;
 
@@ -288,14 +286,14 @@ export class InstructorController implements IInstructorControllers {
       await produce("block-instructor", { email, isBlocked });
 
       if (InstructorStatus?.isBlocked) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Instructor Blocked",
+          message: InstructorSuccessMessages.INSTRUCTOR_BLOCKED,
         });
       } else {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Instructor UnBlocked",
+          message: InstructorSuccessMessages.INSTRUCTOR_UNBLOCKED,
         });
       }
     } catch (error) {
@@ -330,10 +328,10 @@ export class InstructorController implements IInstructorControllers {
       let id = instructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_ID_MISSING);
       }
 
-      if (status === "approved") {
+      if (status === VerifiedStatus.APPROVED) {
         const isVerified = true;
         response = await this.instructorService.updateProfile(id, {
           verificationStatus: status,
@@ -366,15 +364,15 @@ export class InstructorController implements IInstructorControllers {
       let id = instructorData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_ID_MISSING);
       }
-      if (status === "approved") {
+      if (status === VerifiedStatus.APPROVED) {
         const isVerified = true;
         response = await this.instructorService.updateProfile(id, {
           verificationStatus: status,
           isVerified,
         });
-      } else if (status === "rejected") {
+      } else if (status === VerifiedStatus.REJECTED) {
         const isVerified = false;
 
         response = await this.instructorService.updateProfile(id, {
@@ -398,11 +396,11 @@ export class InstructorController implements IInstructorControllers {
       const instructorDetails =
         await this.instructorService.getInstructorDataById(instructorId);
       if (!instructorDetails) {
-        throw new Error("No instructor details not found");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       const transactions = instructorDetails?.wallet.transactions ?? [];
       let walletDetails;
-      if (type === "debit") {
+      if (type === TransactionType.DEBITED) {
         walletDetails = {
           balance: Number(instructorDetails?.wallet.balance) - Number(amount),
           transactions: [...transactions, { amount, description, txnid, type }],

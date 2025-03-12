@@ -12,6 +12,8 @@ import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 import { IBoughtCourses } from "../../Types/updateRequestType";
 import { IUser } from "../../models/userModel";
+import { CourseErrorMessages, CourseSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "@/utils/enums";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}
@@ -31,7 +33,7 @@ export class CourseContoller implements ICourseControllers {
       courseData.mentorId = mentorId;
 
       if (!files?.thumbnail || !files?.demoVideos) {
-        res.status(400).json({ message: "Missing files" });
+        res.status(StatusCode.BAD_REQUEST).json({ message: CourseErrorMessages.MISSING_FILES });
         return;
       }
 
@@ -45,10 +47,10 @@ export class CourseContoller implements ICourseControllers {
       });
 
       res
-        .status(201)
+        .status(StatusCode.CREATED)
         .json({
           success: true,
-          message: "Course created successfully",
+          message: CourseSuccessMessages.COURSE_CREATED,
           data: newCourse,
         });
     } catch (error) {
@@ -82,17 +84,17 @@ export class CourseContoller implements ICourseControllers {
       );
       if (updatedCourse) {
         res
-          .status(201)
+          .status(StatusCode.OK)
           .json({
             success: true,
-            message: "Course updated successfully",
+            message: CourseSuccessMessages.COURSE_UPDATED,
             data: updatedCourse,
           });
         return;
       }
       res
-        .status(500)
-        .json({ success: false, message: "Error updating Course" });
+        .status(StatusCode.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: CourseErrorMessages.INTERNAL_ERROR });
     } catch (error) {
       next(error);
     }
@@ -105,7 +107,7 @@ export class CourseContoller implements ICourseControllers {
   ): Promise<void> {
     try {
       const courses = await this.courseService.getAllCourses();
-      res.status(200).json(courses);
+      res.status(StatusCode.OK).json(courses);
     } catch (error) {
       next(error);
     }
@@ -147,7 +149,7 @@ export class CourseContoller implements ICourseControllers {
         level
       );
 
-      res.status(200).json(result);
+      res.status(StatusCode.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -165,10 +167,10 @@ export class CourseContoller implements ICourseControllers {
       });
 
       res
-        .status(200)
+        .status(StatusCode.OK)
         .json({
           success: true,
-          message: "fetched course categories!",
+          message: CourseSuccessMessages.COURSE_CATEGORIES_FETCHED,
           data: categories,
         });
     } catch (error) {
@@ -185,10 +187,10 @@ export class CourseContoller implements ICourseControllers {
       const { id } = req.params;
       const course = await this.courseService.getCourseById(id);
       if (!course) {
-        res.status(404).json({ message: "Course not found" });
+        res.status(StatusCode.NOT_FOUND).json({ message: CourseErrorMessages.COURSE_NOT_FOUND });
         return;
       }
-      res.status(200).json(course);
+      res.status(StatusCode.OK).json(course);
     } catch (error) {
       next(error);
     }
@@ -202,12 +204,12 @@ export class CourseContoller implements ICourseControllers {
       const { id } = req.params;
       const course = await this.courseService.getBoughtCourseById(id);
       if (!course) {
-        res.status(404).json({ message: "Course not found" });
+        res.status(StatusCode.NOT_FOUND).json({ message: CourseErrorMessages.COURSE_NOT_FOUND });
         return;
       }
       const courseId = course.courseId;
       if (!courseId) {
-        res.status(404).json({ message: "CourseId not found" });
+        res.status(StatusCode.NOT_FOUND).json({ message: CourseErrorMessages.COURSE_ID_NOT_FOUND });
         return;
       }
       const courseDetails = await this.courseService.getCourseById(
@@ -217,7 +219,7 @@ export class CourseContoller implements ICourseControllers {
         ...course,
         courseDetails,
       };
-      res.status(200).json(response);
+      res.status(StatusCode.OK).json(response);
     } catch (error) {
       next(error);
     }
@@ -231,11 +233,11 @@ export class CourseContoller implements ICourseControllers {
     try {
       const { id } = req.params;
       const courseData = await this.courseService.getCourseById(id);
-      if (!courseData) throw new Error("No course found");
+      if (!courseData) throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
       if (!courseData.quizId) {
         res.json({
           success: false,
-          message: "Add Quiz to Publish Course!",
+          message: CourseErrorMessages.ADD_QUIZ_TO_PUBLISH,
         });
         return;
       }
@@ -243,7 +245,7 @@ export class CourseContoller implements ICourseControllers {
       if (chapters.length === 0) {
         res.json({
           success: false,
-          message: "Add chapters to Publish Course!",
+          message: CourseErrorMessages.ADD_CHAPTERS_TO_PUBLISH,
         });
         return;
       }
@@ -257,11 +259,11 @@ export class CourseContoller implements ICourseControllers {
         updatedCourseData
       );
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
         message: courseStatus?.isPublished
-          ? "Course Published"
-          : "Course UnPublished",
+          ? CourseSuccessMessages.COURSE_PUBLISHED
+          : CourseSuccessMessages.COURSE_UNPUBLISHED,
       });
     } catch (error) {
       next(error);
@@ -276,16 +278,16 @@ export class CourseContoller implements ICourseControllers {
       const { courseId } = req.params;
       const courseData = await this.courseService.getCourseById(courseId);
       if (!courseData) {
-        throw new Error("no courseData found");
+        throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
       }
       const listValue = !courseData?.isListed;
       const response = await this.courseService.updateCourse(courseId, {
         ...courseData.toObject(),
         isListed: listValue,
       });
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: response?.isListed ? "Course Listed" : "Course unListed",
+        message: response?.isListed ? CourseSuccessMessages.COURSE_LISTED : CourseSuccessMessages.COURSE_UNLISTED,
       });
     } catch (error) {
       next(error);
@@ -302,7 +304,7 @@ export class CourseContoller implements ICourseControllers {
       const isCourseExist = await this.courseService.getCourseById(
         String(courseId)
       );
-      if (!isCourseExist) throw new Error("Course not found");
+      if (!isCourseExist) throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
 
       const instructorPayment = 0.9 * amount;
       const adminPayment = 0.1 * amount;
@@ -311,7 +313,7 @@ export class CourseContoller implements ICourseControllers {
         String(courseId)
       );
       if (!chapters || chapters.length === 0)
-        throw new Error("Chapters not found");
+        throw new Error(CourseErrorMessages.CHAPTERS_NOT_FOUND);
 
       const completedChapters = chapters.map((chapter: IChapter) => ({
         chapterId: chapter._id,
@@ -345,9 +347,9 @@ export class CourseContoller implements ICourseControllers {
         });
 
         res
-          .status(200)
+          .status(StatusCode.OK)
           .send({
-            message: "Thank you for Enrolling!",
+            message: CourseSuccessMessages.THANK_YOU_FOR_ENROLLING,
             success: true,
             data: response,
           });
@@ -368,15 +370,15 @@ export class CourseContoller implements ICourseControllers {
       );
 
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "User courses fetched !",
+          message: CourseSuccessMessages.COURSE_FETCHED,
           data: response,
         });
       } else {
-        res.status(500).json({
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "Something wrong Please try Later!",
+          message: CourseErrorMessages.INTERNAL_ERROR,
           data: response,
         });
       }
@@ -401,9 +403,9 @@ export class CourseContoller implements ICourseControllers {
       } = req.query;
 
       if (!instructorId) {
-        res.status(400).json({
+        res.status(StatusCode.BAD_REQUEST).json({
           success: false,
-          message: "Instructor ID is required",
+          message: CourseErrorMessages.INSTRUCTOR_ID_REQUIRED,
         });
         return;
       }
@@ -418,25 +420,25 @@ export class CourseContoller implements ICourseControllers {
       );
 
       if (!result) {
-        res.status(404).json({
+        res.status(StatusCode.NOT_FOUND).json({
           success: false,
-          message: "No courses found or instructor doesn't exist",
+          message: CourseErrorMessages.NO_COURSE_DATA_FOUND,
         });
         return;
       }
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Fetched courses data successfully",
+        message: CourseSuccessMessages.COURSES_FETCHED,
         data: {
           data: result.courses,
           total: result.total,
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "An error occurred while fetching courses",
+        message: CourseErrorMessages.INTERNAL_ERROR,
         error: error.message,
       });
       throw error;
@@ -455,8 +457,8 @@ export class CourseContoller implements ICourseControllers {
 
       if (pageNumber < 1 || limitNumber < 1) {
         res
-          .status(400)
-          .send({ message: "Invalid page or limit value", success: false });
+          .status(StatusCode.BAD_REQUEST)
+          .send({ message: CourseErrorMessages.INVALID_PAGE_OR_LIMIT, success: false });
         return;
       }
 
@@ -481,9 +483,9 @@ export class CourseContoller implements ICourseControllers {
       }));
 
       res
-        .status(200)
+        .status(StatusCode.OK)
         .send({
-          message: "Buyed Courses Got Successfully",
+          message:CourseSuccessMessages.BOUGHT_COURSES_FETCHED,
           success: true,
           data: response,
         });
@@ -513,7 +515,7 @@ export class CourseContoller implements ICourseControllers {
         })
         .exec()) as unknown as IPurchasedCourse;
 
-      if (!purchasedCourse) throw new Error("Purchased course not found");
+      if (!purchasedCourse) throw new Error(CourseErrorMessages.NO_COURSE_DATA_FOUND);
 
       const courseData = purchasedCourse.courseId as unknown as ICourse;
 
@@ -522,7 +524,7 @@ export class CourseContoller implements ICourseControllers {
           (video: { chapterId: string }) => video.chapterId
         ) ?? [];
 
-      if (chaptersData.length === 0) throw new Error("Internal Error");
+      if (chaptersData.length === 0) throw new Error(CourseErrorMessages.INTERNAL_ERROR);
 
       const chapters: IChapter[] = await ChapterModel.find({
         _id: { $in: chaptersData },
@@ -546,9 +548,9 @@ export class CourseContoller implements ICourseControllers {
         })
       );
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Retrieved play data",
+        message: CourseSuccessMessages.PLAY_DATA_RETRIEVED,
         data: {
           purchasedCourse,
           course: {
@@ -576,9 +578,9 @@ export class CourseContoller implements ICourseControllers {
       const { chapterId } = req.params;
       if (!chapterId) {
         res
-          .status(400)
+          .status(StatusCode.BAD_REQUEST)
           .send({
-            message: "ChapterId is not provided in the query",
+            message: CourseErrorMessages.CHAPTER_ID_REQUIRED,
             success: false,
           });
         return;
@@ -588,8 +590,8 @@ export class CourseContoller implements ICourseControllers {
         String(chapterId)
       );
       res
-        .status(200)
-        .send({ success: true, message: "Chapter Completed", data: response });
+        .status(StatusCode.OK)
+        .send({ success: true, message: CourseSuccessMessages.CHAPTER_COMPLETED, data: response });
     } catch (error) {
       next(error);
     }
@@ -603,9 +605,9 @@ export class CourseContoller implements ICourseControllers {
     try {
       const { courseId } = req.params;
       const deletedCourse = await this.courseService.deleteCourseById(courseId);
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Course Deleted!",
+        message: CourseSuccessMessages.COURSE_DELETED,
         data: deletedCourse,
       });
     } catch (error) {

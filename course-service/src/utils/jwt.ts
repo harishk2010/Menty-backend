@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
+import { EnvErrorMsg, JwtErrorMsg } from "./constants";
 
 config();
 
@@ -8,11 +9,11 @@ export class JwtService {
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      throw new Error("JWT_SECRET is not defined in the environment variables");
+      throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
     }
 
     const verifyToken = await jwt.sign(payload, secret, {
-      expiresIn: "1hr",
+      expiresIn: JwtErrorMsg.JWT_EXPIRATION,
     });
 
     return verifyToken;
@@ -21,10 +22,10 @@ export class JwtService {
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      throw new Error("JWT_SECRET is not defined in the environment variables");
+      throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
     }
     return jwt.sign(payload, secret, {
-      expiresIn: "1hr",
+      expiresIn: JwtErrorMsg.JWT_EXPIRATION,
     });
   }
 
@@ -32,11 +33,11 @@ export class JwtService {
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      throw new Error("JWT_SECRET is not defined in the environment variables");
+      throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
     }
 
     const verifyToken = await jwt.sign(payload, secret, {
-      expiresIn: "6hr",
+      expiresIn: JwtErrorMsg.JWT_REFRESH_EXPIRATION,
     });
 
     return verifyToken;

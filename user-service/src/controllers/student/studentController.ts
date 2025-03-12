@@ -6,6 +6,8 @@ import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
 import { IStudentControllers } from "../interfaces/IStudentController";
 import { IStudentService } from "../../services/interfaces/IStudentService";
+import { StatusCode } from "@/utils/enums";
+import { PROFILE_PICTURE, StudentErrorMessages, StudentSuccessMessages } from "@/utils/constants";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentService;
@@ -41,15 +43,13 @@ export class StudentController implements IStudentControllers {
         parseInt(limit as string)
       );
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "got the admin Users!",
+        message: StudentSuccessMessages.STUDENTS_FETCHED,
         data: result,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ success: false, message: (error as Error).message });
+      throw error
     }
   }
   public async getStudentDataById(req: Request, res: Response): Promise<void> {
@@ -66,7 +66,7 @@ export class StudentController implements IStudentControllers {
     try {
       const { _id, username, mobile } = req.body;
 
-      let profilePicUrl = "No Picture";
+      let profilePicUrl = PROFILE_PICTURE;
       let response;
 
       if (req.file) {
@@ -86,15 +86,15 @@ export class StudentController implements IStudentControllers {
 
       if (response) {
         await produce("update-profile-student", response);
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Profile Updated!",
+          message: StudentSuccessMessages.PROFILE_UPDATED,
           user: response,
         });
       } else {
         res.json({
           success: false,
-          message: "Not Updated!",
+          message: StudentErrorMessages.PROFILE_UPDATE_FAILED,
         });
       }
     } catch (error) {
@@ -107,12 +107,12 @@ export class StudentController implements IStudentControllers {
       const { currentPassword, newPassword } = req.body;
       const tokenData = await verifyToken(req.cookies["accessToken"]);
       if (!tokenData) {
-        throw new Error("Token expiered!");
+        throw new Error(StudentErrorMessages.TOKEN_EXPIRED);
       }
       let email = tokenData.email;
       const response = await this.studentService.getStudentData(email);
       if (!response) {
-        throw new Error("No user Found");
+        throw new Error(StudentErrorMessages.STUDENT_NOT_FOUND);
       }
 
       const oldPassword = response?.password;
@@ -129,20 +129,20 @@ export class StudentController implements IStudentControllers {
             email,
             password: hashedPassword,
           });
-          res.status(200).json({
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "Password Updated",
+            message: StudentSuccessMessages.PASSWORD_UPDATED,
           });
         } else {
           res.json({
             success: false,
-            message: "Password Not Updated",
+            message: StudentErrorMessages.PASSWORD_UPDATE_FAILED,
           });
         }
       } else {
         res.json({
           success: false,
-          message: "Current Password is Wrong",
+          message: StudentErrorMessages.CURRENT_PASSWORD_INCORRECT,
         });
       }
     } catch (error) {
@@ -153,7 +153,7 @@ export class StudentController implements IStudentControllers {
   public async getStudents(req: Request, res: Response): Promise<void> {
     try {
       const students = await this.studentService.getStudents();
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         users: students,
       });
     } catch (error) {
@@ -167,12 +167,12 @@ export class StudentController implements IStudentControllers {
       const studentData = await this.studentService.getStudentData(email);
 
       if (!studentData) {
-        throw new Error("No user found");
+        throw new Error(StudentErrorMessages.STUDENT_NOT_FOUND);
       }
       let id = studentData?._id?.toString();
 
       if (!id) {
-        throw new Error("Instructor ID is missing");
+        throw new Error(StudentErrorMessages.STUDENT_ID_MISSING);
       }
       const isBlocked = !studentData?.isBlocked;
 
@@ -182,14 +182,14 @@ export class StudentController implements IStudentControllers {
       await produce("block-student", { email, isBlocked });
 
       if (studentStatus?.isBlocked) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Student Blocked",
+          message: StudentSuccessMessages.STUDENT_BLOCKED,
         });
       } else {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Student UnBlocked",
+          message: StudentSuccessMessages.STUDENT_UNBLOCKED,
         });
       }
     } catch (error) {

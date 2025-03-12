@@ -3,6 +3,7 @@ import { IReviewRepository } from "../../repositories/interfaces/IReviewReposito
 import { IReview } from "../../models/reviewModel";
 import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
+import { CourseErrorMessages, ReviewErrorMessages } from "@/utils/constants";
 
 export class ReviewService implements IReviewService {
   private reviewRepository: IReviewRepository;
@@ -19,7 +20,7 @@ export class ReviewService implements IReviewService {
     try {
       const courseExists = await CourseModel.findById(courseId);
       if (!courseExists) {
-        throw new Error("Course not found");
+        throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
       }
 
       const existingReview = await this.reviewRepository.getUserReviewForCourse(
@@ -27,7 +28,7 @@ export class ReviewService implements IReviewService {
         courseId
       );
       if (existingReview) {
-        throw new Error("You have already reviewed this course");
+        throw new Error(ReviewErrorMessages.ALREADY_REVIEWED);
       }
 
       return await this.reviewRepository.create({

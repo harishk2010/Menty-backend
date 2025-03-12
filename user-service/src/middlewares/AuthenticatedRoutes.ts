@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { config } from 'dotenv';
 config();
 import { accessToken } from '../utils/jwt';
+import { StatusCode } from '@/utils/enums';
+import { AuthErrorMsg } from '@/utils/constants';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -24,7 +26,7 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
     const refreshToken = req.cookies['refreshToken'];
 
     if (!theAccessToken) {
-        return res.status(401).json({ failToken: true, message: 'No access token provided' });
+        return res.status(StatusCode.UNAUTHORIZED).json({ failToken: true, message: AuthErrorMsg.NO_ACCESS_TOKEN });
     }
 
     try {
@@ -35,10 +37,10 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
         req.user = accessPayload;
         return next();
     } catch (err: any) {
-        if (err.name === 'TokenExpiredError') {
+        if (err.name === AuthErrorMsg.TOKEN_EXPIRED_NAME) {
 
             if (!refreshToken) {
-                return res.status(401).json({ failToken: true, message: 'No refresh token provided' });
+                return res.status(StatusCode.UNAUTHORIZED).json({ failToken: true, message: AuthErrorMsg.NO_REFRESH_TOKEN });
             }
 
             // Verify Refresh Token
@@ -46,12 +48,12 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                 // const jwtt=new JwtService()
                 const refreshPayload = jwt.verify(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
                 if (!refreshPayload) {
-                    return res.status(401).json({ message: 'Invalid refresh token. Please log in.' });
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.INVALID_ACCESS_TOKEN });
                 }
 
                 const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
                 if (refreshPayload.exp && refreshPayload.exp < currentTime) {
-                    return res.status(401).json({ message: 'Session expired. Please log in again.' });
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.REFRESH_TOKEN_EXPIRED });
                 }
 
 
@@ -72,15 +74,15 @@ const authenticateToken = async (req: AuthenticatedRequest, res: Response, next:
                 req.user = refreshPayload;
                 return next();
             } catch (refreshErr: any) {
-                if (refreshErr.name === 'TokenExpiredError') {
-                    return res.status(401).json({ message: 'Session expired. Please log in again.' });
+                if (refreshErr.name === AuthErrorMsg.TOKEN_EXPIRED_NAME) {
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.REFRESH_TOKEN_EXPIRED });
                 }
 
-                return res.status(401).json({ message: 'Invalid refresh token. Please log in.' });
+                return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.INVALID_REFRESH_TOKEN });
             }
         }
 
-        return res.status(400).json({ message: 'Invalid access token. Please log in.' });
+        return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.INVALID_ACCESS_TOKEN });
     }
 };
 

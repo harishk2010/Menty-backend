@@ -2,18 +2,17 @@ import express, { Application ,Request ,Response ,NextFunction } from "express";
 import { config } from "dotenv";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 // import proxy from 'express-http-proxy'
 import morgan from  "morgan" 
 import logger from './logger/logger'
+import { GeneralServerErrorMsg } from "./utils/constants";
+import { StatusCode } from "./utils/enums";
 
 config();
 
 const app: Application = express();
 
 const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL,COURSE_URL,BOOKING_URL,CHAT_URL} = process.env;
-
-console.log("Environment Variables:", { PORT, FRONTEND_URL, AUTH_URL , USER_URL ,COURSE_URL ,NOTIFICATION_URL , ADMIN_URL,BOOKING_URL,});
 
 const corsOptions = {
     credentials: true,
@@ -70,7 +69,7 @@ app.use(
 // Setup proxies
 services.forEach(({ context, path }) => {
     if (!path || !context) {
-        console.error("Invalid service configuration:", { context, path });
+        console.error(GeneralServerErrorMsg.INVALID_SERVICE_CONFIG, { context, path });
         return;
     }
     app.use(
@@ -86,7 +85,12 @@ services.forEach(({ context, path }) => {
 app.use((err: Error, req:Request, res:Response, next:NextFunction) => {
     logger.error(`Error: ${err.message}`);
     console.error("Error:", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
 });
 
 app.listen(PORT, () => {

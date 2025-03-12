@@ -3,6 +3,7 @@ import { GenericRepository } from "../GenericRepository";
 import VerificationModel from "../../models/verificationModel";
 import { IVerificationRepository } from "../interfaces/IVerificationRepository";
 import { updateRequestType } from "../../types/types";
+import { InstructorErrorMessages, StudentErrorMessages, VerificationErrorMessages } from "@/utils/constants";
 
 export class VerificationRepository
   extends GenericRepository<IVerificationModel>
@@ -27,7 +28,7 @@ export class VerificationRepository
       });
       return response;
     } catch (error) {
-      throw new Error("Verify Request Document failed Creation");
+      throw error
     }
   }
 
@@ -39,13 +40,13 @@ export class VerificationRepository
       const user = await this.findOne({ email });
 
       if (!user) {
-        throw new Error("User not found");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       const userId = user._id as unknown as string;
       const response = await this.update(userId, { status });
       return response;
     } catch (error) {
-      throw new Error("Verify Request Document failed Creation");
+      throw error
     }
   }
 
@@ -57,14 +58,14 @@ export class VerificationRepository
       const user = await this.findOne({ email });
 
       if (!user) {
-        throw new Error("User not found");
+        throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       const userId = user._id as unknown as string;
 
       const response = await this.update(userId, data);
       return response;
     } catch (error) {
-      throw new Error("updateRequest Document failed Creation");
+      throw error
     }
   }
 }

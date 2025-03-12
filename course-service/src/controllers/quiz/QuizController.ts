@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { IQuizService } from "../../services/interfaces/IQuizService";
 import getId from "../../utils/getId";
 import { CourseModel } from "../../models/courseModel";
+import { QuizErrorMessages, QuizSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "@/utils/enums";
 
 export class QuizController {
   private quizService: IQuizService;
@@ -20,7 +22,7 @@ export class QuizController {
       const savedQuiz = await this.quizService.addQuiz(quizData);
       const courseData = await CourseModel.findById(quizData.courseId);
 
-      if (!courseData) throw new Error("No course found");
+      if (!courseData) throw new Error(QuizErrorMessages.NO_COURSE_FOUND);
 
       const updatedCourseData = {
         ...courseData.toObject(),
@@ -30,10 +32,10 @@ export class QuizController {
       await CourseModel.findOneAndUpdate(savedQuiz.courseId, updatedCourseData);
 
       res
-        .status(201)
+        .status(StatusCode.CREATED)
         .json({
           success: true,
-          message: "Quiz added successfully",
+          message: QuizSuccessMessages.QUIZ_ADDED,
           data: savedQuiz,
         });
     } catch (error) {
@@ -51,10 +53,10 @@ export class QuizController {
       const quizData = req.body;
       const updatedQuiz = await this.quizService.editQuiz(quizId, quizData);
       res
-        .status(200)
+        .status(StatusCode.OK)
         .json({
           success: true,
-          message: "Quiz updated successfully",
+          message: QuizSuccessMessages.QUIZ_UPDATED,
           data: updatedQuiz,
         });
     } catch (error) {
@@ -71,10 +73,10 @@ export class QuizController {
       const { quizId } = req.params;
       const quiz = await this.quizService.getQuiz(quizId);
       res
-        .status(200)
+        .status(StatusCode.OK)
         .json({
           success: true,
-          message: "Quiz fetched successfully",
+          message: QuizSuccessMessages.QUIZ_FETCHED,
           data: quiz,
         });
     } catch (error) {
@@ -92,7 +94,7 @@ export class QuizController {
       const { score, total } = req.body;
       const userId = await getId("accessToken", req);
       if (!userId) {
-        throw new Error("No user found");
+        throw new Error(QuizErrorMessages.INTERNAL_SERVER_ERROR);
       }
 
       const percentage = (score / total) * 100;
@@ -101,10 +103,10 @@ export class QuizController {
       if (isPass) {
         await this.quizService.markCourseAsCompleted(userId, courseId);
         res
-          .status(200)
-          .json({ success: true, message: "Course completed successfully!" });
+          .status(StatusCode.OK)
+          .json({ success: true, message: QuizSuccessMessages.COURSE_COMPLETED });
       } else {
-        res.status(200).json({ success: false, message: "Retry quiz!" });
+        res.status(200).json({ success: false, message: QuizSuccessMessages.RETRY_QUIZ });
       }
     } catch (error) {
       next(error);

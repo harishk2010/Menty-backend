@@ -10,6 +10,8 @@ import courseRoutes from "./routes/courseRoutes";
 import chapterRoutes from "./routes/chapterRoutes";
 import quizRoutes from "./routes/quizRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
+import { StatusCode } from "./utils/enums";
+import { GeneralServerErrorMsg } from "./utils/constants";
 
 config();
 
@@ -30,22 +32,34 @@ app.use("/course", courseRoutes);
 app.use("/chapter", chapterRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/review", reviewRoutes);
+
 consume();
+
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err.message);
 
-  res.status(500).json({ error: err.message||"Internal Server Error" });
+  res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
 });
-
 app.use((req, res, next) => {
   console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
   next();
 });
 
 const start = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
-  });
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(" Server startup failed:", error);
+    process.exit(1);
+  }
 };
+
 start();

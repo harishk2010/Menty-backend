@@ -16,7 +16,7 @@ export class InstructorServices implements IInstructorService {
       const response = await this.instructorRepository.create(payload);
       return response;
     } catch (error) {
-      console.error("Error in createInstructor:", error);
+      
       throw error;
     }
   }
@@ -42,7 +42,7 @@ export class InstructorServices implements IInstructorService {
       const response = await this.instructorRepository.findOne({ email });
       return response;
     } catch (error) {
-      console.error("Error in getInstructorData:", error);
+      
       throw error;
     }
   }
@@ -56,7 +56,7 @@ export class InstructorServices implements IInstructorService {
       });
       return response;
     } catch (error) {
-      console.error("Error in updatePlanPrice:", error);
+      
       throw error;
     }
   }
@@ -68,7 +68,7 @@ export class InstructorServices implements IInstructorService {
       const response = await this.instructorRepository.findById(instructorId);
       return response;
     } catch (error) {
-      console.error("Error in getInstructorDataById:", error);
+      
       throw error;
     }
   }
@@ -78,7 +78,7 @@ export class InstructorServices implements IInstructorService {
       const response = await this.instructorRepository.update(id, data);
       return response;
     } catch (error) {
-      console.error("Error in updateProfile:", error);
+      
       throw error;
     }
   }
@@ -99,7 +99,7 @@ export class InstructorServices implements IInstructorService {
 
       return result;
     } catch (error) {
-      console.error("Error in getTransactionsList service:", error);
+      
       throw error;
     }
   }
@@ -115,7 +115,7 @@ export class InstructorServices implements IInstructorService {
       );
       return response;
     } catch (error) {
-      console.error("Error in updatePassword:", error);
+     
       throw error;
     }
   }
@@ -128,7 +128,7 @@ export class InstructorServices implements IInstructorService {
       const response = await this.instructorRepository.findAll();
       return response;
     } catch (error) {
-      console.error("Error in getInstructors:", error);
+      
       throw error;
     }
   }

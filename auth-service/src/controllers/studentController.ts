@@ -7,6 +7,8 @@ import produce from "../config/kafka/producer";
 import IStudentServices from "../services/interfaces/IStudentServices";
 import IStudentControllers from "./interfaces/IStudentControllers";
 import IOtpServices from "../services/interfaces/IOtpService";
+import { InstructorErrorMessages, StudentErrorMessages, StudentSuccessMessages } from "../utils/constants";
+import { Roles, StatusCode } from "../utils/enums";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentServices;
@@ -37,7 +39,7 @@ export class StudentController implements IStudentControllers {
       if (ExistingStudent) {
         return res.json({
           success: false,
-          message: "Existing user",
+          message: StudentErrorMessages.USER_ALREADY_EXISTS,
           user: ExistingStudent,
         });
       } else {
@@ -50,12 +52,12 @@ export class StudentController implements IStudentControllers {
           email,
           password,
           username,
-          role: "student",
+          role: Roles.STUDENT,
         });
 
-        return res.status(201).json({
+        return res.status(StatusCode.CREATED).json({
           success: true,
-          message: "Signup successful, OTP sent to email",
+          message: StudentSuccessMessages.SIGNUP_SUCCESS,
           token,
         });
       }
@@ -77,9 +79,9 @@ export class StudentController implements IStudentControllers {
       await this.otpService.createOtp(email, otp),
         produce("send-otp-email", { name: username, email, otp });
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Otp Sent to Email Succesfully!",
+        message: StudentSuccessMessages.OTP_SENT,
       });
     } catch (error: any) {
       throw error;
@@ -96,7 +98,7 @@ export class StudentController implements IStudentControllers {
       }
       const decode = await this.JWT.verifyToken(token);
       if (!decode) {
-        return new Error("token has expired, register again");
+        return new Error(StudentErrorMessages.TOKEN_INVALID);
       }
       const resultOtp = await this.otpService.findOtp(decode.email);
       console.log(resultOtp?.otp, "<>", otp);
@@ -107,25 +109,20 @@ export class StudentController implements IStudentControllers {
           await produce("add-student", user);
           await this.otpService.deleteOtp(user.email);
 
-          return res.status(201).json({
+          return res.status(StatusCode.CREATED).json({
             success: true,
-            message: "User Created Succesfully!",
+            message: StudentSuccessMessages.USER_CREATED,
             user,
           });
         }
       } else {
         return res.json({
           success: false,
-          message: "Wrong Otp",
+          message: StudentErrorMessages.INCORRECT_OTP,
         });
       }
     } catch (error: any) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error
     }
   }
 
@@ -137,7 +134,7 @@ export class StudentController implements IStudentControllers {
       if (!student) {
         return res.json({
           success: false,
-          message: "Invalid email ID",
+          message: StudentErrorMessages.INVALID_CREDENTIALS,
         });
       }
 
@@ -146,14 +143,14 @@ export class StudentController implements IStudentControllers {
       if (!isPasswordValid) {
         return res.json({
           success: false,
-          message: "Invalid Password",
+          message: StudentErrorMessages.INVALID_CREDENTIALS,
         });
       }
 
       if (student.isBlocked) {
         return res.json({
           success: false,
-          message: "User Blocked",
+          message: StudentErrorMessages.INTERNAL_SERVER_ERROR,
         });
       }
 
@@ -186,7 +183,7 @@ export class StudentController implements IStudentControllers {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
-      res.status(200).send({ success: true, message: "logout success" });
+      res.status(StatusCode.OK).send({ success: true, message: StudentSuccessMessages.LOGOUT_SUCCESS });
     } catch (error: any) {
       throw error;
     }
@@ -202,13 +199,13 @@ export class StudentController implements IStudentControllers {
         produce("send-forgotPassword-email", { email, otp });
         res.send({
           success: true,
-          message: "Rediercting To OTP Page",
+          message: StudentSuccessMessages.REDIERCTING_OTP_PAGE,
           data: existingUser,
         });
       } else {
         res.send({
           success: false,
-          message: "No User Found",
+          message: StudentErrorMessages.USER_NOT_FOUND,
         });
       }
     } catch (error: any) {
@@ -223,14 +220,14 @@ export class StudentController implements IStudentControllers {
       console.log(resultOtp?.otp, "<>", otp);
       if (resultOtp?.otp === otp) {
         let token = await this.JWT.createToken({ email });
-        res.status(200).cookie("forgotToken", token).json({
+        res.status(StatusCode.OK).cookie("forgotToken", token).json({
           success: true,
-          message: "Redirecting to Reset Password Page",
+          message: StudentSuccessMessages.REDIERCTING_PASSWORD_RESET_PAGE,
         });
       } else {
         res.json({
           success: false,
-          message: "Otp didn't match",
+          message: InstructorErrorMessages.INCORRECT_OTP,
         });
       }
     } catch (error) {
@@ -247,17 +244,12 @@ export class StudentController implements IStudentControllers {
 
       produce("send-forgotPassword-email", { email, otp });
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Otp Sent to Email Succesfully!",
+        message: StudentSuccessMessages.OTP_SENT,
       });
     } catch (error: any) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error
     }
   }
 
@@ -268,7 +260,7 @@ export class StudentController implements IStudentControllers {
       const token = req.cookies.forgotToken;
       let data = await this.JWT.verifyToken(token);
       if (!data) {
-        throw new Error("Token expired retry reset password");
+        throw new Error(StudentErrorMessages.TOKEN_INVALID);
       }
 
       const passwordReset = await this.studentService.resetPassword(
@@ -278,9 +270,9 @@ export class StudentController implements IStudentControllers {
       if (passwordReset) {
         await produce("password-reset-student", passwordReset);
         res.clearCookie("forgotToken");
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Password changed !",
+          message: StudentSuccessMessages.PASSWORD_RESET,
         });
       }
     } catch (error) {
@@ -316,12 +308,12 @@ export class StudentController implements IStudentControllers {
           const refreshToken = await this.JWT.refreshToken({ email, role });
 
           res
-            .status(200)
+            .status(StatusCode.OK)
             .cookie("accessToken", accesstoken, { httpOnly: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true })
             .json({
               success: true,
-              message: "Logging in with GOOOOGLE",
+              message: StudentSuccessMessages.GOOGLE_LOGIN_SUCCESS,
               user: user,
             });
         }
@@ -338,16 +330,16 @@ export class StudentController implements IStudentControllers {
             .cookie("refreshToken", refreshToken, { httpOnly: true })
             .json({
               success: true,
-              message: "Logging in with GOOOOGLE",
+              message:StudentSuccessMessages.GOOGLE_LOGIN_SUCCESS,
               user: existingStudent,
             });
         } else {
           res
-            .status(200)
+            .status(StatusCode.OK)
 
             .json({
               success: false,
-              message: "User Blocked",
+              message: StudentErrorMessages.INTERNAL_SERVER_ERROR,
               user: existingStudent,
             });
         }

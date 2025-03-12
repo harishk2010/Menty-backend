@@ -3,6 +3,8 @@ import { IInstructorDashboardService } from "../../services/interfaces/IInstruct
 import { IInstructorDashboardController } from "../interfaces/IInstructorDashboardController";
 import getId from "../../utils/getId";
 import { IUser } from "../../models/userModel";
+import { InstructorDashboardResponses } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class InstructorDashboardController
   implements IInstructorDashboardController
@@ -26,9 +28,9 @@ export class InstructorDashboardController
           String(instructorId)
         );
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Instructor dashboard data retrieved successfully",
+        message: InstructorDashboardResponses.DASHBOARD_DATA_FETCHED,
         data: dashboardData,
       });
     } catch (error) {

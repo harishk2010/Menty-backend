@@ -1,109 +1,95 @@
-import jwt from "jsonwebtoken";
-import { NextFunction, Request, Response } from "express";
-import { config } from "dotenv";
-import { JwtService } from "../utils/jwt";
+
+import jwt from 'jsonwebtoken';
+import { NextFunction, Request, Response } from 'express';
+import { config } from 'dotenv';
+import { JwtService } from '../utils/jwt';
+import { AuthErrorMsg } from '../utils/constants';
+import { StatusCode } from '../utils/enums';
 
 config();
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 interface AuthenticatedRequest extends Request {
-  user?: {
-    user: string;
-    email: string;
-    role: string;
-    iat: number;
-    exp: number;
-  };
+    user?: {
+        user: string;
+        email:string;
+        role: string;
+        iat: number;
+        exp: number;
+    };
 }
 
-const authenticateToken = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
-  const accessToken = req.cookies["accessToken"];
-  const refreshToken = req.cookies["refreshToken"];
 
-  if (!accessToken) {
-    return res
-      .status(401)
-      .json({ failToken: true, message: "No access token provided" });
-  }
+const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
+  
+    const accessToken = req.cookies['accessToken'];
+    const refreshToken = req.cookies['refreshToken'];
 
-  try {
-    // Verify Access Token
-    const accessPayload = jwt.verify(
-      accessToken,
-      JWT_SECRET
-    ) as AuthenticatedRequest["user"];
+    
 
-    // If valid, attach payload to request and proceed
-    req.user = accessPayload;
-    return next();
-  } catch (err: any) {
-    if (err.name === "TokenExpiredError") {
-      if (!refreshToken) {
-        return res
-          .status(401)
-          .json({ failToken: true, message: "No refresh token provided" });
-      }
-
-      // Verify Refresh Token
-      try {
-        const refreshPayload = jwt.verify(
-          refreshToken,
-          JWT_SECRET
-        ) as AuthenticatedRequest["user"];
-        if (!refreshPayload) {
-          return res
-            .status(401)
-            .json({ message: "Invalid refresh token. Please log in." });
-        }
-
-        // Check if the refresh token is expired
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-        if (refreshPayload.exp && refreshPayload.exp < currentTime) {
-          console.log("Refresh token expired");
-          return res
-            .status(401)
-            .json({ message: "Session expired. Please log in again." });
-        }
-
-        // Generate a new Access Token
-        const jwtt = new JwtService();
-        const newAccessToken = await jwtt.accessToken({
-          email: refreshPayload.email,
-          role: refreshPayload.role,
-        });
-
-        // Set new Access Token in cookies
-        res.cookie("accessToken", newAccessToken, {
-          httpOnly: true,
-        });
-
-        req.cookies["accessToken"] = newAccessToken;
-
-        req.user = refreshPayload;
-        return next();
-      } catch (refreshErr: any) {
-        if (refreshErr.name === "TokenExpiredError") {
-          console.log("Refresh token expired");
-          return res
-            .status(401)
-            .json({ message: "Session expired. Please log in again." });
-        }
-
-        return res
-          .status(401)
-          .json({ message: "Invalid refresh token. Please log in." });
-      }
+    if (!accessToken) {
+        return res.status(StatusCode.UNAUTHORIZED).json({ failToken: true, message: AuthErrorMsg.NO_ACCESS_TOKEN  });
     }
 
-    return res
-      .status(401)
-      .json({ message: "Invalid access token. Please log in." });
-  }
+    try {
+        // Verify Access Token
+        const accessPayload = jwt.verify(accessToken, JWT_SECRET) as AuthenticatedRequest['user'];
+
+        // If valid, attach payload to request and proceed
+        req.user = accessPayload;
+        return next();
+    } catch (err: any) {
+        if (err.name === AuthErrorMsg.TOKEN_EXPIRED_NAME) {
+
+            if (!refreshToken) {
+                return res.status(StatusCode.UNAUTHORIZED).json({ failToken: true, message: AuthErrorMsg.NO_REFRESH_TOKEN });
+            }
+
+            // Verify Refresh Token
+            try {
+                const refreshPayload = jwt.verify(refreshToken, JWT_SECRET) as AuthenticatedRequest['user'];
+                if (!refreshPayload) {
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.INVALID_REFRESH_TOKEN });
+                }
+
+                // Check if the refresh token is expired
+                const currentTime = Math.floor(Date.now() / 1000); 
+                if (refreshPayload.exp && refreshPayload.exp < currentTime) {
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.REFRESH_TOKEN_EXPIRED });
+                }
+
+
+                // Generate a new Access Token
+                const jwtt=new JwtService()
+                const newAccessToken =await jwtt.accessToken(
+                    {email:refreshPayload.email, role: refreshPayload.role },
+                   
+                );
+
+                res.cookie('accessToken', newAccessToken, {
+                    httpOnly: true,
+                  
+                });
+
+                
+                req.cookies['accessToken'] = newAccessToken;
+
+               
+                req.user = refreshPayload;
+                return next();
+            } catch (refreshErr: any) {
+                if (refreshErr.name === AuthErrorMsg.TOKEN_EXPIRED_NAME) {
+                    return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.REFRESH_TOKEN_EXPIRED });
+                }
+
+                return res.status(StatusCode.UNAUTHORIZED).json({ message: AuthErrorMsg.INVALID_ACCESS_TOKEN });
+            }
+        }
+
+        return res.status(StatusCode.BAD_REQUEST).json({ message: AuthErrorMsg.INVALID_ACCESS_TOKEN });
+    }
 };
 
 export default authenticateToken;
+// export default authenticateToken;

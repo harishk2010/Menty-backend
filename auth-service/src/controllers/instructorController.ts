@@ -7,6 +7,11 @@ import produce from "../config/kafka/producer";
 import IInstructorControllers from "../services/interfaces/IInstructorController";
 import IInstructorServices from "../services/interfaces/IIntstuctorServices";
 import IOtpServices from "../services/interfaces/IOtpService";
+import {
+  InstructorErrorMessages,
+  InstructorSuccessMessages,
+} from "../utils/constants";
+import { Roles, StatusCode } from "../utils/enums";
 // import  from '../utils/jwt'
 
 export class InstructorController implements IInstructorControllers {
@@ -41,7 +46,7 @@ export class InstructorController implements IInstructorControllers {
       if (ExistingInstructor) {
         res.json({
           success: false,
-          message: "Existing user",
+          message: InstructorErrorMessages.USER_ALREADY_EXISTS,
           user: ExistingInstructor,
         });
         return;
@@ -56,23 +61,18 @@ export class InstructorController implements IInstructorControllers {
           email,
           password,
           username,
-          role: "instructor",
+          role: Roles.INSTRUCTOR,
         });
 
-        res.status(201).json({
+        res.status(StatusCode.CREATED).json({
           success: true,
-          message: "Signup successful, OTP sent to email",
+          message: InstructorSuccessMessages.SIGNUP_SUCCESS,
           token,
         });
         return;
       }
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error;
     }
   }
 
@@ -86,9 +86,9 @@ export class InstructorController implements IInstructorControllers {
 
         produce("send-otp-email", { name: username, email, otp }),
       ]);
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Otp Sent to Email Succesfully!",
+        message: InstructorSuccessMessages.OTP_SENT,
       });
     } catch (error: any) {
       throw error;
@@ -107,7 +107,7 @@ export class InstructorController implements IInstructorControllers {
       const decode = await this.JWT.verifyToken(token);
 
       if (!decode) {
-        throw new Error("token has expired, register again");
+        throw new Error(InstructorErrorMessages.TOKEN_INVALID);
       }
       const resultOtp = await this.otpService.findOtp(decode.email);
       console.log(resultOtp?.otp, "<>", otp);
@@ -117,9 +117,9 @@ export class InstructorController implements IInstructorControllers {
           await produce("add-instructor-data", user);
           await this.otpService.deleteOtp(user.email);
 
-          res.status(201).json({
+          res.status(StatusCode.CREATED).json({
             success: true,
-            message: "User Created Succesfully!",
+            message: InstructorSuccessMessages.USER_CREATED,
             user,
           });
           return;
@@ -127,17 +127,12 @@ export class InstructorController implements IInstructorControllers {
       } else {
         res.json({
           success: false,
-          message: "Wrong Otp",
+          message: InstructorErrorMessages.INCORRECT_OTP,
         });
         return;
       }
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error;
     }
   }
 
@@ -151,7 +146,7 @@ export class InstructorController implements IInstructorControllers {
       if (!instructor) {
         res.json({
           success: false,
-          message: "invalid email id",
+          message: InstructorErrorMessages.USER_NOT_FOUND,
         });
         return;
       }
@@ -164,14 +159,14 @@ export class InstructorController implements IInstructorControllers {
       if (!isPasswordValid) {
         res.json({
           success: false,
-          message: "Invalid Password",
+          message: InstructorErrorMessages.INVALID_CREDENTIALS,
         });
         return;
       }
       if (instructor.isBlocked) {
         res.json({
           success: false,
-          message: "instructor Blocked",
+          message: InstructorErrorMessages.INTERNAL_SERVER_ERROR,
         });
         return;
       }
@@ -182,23 +177,18 @@ export class InstructorController implements IInstructorControllers {
       const refreshToken = await this.JWT.refreshToken({ email, role, id });
 
       res
-        .status(200)
+        .status(StatusCode.OK)
         .cookie("accessToken", accesstoken, { httpOnly: true })
         .cookie("refreshToken", refreshToken, { httpOnly: true })
 
         .send({
           success: true,
-          message: "User Logged Successfully",
+          message: InstructorSuccessMessages.LOGIN_SUCCESS,
           user: instructor,
           token: { accesstoken, refreshToken },
         });
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error;
     }
   }
 
@@ -207,7 +197,12 @@ export class InstructorController implements IInstructorControllers {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
-      res.status(200).send({ success: true, message: "logout success" });
+      res
+        .status(StatusCode.OK)
+        .send({
+          success: true,
+          message: InstructorSuccessMessages.LOGOUT_SUCCESS,
+        });
     } catch (error: any) {
       throw error;
     }
@@ -224,13 +219,13 @@ export class InstructorController implements IInstructorControllers {
         produce("send-forgotPassword-email", { email, otp });
         res.send({
           success: true,
-          message: "Rediercting To OTP Page",
+          message: InstructorSuccessMessages.REDIERCTING_OTP_PAGE,
           data: existingUser,
         });
       } else {
         res.send({
           success: false,
-          message: "No User Found",
+          message: InstructorErrorMessages.USER_NOT_FOUND,
         });
       }
     } catch (error: any) {
@@ -245,14 +240,14 @@ export class InstructorController implements IInstructorControllers {
       console.log(resultOtp?.otp, "<>", otp);
       if (resultOtp?.otp === otp) {
         let token = await this.JWT.createToken({ email });
-        res.status(200).cookie("forgotToken", token).json({
+        res.status(StatusCode.OK).cookie("forgotToken", token).json({
           success: true,
-          message: "Redirecting to Reset Password Page",
+          message: InstructorSuccessMessages.REDIERCTING_PASSWORD_RESET_PAGE,
         });
       } else {
         res.json({
           success: false,
-          message: "Otp didn't match",
+          message: InstructorErrorMessages.INCORRECT_OTP,
         });
       }
     } catch (error) {
@@ -269,17 +264,12 @@ export class InstructorController implements IInstructorControllers {
 
       produce("send-forgotPassword-email", { email, otp });
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Otp Sent to Email Succesfully!",
+        message: InstructorSuccessMessages.OTP_SENT,
       });
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      throw error;
     }
   }
 
@@ -291,7 +281,7 @@ export class InstructorController implements IInstructorControllers {
       const token = req.cookies.forgotToken;
       let data = await this.JWT.verifyToken(token);
       if (!data) {
-        throw new Error("Token expired retry reset password");
+        throw new Error(InstructorErrorMessages.TOKEN_INVALID);
       }
 
       const passwordReset = await this.instructorService.resetPassword(
@@ -300,9 +290,9 @@ export class InstructorController implements IInstructorControllers {
       );
       if (passwordReset) {
         res.clearCookie("forgotToken");
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Password changed !",
+          message: InstructorSuccessMessages.PASSWORD_RESET,
         });
       }
     } catch (error) {
@@ -351,12 +341,12 @@ export class InstructorController implements IInstructorControllers {
           const refreshToken = await this.JWT.refreshToken({ email, role, id });
 
           res
-            .status(200)
+            .status(StatusCode.OK)
             .cookie("accessToken", accesstoken, { httpOnly: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true })
             .json({
               success: true,
-              message: "Logging in with GOOOOGLE",
+              message: InstructorSuccessMessages.GOOGLE_LOGIN_SUCCESS,
               user: user,
             });
         }
@@ -368,21 +358,21 @@ export class InstructorController implements IInstructorControllers {
           const refreshToken = await this.JWT.refreshToken({ id, email, role });
 
           res
-            .status(200)
+            .status(StatusCode.OK)
             .cookie("accessToken", accesstoken, { httpOnly: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true })
             .json({
               success: true,
-              message: "Logging in with GOOOOGLE",
+              message: InstructorSuccessMessages.GOOGLE_LOGIN_SUCCESS,
               user: ExistingInstructor,
             });
         } else {
           res
-            .status(200)
+            .status(StatusCode.CONFLICT)
 
             .json({
               success: false,
-              message: "User Blocked",
+              message: InstructorErrorMessages.INTERNAL_SERVER_ERROR,
               user: ExistingInstructor,
             });
         }

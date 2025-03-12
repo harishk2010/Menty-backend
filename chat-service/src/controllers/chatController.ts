@@ -3,8 +3,9 @@ import { IChatController } from "./interfaces/IChatController";
 import { IChatService } from "../services/interfaces/IChatService";
 import upload from "../utils/multer";
 import { BookingModel, IBooking } from "../models/bookingModel";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { generateSignedUrl } from "../utils/signedUrlGenerator";
+import { StatusCode } from "../utils/enums";
+import { ChatErrorMessages, ChatSuccessMessages, GeneralServerErrorMsg } from "../utils/constants";
 
 export class ChatController implements IChatController {
   private chatService: IChatService;
@@ -22,9 +23,9 @@ export class ChatController implements IChatController {
         studentId,
         instructorId
       );
-      res.status(201).json(chat);
+      res.status(StatusCode.OK).json(chat);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create chat" });
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR });
       throw error;
     }
   }
@@ -35,13 +36,13 @@ export class ChatController implements IChatController {
       const chat = await this.chatService.getChat(bookingId);
 
       if (!chat) {
-        res.status(404).json({ error: "Chat not found" });
+        res.status(StatusCode.NOT_FOUND).json({ error: ChatErrorMessages.CHAT_NOT_FOUND });
         return;
       }
 
-      res.status(200).json(chat);
+      res.status(StatusCode.OK).json(chat);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch chat" });
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: ChatErrorMessages.CHAT_FETCH_FAILED });
       throw error;
     }
   }
@@ -66,9 +67,9 @@ export class ChatController implements IChatController {
         })
       );
 
-      res.status(200).json(signedImageMessage);
+      res.status(StatusCode.OK).json(signedImageMessage);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch chat history" });
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: ChatErrorMessages.CHAT_HISTORY_FETCH_FAILED });
       throw error;
     }
   }
@@ -79,36 +80,36 @@ export class ChatController implements IChatController {
     uploadSingle(req, res, async (err: any) => {
 
       if (err) {
-        console.error("Upload error:", err);
+        console.error(ChatErrorMessages.IMAGE_UPLOAD_FAILED, err);
         res
-          .status(400)
-          .json({ error: "Image upload failed", details: err.message });
+          .status(StatusCode.BAD_REQUEST)
+          .json({ error: ChatErrorMessages.IMAGE_UPLOAD_FAILED, details: err.message });
         return;
       }
 
       try {
         const file = req.file as Express.Multer.File & { key: string };
         if (!file) {
-          res.status(400).json({ error: "No file uploaded" });
+          res.status(StatusCode.BAD_REQUEST).json({ error: ChatErrorMessages.FILE_NOT_UPLOADED });
           return;
         }
 
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           imageUrl: file.key,
-          message: "Image uploaded successfully",
+          message: ChatSuccessMessages.IMAGE_UPLOADED,
         });
       } catch (error) {
-        console.error("Image processing error:", error);
-        res.status(500).json({ error: "Image processing failed" });
+        console.error(ChatErrorMessages.IMAGE_PROCESSING_FAILED, error);
+        res.status(500).json({ error: ChatErrorMessages.IMAGE_PROCESSING_FAILED });
       }
     });
   }
   async addBooking(data: IBooking): Promise<void> {
     try {
-      const booking = await BookingModel.create(data);
+      await BookingModel.create(data);
 
     } catch (error) {
-      console.error("Image processing error:", error);
+      console.error(ChatErrorMessages.CREATE_BOOKING_FAILED, error);
     }
   }
 }

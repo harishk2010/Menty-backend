@@ -9,6 +9,7 @@ import {
 } from "../../models/purchasedModel";
 import { QuizModel } from "../../models/quizModel";
 import { Paginatedcourses } from "../../Types/updateRequestType";
+import { CourseErrorMessages } from "@/utils/constants";
 
 export class CourseRepository
   extends GenericRepository<ICourse>
@@ -76,7 +77,7 @@ export class CourseRepository
         total,
       };
     } catch (error) {
-      console.error("Error in getInstructorCoursesList repository:", error);
+      
       throw error;
     }
   }
@@ -167,7 +168,7 @@ export class CourseRepository
   ): Promise<IPurchasedCourse | null> {
     try {
       const courseDetails = await this.findById(courseId);
-      if (!courseDetails) throw new Error("Course not found");
+      if (!courseDetails) throw new Error(CourseErrorMessages.COURSE_NOT_FOUND);
 
       const boughtCourse = await PurchasedCourseModel.findOneAndUpdate(
         { userId, courseId },
@@ -230,7 +231,7 @@ export class CourseRepository
         (chapter) => chapter.chapterId.toString() === chapterId
       );
 
-      if (chapterIndex === -1) throw new Error("Chapter Not Found");
+      if (chapterIndex === -1) throw new Error(CourseErrorMessages.CHAPTERS_NOT_FOUND);
 
       findChapter.completedChapters[chapterIndex].isCompleted = true;
       const updatedChapters = await findChapter.save();
@@ -245,7 +246,7 @@ export class CourseRepository
     courseId: string
   ): Promise<IPurchasedCourse | null> {
     try {
-      if (!courseId) throw new Error("Purchased courseId not Found");
+      if (!courseId) throw new Error(CourseErrorMessages.COURSE_ID_NOT_FOUND);
       const course = await PurchasedCourseModel.findById(courseId);
       return course;
     } catch (error) {
@@ -255,7 +256,7 @@ export class CourseRepository
 
   async deleteCourseById(courseId: string): Promise<ICourse | null> {
     try {
-      if (!courseId) throw new Error("Purchased courseId not Found");
+      if (!courseId) throw new Error(CourseErrorMessages.COURSE_ID_NOT_FOUND);
       const course = await CourseModel.findById(courseId);
       if (course?.quizId) {
         await QuizModel.findOneAndDelete({ courseId: course._id });

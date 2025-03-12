@@ -1,8 +1,10 @@
-import express, { Application } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import cors from "cors";
 import consume from "./config/kafka/consumer";
+import { StatusCode } from "./utils/enums";
+import { GeneralServerErrorMsg } from "./utils/constants";
 config();
 
 let app: Application = express();
@@ -22,11 +24,18 @@ app.use((req, res, next) => {
   console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
   next();
 });
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Error:", err.message);
+
+  res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
+});
 
 consume();
-app.get("/", (req, res) => {
-  res.json("notificatin service is running ");
-});
 
 app.listen(PORT, () => {
   console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);

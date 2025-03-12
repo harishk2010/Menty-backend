@@ -9,19 +9,8 @@ export class AdminDashboardService implements IAdminDashboardService {
     this.adminDashboardRepository = adminDashboardRepository;
   }
 
-  async getDashboardData(): Promise<AdminDashboardData> {
-    try {
-      const dashboardData =
-        await this.adminDashboardRepository.getDashboardData();
-
-      if (!dashboardData) {
-        throw new Error("Failed to generate dashboard data");
-      }
-
-      return dashboardData;
-    } catch (error) {
-      console.error("Error in AdminDashboardService.getDashboardData:", error);
-      throw new Error("Unable to fetch dashboard data");
-    }
+  async getDashboardData(): Promise<AdminDashboardData | null> {
+      return this.adminDashboardRepository.getDashboardData();
+    
   }
 }

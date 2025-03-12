@@ -1,3 +1,4 @@
+import { StudentErrorMessages } from "../utils/constants";
 import UserModel, { IStudentDTO } from "../models/userModel";
 import { IUser } from "../models/userModel";
 import { GenericRepository } from "./GenericRepository";
@@ -23,7 +24,7 @@ export class StudentRepository
     try {
       const student = await this.findOne({ email });
       if (!student) {
-        throw new Error("No Student data found");
+        throw new Error(StudentErrorMessages.USER_NOT_FOUND);
       }
       const studentId = student._id as unknown as string;
 

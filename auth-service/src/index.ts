@@ -7,7 +7,6 @@ import instructorRoutes from "./routes/instructorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import consume from "./config/kafka/consumer";
-import { errorMiddleware } from "./middlewares/errorMiddleware";
 
 config()
 
@@ -25,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(errorMiddleware);
+
 
 app.use((req, res, next) => {
     console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);

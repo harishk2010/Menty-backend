@@ -3,6 +3,8 @@ import IBookingController from "../interfaces/IBookingController";
 import IBookingService from "../../services/interfaces/IBookingService";
 
 import produce from "../../config/kafka/producer";
+import { BookingErrorMessages, BookingSuccessMessages, UserErrorMsg } from "@/utils/constants";
+import { StatusCode } from "@/utils/enums";
 
 export class BookingController implements IBookingController {
   private bookingService: IBookingService;
@@ -48,8 +50,8 @@ export class BookingController implements IBookingController {
         produce("add-booking", booking);
       }
       res
-        .status(201)
-        .json({ success: true, message: "booked!", data: booking });
+        .status(StatusCode.CREATED)
+        .json({ success: true, message: BookingSuccessMessages.SLOT_BOOKED, data: booking });
     } catch (error) {
       throw error;
     }
@@ -70,9 +72,9 @@ export class BookingController implements IBookingController {
         studentId
       );
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "fetched student Slots",
+          message: BookingSuccessMessages.STUDENT_BOOKINGS_FETCHED,
           data: response,
         });
       }
@@ -88,16 +90,16 @@ export class BookingController implements IBookingController {
     try {
       const { instructorId } = req.params;
       if (!instructorId) {
-        throw new Error("No user found!");
+        throw new Error(UserErrorMsg.NO_USER);
       }
 
       const response = await this.bookingService.getBookingsByInstructorId(
         instructorId
       );
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "fetched student Slots",
+          message: BookingSuccessMessages.BOOKING_DETAILS_FETCHED,
           data: response,
         });
       }
@@ -114,14 +116,14 @@ export class BookingController implements IBookingController {
     try {
       const { bookingId } = req.params;
       if (!bookingId) {
-        throw new Error("No bookingId found!");
+        throw new Error(BookingErrorMessages.BOOKING_NOT_FOUND);
       }
 
       const response = await this.bookingService.getBookindDataById(bookingId);
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "fetched bookingData",
+          message: BookingSuccessMessages.BOOKING_DETAILS_FETCHED,
           data: response,
         });
       }

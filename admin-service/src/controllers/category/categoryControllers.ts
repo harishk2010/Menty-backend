@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ICategoryControllers } from "../interfaces/ICategoryContollers";
 import { ICategoryService } from "../../services/interfaces/ICategoryService";
+import { CategoryErrorMsg, CategorySuccessMsg, GeneralServerErrorMsg } from "@/utils/constants";
+import { StatusCode } from "@/utils/enums";
 
 export class CategoryContoller implements ICategoryControllers {
   private categoryService: ICategoryService;
@@ -20,8 +22,8 @@ export class CategoryContoller implements ICategoryControllers {
       );
       if (existingCategory) {
         res
-          .status(409)
-          .send({ success: false, message: "Category already exists" });
+          .status(StatusCode.CONFLICT)
+          .send({ success: false, message: CategoryErrorMsg.CATEGORY_EXISTS });
         return;
       }
 
@@ -30,16 +32,16 @@ export class CategoryContoller implements ICategoryControllers {
       );
       if (createdCategory) {
         res
-          .status(201)
+          .status(StatusCode.CREATED)
           .send({
             success: true,
-            message: "Category added successfully!",
+            message: CategorySuccessMsg.CATEGORY_ADDED,
             data: createdCategory,
           });
       } else {
         res
-          .status(500)
-          .send({ success: false, message: "Could not create category!" });
+          .status(StatusCode.INTERNAL_SERVER_ERROR)
+          .send({ success: false, message: CategoryErrorMsg.CATEGORY_NOT_CREATED });
       }
     } catch (error) {
       next(error);
@@ -58,8 +60,8 @@ export class CategoryContoller implements ICategoryControllers {
       );
       if (existingCategory) {
         res
-          .status(409)
-          .send({ success: false, message: "Category already exists" });
+          .status(StatusCode.CONFLICT)
+          .send({ success: false, message: CategoryErrorMsg.CATEGORY_EXISTS });
         return;
       }
 
@@ -69,16 +71,16 @@ export class CategoryContoller implements ICategoryControllers {
       );
       if (updatedCategory) {
         res
-          .status(200)
+          .status(StatusCode.OK)
           .send({
             success: true,
-            message: "Category updated",
+            message: CategorySuccessMsg.CATEGORY_UPDATED,
             data: updatedCategory,
           });
       } else {
         res
-          .status(500)
-          .send({ success: false, message: "Category not updated" });
+          .status(StatusCode.INTERNAL_SERVER_ERROR)
+          .send({ success: false, message: CategoryErrorMsg.CATEGORY_NOT_UPDATED });
       }
     } catch (error) {
       next(error);
@@ -93,10 +95,10 @@ export class CategoryContoller implements ICategoryControllers {
     try {
       const categories = await this.categoryService.getAllCategory();
       res
-        .status(200)
+        .status(StatusCode.OK)
         .send({
           success: true,
-          message: "Fetched categories",
+          message: CategorySuccessMsg.CATEGORY_FETCHED,
           data: categories,
         });
     } catch (error) {
@@ -113,12 +115,12 @@ export class CategoryContoller implements ICategoryControllers {
       const { id } = req.params;
       const response = await this.categoryService.listOrUnlistCategory(id);
 
-      if (!response) throw new Error("Internal server error");
+      if (!response) throw new Error(GeneralServerErrorMsg.INTERNAL_SERVER_ERROR);
 
       const message = response.isListed
-        ? `Listed ${response.categoryName}`
-        : `Unlisted ${response.categoryName}`;
-      res.status(200).send({ success: true, message, data: response });
+        ? CategorySuccessMsg.CATEGORY_LISTED
+        : CategorySuccessMsg.CATEGORY_UNLISTED;
+      res.status(StatusCode.OK).send({ success: true, message, data: response });
     } catch (error) {
       next(error);
     }
@@ -133,12 +135,9 @@ export class CategoryContoller implements ICategoryControllers {
       const { categoryId } = req.params;
       const response = await this.categoryService.findCategoryById(categoryId);
 
-      if (!response) throw new Error("Internal server error");
+      if (!response) throw new Error(GeneralServerErrorMsg.INTERNAL_SERVER_ERROR);
 
-      const message = response.isListed
-        ? `Listed ${response.categoryName}`
-        : `Unlisted ${response.categoryName}`;
-      res.status(200).send({ success: true, message, data: response });
+      res.status(StatusCode.OK).send({ success: true, message:CategorySuccessMsg.CATEGORY_FETCHED, data: response });
     } catch (error) {
       next(error);
     }

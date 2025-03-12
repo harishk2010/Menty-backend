@@ -26,7 +26,7 @@ export class NotificationControllers implements INotificationControllers {
     try {
       const { email, otp } = data;
       await this.sendForgotPasswordEmail.sendEmailVerification(email, otp);
-      console.log("Forgot OTP email has been sent");
+    
     } catch (error) {
       throw error
     }
@@ -35,7 +35,7 @@ export class NotificationControllers implements INotificationControllers {
     try {
       const { email,username } = data;
       await this.sendVerifiedEmail.sentEmailVerification(username,email);
-      console.log("Forgot OTP email has been sent");
+     
     } catch (error) {
       throw error
     }

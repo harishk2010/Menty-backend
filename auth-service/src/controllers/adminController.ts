@@ -4,6 +4,8 @@ import { IAdminControllers } from "./interfaces/IAdminControllers";
 import IAdminService from "../services/interfaces/IAdminService";
 import { config } from "dotenv";
 import produce from "../config/kafka/producer";
+import { AdminErrorMessages, AdminSuccessMessages, GeneralServerErrorMsg, MongoDB } from "../utils/constants";
+import { Roles, StatusCode } from "../utils/enums";
 config();
 
 export class AdminController implements IAdminControllers {
@@ -22,10 +24,10 @@ export class AdminController implements IAdminControllers {
 
       // Check credentials in one conditional block
       if (email !== adminEmail || password !== adminPassword) {
-        console.log("error")
+       
         res.send({
           success: false,
-          message: email !== adminEmail ? "Email Wrong" : "Password Wrong",
+          message: email !== adminEmail ? AdminErrorMessages.EMAIL_INCORRECT :AdminErrorMessages.PASSWORD_INCORRECT,
         });
         return;
       }
@@ -38,17 +40,17 @@ export class AdminController implements IAdminControllers {
           admin && produce("create-admin-data", admin);
         }
       } catch (dbError) {
-        console.error("Database error:", dbError);
-        res.status(500).send({
+        console.error(MongoDB.ERROR, dbError);
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send({
           success: false,
-          message: "Error processing admin data",
+          message: AdminErrorMessages.ADMIN_DATA_ERROR,
         });
         return;
       }
 
       const accessToken = await this.JWT.accessToken({
         email,
-        role: "admin",
+        role: Roles.ADMIN,
         id: admin?._id,
       });
 
@@ -58,22 +60,22 @@ export class AdminController implements IAdminControllers {
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
         })
-        .status(200)
+        .status(StatusCode.OK)
         .send({
           success: true,
-          message: "Welcome Admin",
+          message: AdminSuccessMessages.LOGIN_SUCCESS,
           data: {
             email,
-            role: "admin",
-            name: "admin",
+            role: Roles.ADMIN,
+            name: Roles.ADMIN,
             adminId: admin?._id,
           },
         });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).send({
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).send({
         success: false,
-        message: "Internal server error",
+        message: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -82,7 +84,7 @@ export class AdminController implements IAdminControllers {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
-      res.status(200).send({ success: true, message: "logout success" });
+      res.status(StatusCode.OK).send({ success: true, message: AdminSuccessMessages.LOGOUT_SUCCESS });
     } catch (error: any) {
       throw error;
     }

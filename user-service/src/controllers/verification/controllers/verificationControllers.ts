@@ -4,6 +4,8 @@ import { uploadToS3Bucket } from "../../../utils/s3Bucket";
 import { IVerificationService } from "../../../services/interfaces/IVerificationService";
 import produce from "../../../config/kafka/producer";
 import { instructorController } from "../../../config/dependencyInjector";
+import { VerificationErrorMessages, VerificationSuccessMessages } from "@/utils/constants";
+import { StatusCode, VerifiedStatus } from "@/utils/enums";
 
 export class VerificationContoller implements IVerificationControllers {
   private verificationService: IVerificationService;
@@ -16,7 +18,7 @@ export class VerificationContoller implements IVerificationControllers {
     try {
       const { username, email } = req.body;
       if (!req.files || typeof req.files !== "object") {
-        throw new Error("No documents received");
+        throw new Error(VerificationErrorMessages.DOCUMENTS_MISSING);
       }
 
       // Cast `req.files` to the expected shape
@@ -47,19 +49,19 @@ export class VerificationContoller implements IVerificationControllers {
 
         await instructorController.updateVerifyStatus({ emailID, status });
 
-        res.status(200).send({
+        res.status(StatusCode.OK).send({
           success: true,
-          message: "Verification Request Sent",
+          message: VerificationSuccessMessages.VERIFICATION_REQUEST_SENT,
           data: response,
         });
       } else {
-        res.status(400).send({
+        res.status(StatusCode.BAD_REQUEST).send({
           success: false,
-          message: "No Documents",
+          message: VerificationErrorMessages.NO_DOCUMENTS_RECEIVED,
         });
       }
     } catch (error) {
-      throw new Error("Verify Request Document failed Creation at controller");
+      throw error
     }
   }
   async reVerifyRequest(req: Request, res: Response): Promise<void> {
@@ -98,7 +100,7 @@ export class VerificationContoller implements IVerificationControllers {
 
       await Promise.all(uploadPromises);
 
-      const status = "pending";
+      const status = VerifiedStatus.PENDING;
 
       const response = await this.verificationService.updateRequest(email, {
         username,
@@ -111,24 +113,20 @@ export class VerificationContoller implements IVerificationControllers {
         const emailID = response.email;
         await instructorController.updateVerifyStatus({ emailID, status });
 
-        res.status(200).send({
+        res.status(StatusCode.OK).send({
           success: true,
-          message: "Re-Verify Request Sent!",
+          message: VerificationSuccessMessages.REVERIFICATION_REQUEST_SENT,
           data: response,
         });
       } else {
-        res.status(500).send({
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send({
           success: false,
-          message: "Failed to process verification request",
+          message: VerificationErrorMessages.REVERIFICATION_REQUEST_FAILED,
         });
       }
-    } catch (error: any) {
-      console.error("Error in reVerifyRequest:", error);
-      res.status(500).send({
-        success: false,
-        message: "Verify Request Document failed Creation at controller",
-        error: error.message,
-      });
+    } catch (error) {
+     
+      throw error
     }
   }
 
@@ -137,26 +135,26 @@ export class VerificationContoller implements IVerificationControllers {
       const { email } = req.params;
       const requestData = await this.verificationService.getRequestData(email);
       if (requestData) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           data: requestData,
         });
       } else {
         res.json(requestData);
       }
     } catch (error) {
-      throw new Error("Error ");
+      throw error
     }
   }
   async getAllRequests(req: Request, res: Response): Promise<void> {
     try {
       const requestData = await this.verificationService.getAllRequests();
       if (requestData) {
-        res.status(200).json(requestData);
+        res.status(StatusCode.OK).json(requestData);
       } else {
         res.json(requestData);
       }
     } catch (error) {
-      throw new Error("Error ");
+      throw error
     }
   }
 
@@ -173,21 +171,21 @@ export class VerificationContoller implements IVerificationControllers {
           emailID: email,
           status: approvedRequest.status,
         });
-        if (approvedRequest.status == "approved") {
+        if (approvedRequest.status == VerifiedStatus.APPROVED) {
           let email = approvedRequest.email;
           let username = approvedRequest.username;
 
           produce("verified-Instructor-email", { email, username });
 
-          res.status(200).json({
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "Verified Instructor",
+            message: VerificationSuccessMessages.INSTRUCTOR_VERIFIED,
             data: approvedRequest,
           });
-        } else if (approvedRequest.status === "rejected") {
-          res.status(200).json({
+        } else if (approvedRequest.status === VerifiedStatus.REJECTED) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "Rejected Instructor",
+            message: VerificationSuccessMessages.REQUEST_REJECTED,
             data: approvedRequest,
           });
         }
@@ -195,7 +193,7 @@ export class VerificationContoller implements IVerificationControllers {
         res.json(approvedRequest);
       }
     } catch (error) {
-      throw new Error("Error in controller ");
+      throw error
     }
   }
 }

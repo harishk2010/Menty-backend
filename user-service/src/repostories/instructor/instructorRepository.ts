@@ -68,7 +68,7 @@ export class InstructorRepository
         total,
       };
     } catch (error) {
-      console.error("Error in getTransactionsList repository:", error);
+      
       throw error;
     }
   }
@@ -166,7 +166,7 @@ export class InstructorRepository
       );
       return response;
     } catch (error) {
-      console.error("Error in updatePassword:", error);
+      
       throw error;
     }
   }

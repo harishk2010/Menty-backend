@@ -4,6 +4,8 @@ import IAdminService from "../../services/interfaces/IAdminService";
 import { config } from "dotenv";
 import { adminWallet } from "../../Types/types";
 import { IAdmin } from "../../models/adminModel";
+import { AdminErrorMsg, AdminSuccessMsg } from "../../utils/constants";
+import { StatusCode, TransactionType } from "../../utils/enums";
 config();
 
 export class AdminController implements IAdminControllers {
@@ -19,21 +21,20 @@ export class AdminController implements IAdminControllers {
 
       const adminDetails = await this.adminService.getAdminData(email);
       if (!adminDetails) {
-        res.status(500).json({
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "No adminData Found!",
+          message: AdminSuccessMsg.ADMIN_DATA_FOUND,
         });
         return;
       } else {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "No adminData Found!",
+          message: AdminErrorMsg.NO_ADMIN_DATA,
           data: adminDetails,
         });
         return;
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -46,11 +47,11 @@ export class AdminController implements IAdminControllers {
       const adminDetails = await this.adminService.getAdminData(String(email));
 
       if (!adminDetails) {
-        throw new Error("No admin details not found");
+        throw new Error(AdminErrorMsg.NO_ADMIN_DATA);
       }
       const transactions = adminDetails?.wallet.transactions ?? [];
       let walletDetails;
-      if (type === "debit") {
+      if (type ===TransactionType.DEBITED) {
         walletDetails = {
           balance: Number(adminDetails?.wallet.balance) - Number(amount),
           transactions: [...transactions, { amount, description, txnid, type }],

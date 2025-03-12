@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 import { IMulterFile } from "../types/types";
+import { S3BucketErrors } from "./constants";
 
 export async function uploadToS3Bucket(
   file: IMulterFile,
@@ -7,7 +8,7 @@ export async function uploadToS3Bucket(
 ): Promise<string> {
   try {
     if (!file) {
-      throw new Error("No file uploaded");
+      throw new Error(S3BucketErrors.NO_FILE);
     }
 
     const params: any = {
@@ -28,7 +29,7 @@ export async function uploadToS3Bucket(
 
     const uploadedResult = await s3.upload(params).promise();
     if (!uploadedResult) {
-      throw new Error("Error gettting the image from S# Bucket!!!");
+      throw new Error(S3BucketErrors.ERROR_GETTING_IMAGE);
     }
 
     return uploadedResult.Location;

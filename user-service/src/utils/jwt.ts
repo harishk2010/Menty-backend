@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
+import { EnvErrorMsg, JwtErrorMsg } from "./constants";
 config();
 
 export default async function verifyToken(payload: string): Promise<any> {
@@ -7,7 +8,7 @@ export default async function verifyToken(payload: string): Promise<any> {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       throw new Error(
-        "JWT_SECRET is not defined in the environment variables."
+        EnvErrorMsg.JWT_NOT_FOUND
       );
     }
     const result = await jwt.verify(payload, secret);
@@ -21,10 +22,10 @@ export async function accessToken(payload: Object): Promise<string> {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    throw new Error("JWT_SECRET is not defined in the environment variables");
+    throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
   }
   // Sign the token with the validated secret
   return jwt.sign(payload, secret, {
-    expiresIn: "1hr",
+    expiresIn: JwtErrorMsg.JWT_EXPIRATION,
   });
 }

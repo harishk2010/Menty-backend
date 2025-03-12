@@ -3,6 +3,7 @@ import { IMentorReviewRepository } from "../../repostories/interfaces/IMentorRev
 import { IMentorReview } from "../../models/mentorReviewModel";
 import InstructorModel from "../../models/instructorModel";
 import { Types } from "mongoose";
+import { MentorReviewErrorMessages } from "@/utils/constants";
 
 export class MentorReviewService implements IMentorReviewService {
   private mentorReviewRepository: IMentorReviewRepository;
@@ -20,7 +21,7 @@ export class MentorReviewService implements IMentorReviewService {
     try {
       const mentorExists = await InstructorModel.findById(mentorId);
       if (!mentorExists) {
-        throw new Error("Mentor not found");
+        throw new Error(MentorReviewErrorMessages.MENTOR_NOT_FOUND);
       }
 
       const existingReview =
@@ -29,7 +30,7 @@ export class MentorReviewService implements IMentorReviewService {
           mentorId
         );
       if (existingReview) {
-        throw new Error("You have already reviewed this mentor");
+        throw new Error(MentorReviewErrorMessages.MENTOR_ALREADY_REVIEWED);
       }
 
       const response = await this.mentorReviewRepository.create({

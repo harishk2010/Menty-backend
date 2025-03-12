@@ -2,6 +2,7 @@ import otpModel, { Iotp } from "../models/otpModel";
 import IOtpRepository from "./interfaces/IOtpRespoitory";
 
 import { GenericRepository } from "./GenericRepository";
+import { GeneralServerErrorMsg, OtpResponses } from "../utils/constants";
 
 export class OtpRespository
   extends GenericRepository<Iotp>
@@ -34,7 +35,7 @@ export class OtpRespository
       const otpData = await this.findOne({ email });
 
       if (!otpData) {
-        throw new Error("No Otp Data found");
+        throw new Error(OtpResponses.NO_OTP_DATA);
       }
       const otpId = otpData._id as unknown as string;
       const response = await this.delete(otpId);

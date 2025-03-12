@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request } from "express";
+import { AuthErrorMsg } from "./constants";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -17,7 +18,7 @@ const getId = (token: string, req: CustomRequest): string | null => {
     const { id } = decodedData;
     return id;
   } catch (error) {
-    console.error("Error verifying token:", error);
+    console.error(AuthErrorMsg.TOKEN_VERIFICATION_ERROR, error);
     return null;
   }
 };

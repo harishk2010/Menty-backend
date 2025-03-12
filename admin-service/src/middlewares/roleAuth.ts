@@ -1,5 +1,7 @@
+import { AuthErrorMsg } from "../utils/constants";
 import verifyToken from "../utils/jwt";
 import { Request, Response, NextFunction } from "express";
+import { Roles, StatusCode } from "../utils/enums";
 
 export const isInstructor = async (
   req: Request,
@@ -9,14 +11,14 @@ export const isInstructor = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
 
     const decode = await verifyToken(Token);
     if (decode) {
-      if (decode.role !== "instructor") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.INSTRUCTOR) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -34,13 +36,13 @@ export const isStudent = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const decode = await verifyToken(Token);
     if (decode) {
-      if (decode.role !== "student") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.STUDENT) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -58,13 +60,13 @@ export const isAdmin = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const decode = await verifyToken(Token);
     if (decode) {
-      if (decode.role !== "admin") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.ADMIN) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -82,15 +84,15 @@ export const isAdminOrInstructor = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const decode = await verifyToken(Token);
     if (decode) {
-      if (decode.role === "admin" || decode.role === "instructor") {
+      if (decode.role === Roles.ADMIN || decode.role === Roles.INSTRUCTOR) {
         next();
       } else {
-        res.status(401).send("Access Forbidden");
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -106,15 +108,15 @@ export const isAdminOrStudent = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const decode = await verifyToken(Token);
     if (decode) {
-      if (decode.role === "admin" || decode.role === "student") {
+      if (decode.role === Roles.ADMIN || decode.role === Roles.STUDENT) {
         next();
       } else {
-        res.status(401).send("Access Forbidden");
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }

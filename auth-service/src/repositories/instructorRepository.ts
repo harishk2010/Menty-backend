@@ -2,6 +2,7 @@ import { IInstructor, IInstructorDTO } from "../models/instructorModel";
 import { GenericRepository } from "./GenericRepository";
 import InstructorModel from "../models/instructorModel";
 import { IInstructorRepository } from "./interfaces/IInstructorRepository";
+import { InstructorErrorMessages } from "@/utils/constants";
 
 export class InstructorRepository
   extends GenericRepository<IInstructor>
@@ -26,7 +27,7 @@ export class InstructorRepository
     try {
       const instructor = await this.findOne({ email });
       if (!instructor) {
-        throw new Error("No InstructorData found");
+        throw new Error(InstructorErrorMessages.USER_NOT_FOUND);
       }
       const userId = instructor._id as unknown as string;
 
@@ -60,7 +61,7 @@ export class InstructorRepository
     try {
       const instructor = await this.findOne({ email });
       if (!instructor) {
-        throw new Error("No InstructorData found");
+        throw new Error(InstructorErrorMessages.USER_NOT_FOUND);
       }
       const userId = instructor._id as unknown as string;
       return await this.update(userId, data);

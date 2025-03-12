@@ -1,5 +1,6 @@
 import kafka from "./kafkaConfig";
 import { instructorController, studentController } from "../dependencyInjector";
+import { KafkaError } from "../../utils/constants";
 
 async function consume() {
   const consumer = kafka.consumer({ groupId: "users-service" });
@@ -27,7 +28,7 @@ async function consume() {
             : null;
 
           if (!messageValue) {
-            console.warn(`Empty message received on topic: ${topic}`);
+            console.warn(`${KafkaError.CONSUMER_EMPTY_MESSAGE} ${topic}`);
             return;
           }
 
@@ -53,22 +54,20 @@ async function consume() {
               break;
 
             default:
-              console.warn(`No handler for topic: ${topic}`);
+              console.warn(
+                              `${KafkaError.CONSUMER_NO_HANDLER} for topic: ${topic}`
+                            );
           }
         } catch (error: any) {
           console.error(
-            `Error processing message from topic ${topic}:`,
-            error.message
-          );
+                      `${KafkaError.CONSUMER_ERROR} ${topic}:`,
+                      error.message
+                    );
         }
       },
     });
   } catch (error: any) {
-    console.error(
-      "Error in User-Service Consumer:",
-      error.message,
-      error.stack
-    );
+    console.error(KafkaError.CONSUMER_ERROR, error.message, error.stack);
   }
 }
 

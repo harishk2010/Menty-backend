@@ -8,6 +8,8 @@ import { Server } from "socket.io";
 import registerSocketHandlers from "./socket/socketHandlers";
 import consume from "./config/kafka/consumer";
 import chatRoutes from "./routes/chatRoutes";
+import { GeneralServerErrorMsg, KafkaError, KafkaSuccess, SocketErrors } from "./utils/constants";
+import { StatusCode } from "./utils/enums";
 
 config();
 
@@ -53,24 +55,25 @@ try {
   registerSocketHandlers(io);
   console.log("Socket handlers registered successfully");
 } catch (error) {
-  console.error("Failed to register socket handlers:", error);
+  console.error(SocketErrors.FAILED_TO_REGISTER, error);
 }
 
 try {
   consume();
-  console.log("Kafka consumer initialized successfully");
+  console.log(KafkaSuccess.CONSUMER_CONNECTED);
 } catch (error) {
-  console.error("Failed to initialize Kafka consumer:", error);
+  console.error(KafkaError.CONSUMER_CONNECTION_FAILED, error);
 }
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err);
-  const errorResponse = {
-    error: "Internal Server Error",
-    message: err.message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-  };
-  res.status(500).json(errorResponse);
+  console.error("Error:", err.message);
+
+  res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
 });
 
 // Logging middleware with request timing
@@ -88,7 +91,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 const start = async () => {
   try {
     await connectDB();
-    console.log("Database connected successfully");
 
     // Server startup
     httpServer.listen(PORT, () => {});
@@ -105,14 +107,14 @@ const start = async () => {
 const gracefulShutdown = async () => {
   try {
     await io.close();
-    console.log("Socket.IO server closed");
+    console.log(SocketErrors.SERVER_CLOSED);
 
     // Close HTTP server
     httpServer.close(() => {
       process.exit(0);
     });
   } catch (error) {
-    console.error("Error during shutdown:", error);
+    console.error(SocketErrors.SHUTDOWN_ERROR, error);
     process.exit(1);
   }
 };

@@ -17,7 +17,7 @@ export class StudentServices implements IStudentService {
       const response = await this.studentRepository.create(payload);
       return response;
     } catch (error) {
-      console.error("Error in createStudent:", error);
+      
       throw error;
     }
   }
@@ -27,7 +27,7 @@ export class StudentServices implements IStudentService {
       const response = await this.studentRepository.findOne({ email });
       return response;
     } catch (error) {
-      console.error("Error in getStudentData:", error);
+      
       throw error;
     }
   }
@@ -36,7 +36,7 @@ export class StudentServices implements IStudentService {
       const response = await this.studentRepository.findById(studentId);
       return response;
     } catch (error) {
-      console.error("Error in getStudentData:", error);
+     
       throw error;
     }
   }
@@ -46,7 +46,7 @@ export class StudentServices implements IStudentService {
       const response = await this.studentRepository.update(id, data);
       return response;
     } catch (error) {
-      console.error("Error in updateProfile:", error);
+      
       throw error;
     }
   }
@@ -82,7 +82,7 @@ export class StudentServices implements IStudentService {
       );
       return response;
     } catch (error) {
-      console.error("Error in updatePassword:", error);
+      
       throw error;
     }
   }
@@ -92,7 +92,7 @@ export class StudentServices implements IStudentService {
       const response = await this.studentRepository.findAll();
       return response;
     } catch (error) {
-      console.error("Error in getStudents:", error);
+      
       throw error;
     }
   }

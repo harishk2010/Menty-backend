@@ -1,5 +1,7 @@
+import { Roles, StatusCode } from "../utils/enums";
 import { JwtService } from "../utils/jwt";
 import { Request, Response, NextFunction } from "express";
+import { AuthErrorMsg } from "../utils/constants";
 
 export const isInstructor = async (
   req: Request,
@@ -9,14 +11,14 @@ export const isInstructor = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
     if (decode) {
-      if (decode.role !== "instructor") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.INSTRUCTOR) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -35,14 +37,14 @@ export const isStudent = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
       return;
     }
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
     if (decode) {
-      if (decode.role !== "student") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.STUDENT) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }
@@ -61,14 +63,14 @@ export const isAdmin = async (
   try {
     const Token = req.cookies.accessToken;
     if (!Token) {
-      res.status(401).send("Acess Forbidden No access Token");
+      res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_TOKEN_EXPIRED);
       return;
     }
     const JWT = new JwtService();
     const decode = await JWT.verifyToken(Token);
     if (decode) {
-      if (decode.role !== "admin") {
-        res.status(401).send("Access Forbidden");
+      if (decode.role !== Roles.ADMIN) {
+        res.status(StatusCode.UNAUTHORIZED).send(AuthErrorMsg.ACCESS_FORBIDDEN);
         return;
       }
     }

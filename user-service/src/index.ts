@@ -10,6 +10,8 @@ import instructorRoutes from "./routes/instructorRoutes";
 import verificationRoutes from "./routes/verificationRoutes";
 import mentorReviewRoutes from "./routes/mentorReviewRoutes";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes";
+import { StatusCode } from "./utils/enums";
+import { GeneralServerErrorMsg } from "./utils/constants";
 
 config();
 
@@ -36,7 +38,12 @@ consume();
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err.message);
 
-  res.status(500).json({ error: err.message||"Internal Server Error" });
+  res
+    .status(StatusCode.INTERNAL_SERVER_ERROR)
+    .json({
+      error: GeneralServerErrorMsg.INTERNAL_SERVER_ERROR,
+      details: err.message,
+    });
 });
 app.use((req, res, next) => {
   console.log(`LOGGING 📝 : ${req.method} request to: ${req.originalUrl}`);
@@ -44,9 +51,15 @@ app.use((req, res, next) => {
 });
 
 const start = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
-  });
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(" Server startup failed:", error);
+    process.exit(1);
+  }
 };
+
 start();

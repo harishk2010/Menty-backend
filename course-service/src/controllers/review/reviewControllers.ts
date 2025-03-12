@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { IReviewService } from "../../services/interfaces/IReviewService";
 import getId from "../../utils/getId";
 import { IReviewController } from "../interfaces/IReviewControllers";
+import { StatusCode } from "@/utils/enums";
+import { ReviewErrorMessages, ReviewSuccessMessages } from "@/utils/constants";
 
 export class ReviewController implements IReviewController {
   private reviewService: IReviewService;
@@ -25,15 +27,15 @@ export class ReviewController implements IReviewController {
         comment
       );
       if (newReview) {
-        res.status(201).json({
+        res.status(StatusCode.CREATED).json({
           success: true,
-          message: "Review created successfully",
+          message: ReviewSuccessMessages.REVIEW_CREATED,
           data: newReview,
         });
       } else {
-        res.status(500).json({
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "Something Went Wrong",
+          message:ReviewErrorMessages.SOMETHING_WENT_WRONG,
         });
       }
     } catch (error) {
@@ -52,9 +54,9 @@ export class ReviewController implements IReviewController {
       const reviews = await this.reviewService.getReviewsByCourse(courseId);
       const averageRating = await this.reviewService.getAverageRating(courseId);
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Course reviews retrieved successfully",
+        message: ReviewSuccessMessages.COURSE_REVIEWS_RETRIEVED,
         data: {
           reviews,
           averageRating,

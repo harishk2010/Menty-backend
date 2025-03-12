@@ -60,7 +60,7 @@ export class CourseService implements ICourseService {
 
       return result;
     } catch (error) {
-      console.error("Error in getInstructorCoursesList service:", error);
+     
       throw error;
     }
   }

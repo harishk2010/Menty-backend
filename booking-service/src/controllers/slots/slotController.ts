@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import ISlotController from "../interfaces/ISlotController";
 import ISlotService from "../../services/interfaces/ISlotService";
+import { StatusCode } from "@/utils/enums";
+import { SlotErrorMessages, SlotSuccessMessages } from "@/utils/constants";
 
 export default class SlotController implements ISlotController {
   private slotService: ISlotService;
@@ -24,8 +26,8 @@ export default class SlotController implements ISlotController {
         req.body.price
       );
       res
-        .status(201)
-        .json({ success: true, message: "added slots", data: slots });
+        .status(StatusCode.CREATED)
+        .json({ success: true, message: SlotSuccessMessages.SLOTS_CREATED, data: slots });
     } catch (error) {
       throw error;
     }
@@ -40,16 +42,16 @@ export default class SlotController implements ISlotController {
 
       if (!instructorId) {
         res
-          .status(401)
-          .json({ success: false, message: "No Instructor found" });
+          .status(StatusCode.UNAUTHORIZED)
+          .json({ success: false, message: SlotErrorMessages.INVALID_INSTRUCTOR_ID });
         return;
       }
       const response = await this.slotService.getInstructorSlots(instructorId);
 
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "Fetched all the slots",
+          message: SlotSuccessMessages.INSTRUCTOR_SLOTS_FETCHED,
           data: response,
         });
       }
@@ -67,13 +69,13 @@ export default class SlotController implements ISlotController {
       const { slotId } = req.params;
 
       if (!slotId) {
-        res.status(401).json({ success: false, message: "No Slot Id found" });
+        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: SlotErrorMessages.INVALID_SLOT_ID });
       }
       const response = await this.slotService.deleteSlot(slotId);
       if (response) {
-        res.status(200).json({
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "deleted slot!",
+          message: SlotSuccessMessages.SLOT_DELETED,
           data: response,
         });
       }
@@ -91,7 +93,7 @@ export default class SlotController implements ISlotController {
       const { slotId } = req.params;
 
       if (!slotId) {
-        res.status(401).json({ success: false, message: "No Slot Id found" });
+        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: SlotErrorMessages.INVALID_SLOT_ID });
       }
 
       const response = await this.slotService.getSlotById(slotId);
@@ -99,14 +101,14 @@ export default class SlotController implements ISlotController {
       if (response) {
         res.status(200).json({
           success: true,
-          message: "fetched slot!",
+          message: SlotSuccessMessages.SLOT_FETCHED,
           data: response,
         });
         return;
       }
-      res.status(500).json({
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "error fetching slot!",
+        message: SlotErrorMessages.FETCH_SLOTS_FAILED,
         data: response,
       });
     } catch (error) {

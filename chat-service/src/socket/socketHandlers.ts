@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { ChatService } from "../services/chatService";
 import { ChatRepository } from "../repositories/chatRepository";
 import { BookingModel } from "../models/bookingModel";
+import { GeneralServerErrorMsg, MongoDB, SocketErrors } from "@/utils/constants";
 
 // Initialize chat service for database operations
 const chatRepository = new ChatRepository();
@@ -147,7 +148,7 @@ export default function registerSocketHandlers(io: Server) {
           };
           await chatService.addMessage(bookingId, messageData, chatData);
         } catch (dbError) {
-          console.error("Error saving message to database:", dbError);
+          console.error(MongoDB.DB_ERROR, dbError);
         }
 
         // Emit message to room
@@ -156,9 +157,9 @@ export default function registerSocketHandlers(io: Server) {
         // Clear typing indicator for sender
         clearTypingTimeout(sender, roomId, socket);
       } catch (error) {
-        console.error("Error handling message:", error);
+        console.error(SocketErrors.INTERNAL_SOCKET_ERROR, error);
         socket.emit("message-error", {
-          error: "Internal server error",
+          error: SocketErrors.INTERNAL_SOCKET_ERROR,
           roomId,
         });
       }
@@ -206,8 +207,8 @@ export default function registerSocketHandlers(io: Server) {
 
     // Error handling
     socket.on("error", (error) => {
-      console.error("Socket error:", error);
-      socket.emit("error", { message: "An error occurred" });
+      console.error(SocketErrors.INTERNAL_SOCKET_ERROR, error);
+      socket.emit("error", { message: SocketErrors.INTERNAL_SOCKET_ERROR });
     });
   });
 }

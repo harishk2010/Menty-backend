@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { IMentorReviewService } from "../../services/interfaces/IMentorReviewService";
 import getId from "../../utils/getId";
 import { IMentorReviewController } from "../interfaces/IMentorReviewController";
+import { StatusCode } from "@/utils/enums";
+import { MentorReviewErrorMessages, MentorReviewSuccessMessages } from "@/utils/constants";
 
 export class MentorReviewController implements IMentorReviewController {
   private mentorReviewService: IMentorReviewService;
@@ -27,15 +29,15 @@ export class MentorReviewController implements IMentorReviewController {
       );
 
       if (newReview) {
-        res.status(201).json({
+        res.status(StatusCode.CREATED).json({
           success: true,
-          message: "Review created successfully",
+          message: MentorReviewSuccessMessages.REVIEW_CREATED,
           data: newReview,
         });
       } else {
         res.json({
           success: false,
-          message: "Something Went Wrong",
+          message: MentorReviewErrorMessages.REVIEW_CREATION_FAILED,
         });
       }
     } catch (error) {
@@ -58,9 +60,9 @@ export class MentorReviewController implements IMentorReviewController {
         mentorId
       );
 
-      res.status(200).json({
+      res.status(StatusCode.OK).json({
         success: true,
-        message: "Mentor reviews retrieved successfully",
+        message: MentorReviewSuccessMessages.MENTOR_REVIEWS_FETCHED,
         data: {
           reviews,
           averageRating,
