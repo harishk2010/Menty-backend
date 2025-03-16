@@ -3,7 +3,7 @@ import { GenericRepository } from "../GenericRepository";
 import VerificationModel from "../../models/verificationModel";
 import { IVerificationRepository } from "../interfaces/IVerificationRepository";
 import { updateRequestType } from "../../types/types";
-import { InstructorErrorMessages, StudentErrorMessages, VerificationErrorMessages } from "@/utils/constants";
+import { InstructorErrorMessages, StudentErrorMessages, VerificationErrorMessages } from "../../utils/constants";
 
 export class VerificationRepository
   extends GenericRepository<IVerificationModel>

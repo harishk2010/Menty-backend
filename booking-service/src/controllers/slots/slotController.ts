@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import ISlotController from "../interfaces/ISlotController";
 import ISlotService from "../../services/interfaces/ISlotService";
-import { StatusCode } from "@/utils/enums";
-import { SlotErrorMessages, SlotSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "../../utils/enums";
+import { SlotErrorMessages, SlotSuccessMessages } from "../../utils/constants";
 
 export default class SlotController implements ISlotController {
   private slotService: ISlotService;

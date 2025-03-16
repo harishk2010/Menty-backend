@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { ChatService } from "../services/chatService";
 import { ChatRepository } from "../repositories/chatRepository";
 import { BookingModel } from "../models/bookingModel";
-import { GeneralServerErrorMsg, MongoDB, SocketErrors } from "@/utils/constants";
+import { GeneralServerErrorMsg, MongoDB, SocketErrors } from "../utils/constants";
 
 // Initialize chat service for database operations
 const chatRepository = new ChatRepository();

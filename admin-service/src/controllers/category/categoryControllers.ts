@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ICategoryControllers } from "../interfaces/ICategoryContollers";
 import { ICategoryService } from "../../services/interfaces/ICategoryService";
-import { CategoryErrorMsg, CategorySuccessMsg, GeneralServerErrorMsg } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { CategoryErrorMsg, CategorySuccessMsg, GeneralServerErrorMsg } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class CategoryContoller implements ICategoryControllers {
   private categoryService: ICategoryService;

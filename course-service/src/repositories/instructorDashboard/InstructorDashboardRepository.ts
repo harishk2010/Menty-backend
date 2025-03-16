@@ -4,9 +4,7 @@ import { InstructorDashboardData } from "../../Types/updateRequestType";
 import { CourseModel } from "../../models/courseModel";
 import { PurchasedCourseModel } from "../../models/purchasedModel";
 import { ReviewModel } from "../../models/reviewModel";
-import UserModel from "../../models/userModel";
-import { ChapterModel } from "../../models/chapterModel";
-import { CourseErrorMessages } from "@/utils/constants";
+import { CourseErrorMessages } from "../../utils/constants";
 
 export class InstructorDashboardRepository
   implements IInstructorDashboardRepository

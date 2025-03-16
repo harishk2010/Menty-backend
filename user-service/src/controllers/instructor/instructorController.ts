@@ -12,8 +12,8 @@ import {
   InstructorWallet,
   ResetPassword,
 } from "../../types/types";
-import { StatusCode, TransactionType, VerifiedStatus } from "@/utils/enums";
-import { AuthErrorMsg, InstructorErrorMessages, InstructorSuccessMessages } from "@/utils/constants";
+import { StatusCode, TransactionType, VerifiedStatus } from "../../utils/enums";
+import { AuthErrorMsg, InstructorErrorMessages, InstructorSuccessMessages } from "../../utils/constants";
 
 export class InstructorController implements IInstructorControllers {
   private instructorService: IInstructorService;
@@ -265,15 +265,18 @@ export class InstructorController implements IInstructorControllers {
   public async blockInstructor(req: Request, res: Response) {
     try {
       const { email } = req.params;
-
+      console.log(email)
+      
       const InstructorData = await this.instructorService.getInstructorData(
         email
       );
-
+      console.log(InstructorData)
+      
       if (!InstructorData) {
         throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       let id = InstructorData?._id?.toString();
+      console.log(id)
 
       if (!id) {
         throw new Error(InstructorErrorMessages.INSTRUCTOR_ID_MISSING);

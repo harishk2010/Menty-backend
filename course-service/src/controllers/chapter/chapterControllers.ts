@@ -5,8 +5,8 @@ import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 import getId from "../../utils/getId";
-import { ChapterErrorMessages, ChapterSuccessMessages } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { ChapterErrorMessages, ChapterSuccessMessages } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class ChapterController implements IChapterControllers {
   constructor(private chapterService: IChapterService) {}

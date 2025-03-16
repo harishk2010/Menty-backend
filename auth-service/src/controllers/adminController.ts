@@ -55,11 +55,9 @@ export class AdminController implements IAdminControllers {
       });
 
       res
-        .cookie("accessToken", accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        })
+        .cookie("accessToken", accessToken)
+      res
+        .cookie("refreshToken", accessToken)
         .status(StatusCode.OK)
         .send({
           success: true,

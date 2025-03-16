@@ -6,8 +6,8 @@ import verifyToken from "../../utils/jwt";
 import produce from "../../config/kafka/producer";
 import { IStudentControllers } from "../interfaces/IStudentController";
 import { IStudentService } from "../../services/interfaces/IStudentService";
-import { StatusCode } from "@/utils/enums";
-import { PROFILE_PICTURE, StudentErrorMessages, StudentSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "../../utils/enums";
+import { PROFILE_PICTURE, StudentErrorMessages, StudentSuccessMessages } from "../../utils/constants";
 
 export class StudentController implements IStudentControllers {
   private studentService: IStudentService;

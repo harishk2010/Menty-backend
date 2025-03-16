@@ -2,7 +2,7 @@ import { IInstructor, IInstructorDTO } from "../models/instructorModel";
 import { GenericRepository } from "./GenericRepository";
 import InstructorModel from "../models/instructorModel";
 import { IInstructorRepository } from "./interfaces/IInstructorRepository";
-import { InstructorErrorMessages } from "@/utils/constants";
+import { InstructorErrorMessages } from "../utils/constants";
 
 export class InstructorRepository
   extends GenericRepository<IInstructor>

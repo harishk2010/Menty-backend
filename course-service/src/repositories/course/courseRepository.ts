@@ -9,7 +9,7 @@ import {
 } from "../../models/purchasedModel";
 import { QuizModel } from "../../models/quizModel";
 import { Paginatedcourses } from "../../Types/updateRequestType";
-import { CourseErrorMessages } from "@/utils/constants";
+import { CourseErrorMessages } from "../../utils/constants";
 
 export class CourseRepository
   extends GenericRepository<ICourse>

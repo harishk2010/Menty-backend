@@ -3,7 +3,7 @@ import { IMentorReviewRepository } from "../../repostories/interfaces/IMentorRev
 import { IMentorReview } from "../../models/mentorReviewModel";
 import InstructorModel from "../../models/instructorModel";
 import { Types } from "mongoose";
-import { MentorReviewErrorMessages } from "@/utils/constants";
+import { MentorReviewErrorMessages } from "../../utils/constants";
 
 export class MentorReviewService implements IMentorReviewService {
   private mentorReviewRepository: IMentorReviewRepository;
@@ -42,6 +42,7 @@ export class MentorReviewService implements IMentorReviewService {
       });
       const avgRating =
         await this.mentorReviewRepository.getMentorAverageRating(mentorId);
+
       await InstructorModel.findByIdAndUpdate(mentorId, {
         $set: {
           rating: avgRating,

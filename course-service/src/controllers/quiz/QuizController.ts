@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { IQuizService } from "../../services/interfaces/IQuizService";
 import getId from "../../utils/getId";
 import { CourseModel } from "../../models/courseModel";
-import { QuizErrorMessages, QuizSuccessMessages } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { QuizErrorMessages, QuizSuccessMessages } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class QuizController {
   private quizService: IQuizService;

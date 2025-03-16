@@ -4,8 +4,8 @@ import { uploadToS3Bucket } from "../../../utils/s3Bucket";
 import { IVerificationService } from "../../../services/interfaces/IVerificationService";
 import produce from "../../../config/kafka/producer";
 import { instructorController } from "../../../config/dependencyInjector";
-import { VerificationErrorMessages, VerificationSuccessMessages } from "@/utils/constants";
-import { StatusCode, VerifiedStatus } from "@/utils/enums";
+import { VerificationErrorMessages, VerificationSuccessMessages } from "../../../utils/constants";
+import { StatusCode, VerifiedStatus } from "../../../utils/enums";
 
 export class VerificationContoller implements IVerificationControllers {
   private verificationService: IVerificationService;

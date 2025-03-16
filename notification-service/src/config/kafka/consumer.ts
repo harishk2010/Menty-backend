@@ -1,4 +1,4 @@
-import { KafkaError } from "@/utils/constants";
+import { KafkaError } from "../../utils/constants";
 import notificatinController from "../dependencyInjection";
 import kafka from "./kafkaConfig";
 

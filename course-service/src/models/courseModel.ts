@@ -24,8 +24,10 @@ export interface ICourse extends Document {
   thumbnailUrl: string;
   isPublished: boolean;
   isListed: boolean;
+  rating:number;
   createdAt: Date;
   updatedAt: Date;
+
 }
 
 const demoVideoSchema = new Schema<IDemoVideo>({
@@ -51,6 +53,7 @@ const CourseSchema = new Schema<ICourse>(
       },
     ],
     price: { type: Number, required: true },
+    rating:{type:Number ,required:false,default:0},
     category: { type: String, required: true },
     level: { type: String, required: true },
     duration: { type: String, required: true },

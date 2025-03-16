@@ -3,7 +3,7 @@ import { IReviewRepository } from "../../repositories/interfaces/IReviewReposito
 import { IReview } from "../../models/reviewModel";
 import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
-import { CourseErrorMessages, ReviewErrorMessages } from "@/utils/constants";
+import { CourseErrorMessages, ReviewErrorMessages } from "../../utils/constants";
 
 export class ReviewService implements IReviewService {
   private reviewRepository: IReviewRepository;

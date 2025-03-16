@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { IMentorReviewService } from "../../services/interfaces/IMentorReviewService";
 import getId from "../../utils/getId";
 import { IMentorReviewController } from "../interfaces/IMentorReviewController";
-import { StatusCode } from "@/utils/enums";
-import { MentorReviewErrorMessages, MentorReviewSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "../../utils/enums";
+import { MentorReviewErrorMessages, MentorReviewSuccessMessages } from "../../utils/constants";
 
 export class MentorReviewController implements IMentorReviewController {
   private mentorReviewService: IMentorReviewService;

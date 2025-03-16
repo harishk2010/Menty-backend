@@ -30,7 +30,7 @@ router.get(
   authenticateToken,
   instructorController.getTransactions.bind(instructorController)
 );
-router.patch(
+router.post(
   "/blockInstructor/:email",
   authenticateToken,
   instructorController.blockInstructor.bind(instructorController)

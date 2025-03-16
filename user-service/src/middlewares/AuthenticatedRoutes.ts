@@ -4,10 +4,10 @@ import { NextFunction, Request, Response } from 'express';
 import { config } from 'dotenv';
 config();
 import { accessToken } from '../utils/jwt';
-import { StatusCode } from '@/utils/enums';
-import { AuthErrorMsg } from '@/utils/constants';
+import { StatusCode } from '../utils/enums';
+import { AuthErrorMsg } from '../utils/constants';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET as string || "Sombu"
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -23,7 +23,9 @@ interface AuthenticatedRequest extends Request {
 const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
 
     const theAccessToken = req.cookies['accessToken'];
+    console.log(theAccessToken)
     const refreshToken = req.cookies['refreshToken'];
+    console.log(refreshToken)
 
     if (!theAccessToken) {
         return res.status(StatusCode.UNAUTHORIZED).json({ failToken: true, message: AuthErrorMsg.NO_ACCESS_TOKEN });

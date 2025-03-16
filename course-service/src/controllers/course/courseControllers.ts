@@ -12,8 +12,8 @@ import { ChapterModel, IChapter } from "../../models/chapterModel";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 import { IBoughtCourses } from "../../Types/updateRequestType";
 import { IUser } from "../../models/userModel";
-import { CourseErrorMessages, CourseSuccessMessages } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { CourseErrorMessages, CourseSuccessMessages } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class CourseContoller implements ICourseControllers {
   constructor(private courseService: ICourseService) {}

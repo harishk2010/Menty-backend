@@ -1,4 +1,4 @@
-import { KafkaError } from "@/utils/constants";
+import { KafkaError } from "../../utils/constants";
 import kafka from "./kafkaConfig";
 import { Partitioners } from "kafkajs";
 

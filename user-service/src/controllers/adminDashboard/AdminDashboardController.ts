@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { IAdminDashboardService } from "../../services/interfaces/IAdminDashboardService";
 import { IAdminDashboardController } from "../interfaces/IAdminDashboardController";
 import getId from "../../utils/getId";
-import { AdminboardResponses } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { AdminboardResponses } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class AdminDashboardController implements IAdminDashboardController {
   private adminDashboardService: IAdminDashboardService;

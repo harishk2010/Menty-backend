@@ -3,8 +3,8 @@ import IBookingController from "../interfaces/IBookingController";
 import IBookingService from "../../services/interfaces/IBookingService";
 
 import produce from "../../config/kafka/producer";
-import { BookingErrorMessages, BookingSuccessMessages, UserErrorMsg } from "@/utils/constants";
-import { StatusCode } from "@/utils/enums";
+import { BookingErrorMessages, BookingSuccessMessages, UserErrorMsg } from "../../utils/constants";
+import { StatusCode } from "../../utils/enums";
 
 export class BookingController implements IBookingController {
   private bookingService: IBookingService;

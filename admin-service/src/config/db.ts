@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { config } from "dotenv";
-import { MongoDB } from "@/utils/constants";
+import { MongoDB } from "../utils/constants";
 config()
 
 const connectDB=async()=>{

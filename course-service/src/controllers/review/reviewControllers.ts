@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { IReviewService } from "../../services/interfaces/IReviewService";
 import getId from "../../utils/getId";
 import { IReviewController } from "../interfaces/IReviewControllers";
-import { StatusCode } from "@/utils/enums";
-import { ReviewErrorMessages, ReviewSuccessMessages } from "@/utils/constants";
+import { StatusCode } from "../../utils/enums";
+import { ReviewErrorMessages, ReviewSuccessMessages } from "../../utils/constants";
+import { CourseModel } from "../../models/courseModel";
 
 export class ReviewController implements IReviewController {
   private reviewService: IReviewService;
@@ -27,6 +28,8 @@ export class ReviewController implements IReviewController {
         comment
       );
       if (newReview) {
+        const averageRating = await this.reviewService.getAverageRating(courseId);
+        await CourseModel.findByIdAndUpdate(courseId,{rating:averageRating})
         res.status(StatusCode.CREATED).json({
           success: true,
           message: ReviewSuccessMessages.REVIEW_CREATED,

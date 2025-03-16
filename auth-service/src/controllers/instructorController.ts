@@ -419,6 +419,7 @@ export class InstructorController implements IInstructorControllers {
   }): Promise<IInstructor | null> {
     try {
       const { email, isBlocked } = data;
+     
       const response = await this.instructorService.updateProfile(email, {
         isBlocked,
       });
