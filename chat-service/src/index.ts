@@ -1,6 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
-import { config } from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
 import { createServer } from "http";
@@ -10,8 +9,13 @@ import consume from "./config/kafka/consumer";
 import chatRoutes from "./routes/chatRoutes";
 import { GeneralServerErrorMsg, KafkaError, KafkaSuccess, SocketErrors } from "./utils/constants";
 import { StatusCode } from "./utils/enums";
+import dotenv from "dotenv";
 
-config();
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 const app: Application = express();
 const httpServer = createServer(app);

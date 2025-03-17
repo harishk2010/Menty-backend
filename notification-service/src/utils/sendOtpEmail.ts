@@ -1,6 +1,12 @@
 import { IEmail } from "../interface/Email";
 import nodeMailer from "nodemailer";
+import dotenv from "dotenv";
 
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 export class SendEmail implements IEmail {
   async sentEmailVerification(
     name: string,

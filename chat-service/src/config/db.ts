@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
-import { config } from "dotenv";
 import { MongoDB } from "../utils/constants";
-config();
+import dotenv from "dotenv";
+
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
+
 
 const connectDB = async () => {
   try {

@@ -1,8 +1,14 @@
 import jwt from "jsonwebtoken";
-import { config } from "dotenv";
-import { EnvErrorMsg, JwtErrorMsg } from "./constants";
 
-config();
+import { EnvErrorMsg, JwtErrorMsg } from "./constants";
+import dotenv from "dotenv";
+
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
+
 
 export class JwtService {
   async createToken(payload: Object): Promise<string> {

@@ -18,7 +18,7 @@ router
   .put(authenticateToken, categoryController.listOrUnlistCategory.bind(categoryController));
 router
   .route("/:categoryId")
-  .put(authenticateToken,categoryController.findCategoryById.bind(categoryController));
+  .get(authenticateToken,categoryController.findCategoryById.bind(categoryController));
 
 const categoryRoutes = router;
 export default categoryRoutes;

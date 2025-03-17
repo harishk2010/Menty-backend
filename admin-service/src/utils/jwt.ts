@@ -1,22 +1,24 @@
-import jwt from "jsonwebtoken"
-import { config } from "dotenv"
+import jwt from "jsonwebtoken";
 import { EnvErrorMsg, JwtErrorMsg } from "./constants";
-config()
+import dotenv from "dotenv";
 
-export default async function verifyToken(payload:string):Promise<any>{
-    try {
-        const secret=process.env.JWT_SECRET 
-        if (!secret) {
-            throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
-        }
-        const result=await jwt.verify(payload,secret)
-        return result
-        
-    } catch (error) {
-        console.log(error)
-        
-        
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
+
+export default async function verifyToken(payload: string): Promise<any> {
+  try {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error(EnvErrorMsg.JWT_NOT_FOUND);
     }
+    const result = await jwt.verify(payload, secret);
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function accessToken(payload: Object): Promise<string> {
@@ -30,4 +32,3 @@ export async function accessToken(payload: Object): Promise<string> {
     expiresIn: JwtErrorMsg.JWT_EXPIRATION,
   });
 }
-

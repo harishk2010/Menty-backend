@@ -3,7 +3,11 @@ import multer from "multer";
 import multerS3 from "multer-s3";
 import dotenv from "dotenv";
 
-dotenv.config();
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 const s3 = new S3Client({
   region: process.env.BUCKET_REGION!,

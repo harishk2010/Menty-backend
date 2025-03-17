@@ -1,7 +1,12 @@
 import jwt from "jsonwebtoken";
-import { config } from "dotenv";
 import { EnvErrorMsg, JwtErrorMsg } from "./constants";
-config();
+import dotenv from "dotenv";
+
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 export default async function verifyToken(payload: string): Promise<any> {
   try {

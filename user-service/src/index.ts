@@ -1,7 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 
 import cookieParser from "cookie-parser";
-import { config } from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
 import studentRoutes from "./routes/studentRoutes";
@@ -12,9 +11,13 @@ import mentorReviewRoutes from "./routes/mentorReviewRoutes";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes";
 import { StatusCode } from "./utils/enums";
 import { GeneralServerErrorMsg } from "./utils/constants";
+import dotenv from "dotenv";
 
-config();
-
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 let app: Application = express();
 const PORT: number = Number(process.env.port) || 5002;
 

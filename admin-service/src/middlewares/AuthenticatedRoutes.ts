@@ -1,11 +1,17 @@
 
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-import { config } from 'dotenv';
-config();
+
 import { accessToken } from '../utils/jwt';
 import { AuthErrorMsg } from '../utils/constants';
 import { StatusCode } from '../utils/enums';
+import dotenv from "dotenv";
+
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 

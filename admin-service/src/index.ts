@@ -1,6 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
-import { config } from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
 import consume from "./config/kafka/consumer";
@@ -8,8 +7,13 @@ import categoryRoutes from "./routes/categoryRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import { GeneralServerErrorMsg } from "./utils/constants";
 import { StatusCode } from "./utils/enums";
+import dotenv from "dotenv";
 
-config();
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 let app: Application = express();
 const PORT: number = Number(process.env.port) || 5004;

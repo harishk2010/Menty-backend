@@ -1,6 +1,12 @@
 import { IEmail } from "../interface/Email";
 import nodeMailer from "nodemailer";
+import dotenv from "dotenv";
 
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 export class SendVerifiedEmail implements IEmail {
   async sentEmailVerification(username: string, email: string): Promise<any> {
     if (!email || typeof email !== "string" || !email.includes("@")) {

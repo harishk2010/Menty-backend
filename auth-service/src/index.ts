@@ -1,14 +1,18 @@
 import express,{Application} from "express"
 import cookieParser from 'cookie-parser';
-import { config } from 'dotenv';
 import connectDB from "./config/db";
 import cors from 'cors'
 import instructorRoutes from "./routes/instructorRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import consume from "./config/kafka/consumer";
+import dotenv from "dotenv";
 
-config()
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.development" });
+}
 
 let app:Application=express()
 const PORT:number=Number(process.env.port)||5001
