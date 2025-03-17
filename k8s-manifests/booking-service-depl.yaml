@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+        - name: booking-service-container
+          image: harishk2001/menty-booking-service
+          envFrom:
+            - configMapRef:
+                name: booking-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service-srv
+spec:
+  selector:
+    app: booking-service
+  ports:
+    - name: booking-service-ports
+      protocol: TCP
+      port: 5006
+      targetPort: 5006

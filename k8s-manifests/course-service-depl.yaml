@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: course-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: course-service
+  template:
+    metadata:
+      labels:
+        app: course-service
+    spec:
+      containers:
+        - name: course-service-container
+          image: harishk2001/menty-course-service
+          envFrom:
+            - configMapRef:
+                name: course-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: course-service-srv
+spec:
+  selector:
+    app: course-service
+  ports:
+    - name: course-service-ports
+      protocol: TCP
+      port: 5005
+      targetPort: 5005

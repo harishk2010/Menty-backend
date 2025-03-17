@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-service
+  template:
+    metadata:
+      labels:
+        app: chat-service
+    spec:
+      containers:
+        - name: chat-service-container
+          image: harishk2001/menty-chat-service
+          envFrom:
+            - configMapRef:
+                name: chat-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service-srv
+spec:
+  selector:
+    app: chat-service
+  ports:
+    - name: chat-service-ports
+      protocol: TCP
+      port: 5007
+      targetPort: 5007

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-service
+  template:
+    metadata:
+      labels:
+        app: admin-service
+    spec:
+      containers:
+        - name: admin-service-container
+          image: harishk2001/menty-admin-service
+          envFrom:
+            - configMapRef:
+                name: admin-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-service-srv
+spec:
+  selector:
+    app: admin-service
+  ports:
+    - name: admin-service-ports
+      protocol: TCP
+      port: 5003
+      targetPort: 5003
