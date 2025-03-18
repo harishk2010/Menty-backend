@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
 
 const connectDB = async () => {
   try {
-    let connect = await mongoose.connect(`${process.env.MONGO_URL}`);
+    let connect = await mongoose.connect(`${process.env.MONGO_URI}`);
     console.log(`${MongoDB.SUCCESS}${connect.connection.host}`);
   } catch (error) {
     console.error(MongoDB.ERROR);
