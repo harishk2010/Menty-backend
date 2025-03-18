@@ -23,4 +23,4 @@ spec:
   tls:
     - hosts:
         - menty.live
-      secretName: menty-live-tls
+      secretName: 

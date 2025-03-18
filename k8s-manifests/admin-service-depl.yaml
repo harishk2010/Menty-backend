@@ -29,5 +29,5 @@ spec:
   ports:
     - name: admin-service-ports
       protocol: TCP
-      port: 5003
-      targetPort: 5003
+      port: 5004
+      targetPort: 5004
