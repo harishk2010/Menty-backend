@@ -10,8 +10,10 @@ import { StatusCode } from "./utils/enums";
 import dotenv from "dotenv";
 
 if (process.env.NODE_ENV === "production") {
+  console.log("prod")
   dotenv.config({ path: ".env.production" });
 } else {
+  console.log("dev")
   dotenv.config({ path: ".env.development" });
 }
 
@@ -52,7 +54,9 @@ app.use((req, res, next) => {
 
 const start = async () => {
   try {
+    console.log("first")
     await connectDB();
+    console.log("second")
     app.listen(PORT, () => {
       console.log(`The ${process.env.SERVICE} is listening on port ${PORT}`);
     });
