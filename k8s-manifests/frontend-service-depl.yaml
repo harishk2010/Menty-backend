@@ -18,7 +18,7 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
-                name: frontend-env
+                name: frontend-service-env
 ---
 apiVersion: v1
 kind: Service
