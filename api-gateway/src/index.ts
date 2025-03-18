@@ -27,31 +27,31 @@ app.use(cors(corsOptions));
 const services = [
     {
         path: AUTH_URL, 
-        context: "/auth", 
+        context: "/api/auth", 
     },
     {
         path: USER_URL, 
-        context: "/user", 
+        context: "/api/user", 
     },
     {
         path: NOTIFICATION_URL, 
-        context: "/notification", 
+        context: "/api/notification", 
     },
     {
         path: ADMIN_URL, 
-        context: "/admin", 
+        context: "/api/admin", 
     },
     {
         path: COURSE_URL, 
-        context: "/course", 
+        context: "/api/course", 
     },
     {
         path: BOOKING_URL, 
-        context: "/booking", 
+        context: "/api/booking", 
     },
     {
         path: CHAT_URL, 
-        context: "/chat", 
+        context: "/api/chat", 
     },
     
 ];
