@@ -4,12 +4,16 @@ import { MongoDB } from "../utils/constants";
 
 if (process.env.NODE_ENV === 'production') {
     dotenv.config({ path: '.env.production' });
+    console.log(process.env.MONGO_URI,"production")
   } else {
+    console.log(process.env.MONGO_URI,"dev")
     dotenv.config({ path: '.env.development' });
   }
 
 const connectDB=async()=>{
     try {
+      console.log(process.env.MONGO_URI,"inside db")
+
        
         let connect=await mongoose.connect(`${process.env.MONGO_URI}`)
         console.log(`${MongoDB.SUCCESS}${connect.connection.host}`)
