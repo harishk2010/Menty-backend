@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: abinbabu2001/menty-api-gateway
+          image: harishk2001/menty-api-gateway
           ports:
             - containerPort: 5000
           envFrom:
