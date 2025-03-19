@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: ingress-controller
   annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://menty.live"
@@ -13,7 +14,16 @@ spec:
     - host: menty.live
       http:
         paths:
+          # Frontend service handles the root path (/)
           - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-srv
+                port:
+                  number: 3000
+          # API Gateway handles requests under /api
+          - path: /api
             pathType: Prefix
             backend:
               service:

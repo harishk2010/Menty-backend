@@ -20,7 +20,8 @@ export class AdminController implements IAdminControllers {
       const { email } = req.params;
 
       const adminDetails = await this.adminService.getAdminData(email);
-      if (!adminDetails) {
+      console.log(adminDetails,"adminDetails")
+      if (adminDetails) {
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: AdminSuccessMsg.ADMIN_DATA_FOUND,

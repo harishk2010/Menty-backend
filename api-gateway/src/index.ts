@@ -1,5 +1,5 @@
 import express, { Application ,Request ,Response ,NextFunction } from "express";
-import { config } from "dotenv";
+import dotenv from "dotenv";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
 // import proxy from 'express-http-proxy'
@@ -8,11 +8,17 @@ import logger from './logger/logger'
 import { GeneralServerErrorMsg } from "./utils/constants";
 import { StatusCode } from "./utils/enums";
 
-config();
-
+if (process.env.NODE_ENV === 'production') {
+    dotenv.config({ path: '.env.production' });
+    console.log(process.env.NODE_ENV,"production")
+  } else {
+      dotenv.config({ path: '.env.development' });
+      console.log(process.env.NODE_ENV,"dev")
+  }
 const app: Application = express();
 
-const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL,COURSE_URL,BOOKING_URL,CHAT_URL} = process.env;
+const { PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL,COURSE_URL,BOOKING_URL,CHAT_URL,NODE_ENV} = process.env;
+console.log(PORT, FRONTEND_URL, AUTH_URL , USER_URL , ADMIN_URL ,NOTIFICATION_URL,COURSE_URL,BOOKING_URL,CHAT_URL,NODE_ENV)
 
 const corsOptions = {
     credentials: true,

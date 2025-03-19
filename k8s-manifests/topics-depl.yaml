@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-kafka-topics
+spec:
+  template:
+    spec:
+      containers:
+        - name: kafka-topic-creator
+          image: bitnami/kafka:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              # Function to create a topic if it doesn't exist
+              create_topic_if_not_exists() {
+                topic_name=$1
+                if ! kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic $topic_name > /dev/null 2>&1; then
+                  echo "Creating topic: $topic_name"
+                  kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic $topic_name
+                else
+                  echo "Topic already exists: $topic_name"
+                fi
+              }
+
+              # Create topics
+              create_topic_if_not_exists update-admin-wallet
+              create_topic_if_not_exists create-admin-data
+              create_topic_if_not_exists update-password-student
+              create_topic_if_not_exists update-profile-student
+              create_topic_if_not_exists block-student
+              create_topic_if_not_exists update-password-instructor
+              create_topic_if_not_exists update-profile-instructor
+              create_topic_if_not_exists block-instructor
+              create_topic_if_not_exists add-booking
+              create_topic_if_not_exists add-student
+              create_topic_if_not_exists send-otp-email
+              create_topic_if_not_exists send-forgotPassword-email
+              create_topic_if_not_exists verified-Instructor-email
+              create_topic_if_not_exists password-reset-student
+              create_topic_if_not_exists add-instructor-data
+              create_topic_if_not_exists password-reset-instructor
+              create_topic_if_not_exists update-instructor-wallet
+      restartPolicy: Never
+  backoffLimit: 4
