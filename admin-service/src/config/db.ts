@@ -7,7 +7,7 @@ if (process.env.NODE_ENV === 'production') {
     console.log(process.env.MONGO_URI,"production")
   } else {
     console.log(process.env.MONGO_URI,"dev")
-    dotenv.config({ path: '.env.development' });
+    dotenv.config({ path: '.env' });
   }
 
 const connectDB=async()=>{

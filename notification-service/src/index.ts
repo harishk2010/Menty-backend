@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 if (process.env.NODE_ENV === "production") {
   dotenv.config({ path: ".env.production" });
 } else {
-  dotenv.config({ path: ".env.development" });
+  dotenv.config({ path: ".env" });
 }
 let app: Application = express();
 const PORT: number = Number(process.env.port) || 5003;

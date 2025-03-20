@@ -13,8 +13,8 @@ if (process.env.NODE_ENV === "production") {
   console.log("prod")
   dotenv.config({ path: ".env.production" });
 } else {
+  dotenv.config({ path: ".env" });
   console.log("dev")
-  dotenv.config({ path: ".env.development" });
 }
 
 let app: Application = express();

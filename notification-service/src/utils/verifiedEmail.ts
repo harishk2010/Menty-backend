@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 if (process.env.NODE_ENV === "production") {
   dotenv.config({ path: ".env.production" });
 } else {
-  dotenv.config({ path: ".env.development" });
+  dotenv.config({ path: ".env" });
 }
 export class SendVerifiedEmail implements IEmail {
   async sentEmailVerification(username: string, email: string): Promise<any> {

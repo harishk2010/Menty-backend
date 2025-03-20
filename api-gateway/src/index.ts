@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
     dotenv.config({ path: '.env.production' });
     console.log(process.env.NODE_ENV,"production")
   } else {
-      dotenv.config({ path: '.env.development' });
+      dotenv.config({ path: '.env' });
       console.log(process.env.NODE_ENV,"dev")
   }
 const app: Application = express();
