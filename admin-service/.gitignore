@@ -25,7 +25,7 @@ coverage
 .env.production
 .env
 .env.prod
-.env.development
+# .env.development
 .env.production
 
 # Dependency directory
