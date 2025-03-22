@@ -9,6 +9,10 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://menty.live"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"  # Allowed HTTP methods
     nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type"  # Allowed headers
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/upgrade: "websocket"
+    nginx.ingress.kubernetes.io/connection: "Upgrade"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: "nginx"
