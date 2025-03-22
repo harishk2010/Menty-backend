@@ -15,9 +15,9 @@ spec:
               # Function to create a topic if it doesn't exist
               create_topic_if_not_exists() {
                 topic_name=$1
-                if ! kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic $topic_name > /dev/null 2>&1; then
+                if ! kafka-topics.sh --describe --bootstrap-server kafka-service:9092 --topic $topic_name > /dev/null 2>&1; then
                   echo "Creating topic: $topic_name"
-                  kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic $topic_name
+                  kafka-topics.sh --create --bootstrap-server kafka-service:9092 --replication-factor 1 --partitions 1 --topic $topic_name
                 else
                   echo "Topic already exists: $topic_name"
                 fi
