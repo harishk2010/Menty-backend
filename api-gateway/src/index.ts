@@ -62,7 +62,7 @@ const services = [
     
 ];
 app.use('/chat', createProxyMiddleware({
-    target: "http://chat-service-srv:5005",
+    target: CHAT_URL,
     changeOrigin: true,
     ws: true 
   }));
