@@ -61,11 +61,11 @@ const services = [
     },
     
 ];
-app.use('/chat', createProxyMiddleware({
-    target: CHAT_URL,
-    changeOrigin: true,
-    ws: true 
-  }));
+// app.use('/api/chat', createProxyMiddleware({
+//     target: CHAT_URL,
+//     changeOrigin: true,
+//     ws: true 
+//   }));
   
 // app.use(morgan('dev'))
 app.use(
