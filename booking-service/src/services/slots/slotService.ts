@@ -68,102 +68,161 @@ export class SlotService implements ISlotService {
   //     throw error;
   //   }
   // }
-  async createRecurringSlots(
-    instructorId: string,
-    startDate: string,
-    endDate: string,
-    days: number[],
-    startTime: string,  // Expecting ISO format (UTC)
-    endTime: string,    // Expecting ISO format (UTC)
-    price: number
-  ): Promise<ISlot[]> {
-    try {
-      console.log("Processing slots with:", { 
-        instructorId, startDate, endDate, days, startTime, endTime, price 
-      });
+
+  // async createRecurringSlots(
+  //   instructorId: string,
+  //   startDate: string,
+  //   endDate: string,
+  //   days: number[],
+  //   startTime: string,  // Local time with offset (e.g., "2025-03-22T15:00:00+05:30")
+  //   endTime: string,    // Local time with offset (e.g., "2025-03-22T16:00:00+05:30")
+  //   price: number,
+  //   timezone: string    // Timezone offset (e.g., "+05:30")
+  // ): Promise<ISlot[]> {
+  //   try {
+  //     console.log("Processing slots with:", { 
+  //       instructorId, startDate, endDate, days, startTime, endTime, price, timezone 
+  //     });
   
-      // Parse the incoming ISO date strings as UTC
-      const startTimeObj = new Date(startTime);
-      const endTimeObj = new Date(endTime);
+  //     // Parse the incoming local times with timezone
+  //     const startTimeObj = new Date(startTime);
+  //     const endTimeObj = new Date(endTime);
   
-      // Check if the dates are valid
-      if (isNaN(startTimeObj.getTime()) || isNaN(endTimeObj.getTime())) {
-        console.error("Invalid date objects:", { startTimeObj, endTimeObj });
-        throw new Error("Invalid start or end time provided");
-      }
+  //     // Check if the dates are valid
+  //     if (isNaN(startTimeObj.getTime()) || isNaN(endTimeObj.getTime())) {
+  //       console.error("Invalid date objects:", { startTimeObj, endTimeObj });
+  //       throw new Error("Invalid start or end time provided");
+  //     }
   
-      // Extract time portion in HH:MM:SS format (UTC)
-      const startTimeString = startTimeObj.toISOString().split('T')[1].slice(0, 8);
-      const endTimeString = endTimeObj.toISOString().split('T')[1].slice(0, 8);
+  //     // Generate recurring dates using rrule
+  //     const rule = new RRule({
+  //       freq: RRule.WEEKLY, // Weekly recurrence
+  //       interval: 1, // Every week
+  //       byweekday: days, // Selected days (e.g., [0, 1] for Sunday and Monday)
+  //       dtstart: new Date(startDate), // Start date
+  //       until: new Date(endDate), // End date
+  //     });
   
-      console.log("Extracted time strings (UTC):", { startTimeString, endTimeString });
+  //     // Generate all dates based on the rule
+  //     const slotDates = rule.all();
+  //     console.log(`Generated ${slotDates.length} dates based on rule`);
   
-      const rule = new RRule({
-        freq: RRule.WEEKLY,
-        interval: 1,
-        byweekday: days,
-        dtstart: new Date(startDate),
-        until: new Date(endDate),
-      });
+  //     // Generate slot objects
+  //     const slots = slotDates.map((date) => {
+  //       const dateString = date.toISOString().split('T')[0]; // Extract date part (YYYY-MM-DD)
   
-      const slotDates = rule.all();
-      console.log(`Generated ${slotDates.length} dates based on rule`);
+  //       // Create full datetime objects in local time
+  //       const startDateTime = new Date(`${dateString}T${startTime.split('T')[1]}`);
+  //       const endDateTime = new Date(`${dateString}T${endTime.split('T')[1]}`);
   
-      // Generate slot objects
-      const slots = slotDates.map((date) => {
-        const dateString = date.toISOString().split('T')[0];
+  //       // Validate the datetime objects
+  //       if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+  //         console.error("Created invalid datetime:", { 
+  //           dateString, startTime, endTime, startDateTime, endDateTime 
+  //         });
+  //         throw new Error(`Invalid datetime created for date: ${dateString}`);
+  //       }
   
-        // Create full datetime objects in UTC
-        const startDateTime = new Date(`${dateString}T${startTimeString}Z`);
-        const endDateTime = new Date(`${dateString}T${endTimeString}Z`);
+  //       return {
+  //         instructorId,
+  //         startTime: startDateTime,
+  //         endTime: endDateTime,
+  //         price,
+  //         timezone, // Store the timezone offset
+  //       };
+  //     });
   
-        if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-          console.error("Created invalid datetime:", { 
-            dateString, startTimeString, endTimeString, startDateTime, endDateTime 
-          });
-          throw new Error(`Invalid datetime created for date: ${dateString}`);
-        }
+  //     // Insert slots into the database
+  //     const createdSlots = await Promise.all(
+  //       slots.map((slot) =>
+  //         this.slotRepository.create(slot as Partial<ISlot>)
+  //       )
+  //     );
   
-        return {
-          instructorId,
-          startTime: startDateTime,
-          endTime: endDateTime,
-          price,
-        };
-      });
-  
-      // Check for existing slots before inserting
-      const existingSlots = await this.slotRepository.findAll({
-        instructorId,
-        startTime: { $in: slots.map((slot) => slot.startTime) },
-        endTime: { $in: slots.map((slot) => slot.endTime) },
-      });
-  
-      // Filter out duplicates
-      const newSlots = slots.filter(
-        (slot) =>
-          !existingSlots.some(
-            (existingSlot) =>
-              existingSlot.startTime.getTime() === slot.startTime.getTime() &&
-              existingSlot.endTime.getTime() === slot.endTime.getTime()
-          )
-      );
-  
-      console.log(`Found ${existingSlots.length} existing slots. Creating ${newSlots.length} new slots.`);
-  
-      // Insert only new (non-duplicate) slots
-      const createdSlots = await Promise.all(
-        newSlots.map((slot) =>
-          this.slotRepository.create(slot as Partial<ISlot>)
-        )
-      );
-  
-      return createdSlots;
-    } catch (error) {
-      console.error("Error in createRecurringSlots:", error);
-      throw error;
+  //     return createdSlots;
+  //   } catch (error) {
+  //     console.error("Error in createRecurringSlots:", error);
+  //     throw error;
+  //   }
+  // }
+ // In your backend service
+// In your backend service
+async createRecurringSlots(
+  instructorId: string,
+  startDate: string,
+  endDate: string,
+  days: number[],
+  startTime: string,  // UTC time (e.g., "2025-03-22T13:30:00.000Z")
+  endTime: string,    // UTC time (e.g., "2025-03-22T14:30:00.000Z")
+  price: number,
+  timezone: string    // Timezone offset (e.g., "+05:30")
+): Promise<ISlot[]> {
+  try {
+    console.log("Processing slots with:", { 
+      instructorId, startDate, endDate, days, startTime, endTime, price, timezone 
+    });
+
+    // Parse the incoming UTC times
+    const startTimeObj = new Date(startTime);
+    const endTimeObj = new Date(endTime);
+
+    // Check if the dates are valid
+    if (isNaN(startTimeObj.getTime()) || isNaN(endTimeObj.getTime())) {
+      console.error("Invalid date objects:", { startTimeObj, endTimeObj });
+      throw new Error("Invalid start or end time provided");
     }
+
+    // Generate recurring dates using rrule
+    const rule = new RRule({
+      freq: RRule.WEEKLY, // Weekly recurrence
+      interval: 1, // Every week
+      byweekday: days, // Selected days (e.g., [0, 1] for Sunday and Monday)
+      dtstart: new Date(startDate), // Start date
+      until: new Date(endDate), // End date
+    });
+
+    // Generate all dates based on the rule
+    const slotDates = rule.all();
+    console.log(`Generated ${slotDates.length} dates based on rule`);
+
+    // Generate slot objects
+    const slots = slotDates.map((date) => {
+      const dateString = date.toISOString().split('T')[0]; // Extract date part (YYYY-MM-DD)
+
+      // Create full datetime objects in UTC
+      const startDateTime = new Date(`${dateString}T${startTime.split('T')[1]}`);
+      const endDateTime = new Date(`${dateString}T${endTime.split('T')[1]}`);
+
+      // Validate the datetime objects
+      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        console.error("Created invalid datetime:", { 
+          dateString, startTime, endTime, startDateTime, endDateTime 
+        });
+        throw new Error(`Invalid datetime created for date: ${dateString}`);
+      }
+
+      return {
+        instructorId,
+        startTime: startDateTime, // Store UTC time
+        endTime: endDateTime,     // Store UTC time
+        price,
+        timezone, // Store the timezone offset
+      };
+    });
+
+    // Insert slots into the database
+    const createdSlots = await Promise.all(
+      slots.map((slot) =>
+        this.slotRepository.create(slot as Partial<ISlot>)
+      )
+    );
+
+    return createdSlots;
+  } catch (error) {
+    console.error("Error in createRecurringSlots:", error);
+    throw error;
   }
+}
 
   async getInstructorSlots(instructorId: string): Promise<ISlot[]> {
     try {

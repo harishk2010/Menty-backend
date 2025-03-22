@@ -8,7 +8,8 @@ export default interface ISlotService {
     days: number[],
     startTime: string,
     endTime: string,
-    price: number
+    price: number,
+    timezone: string
   ): Promise<ISlot[]>;
   getInstructorSlots(instructorId: string): Promise<ISlot[]>;
   deleteSlot(slotId: string): Promise<ISlot | null>;
