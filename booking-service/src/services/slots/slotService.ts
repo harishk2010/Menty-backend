@@ -152,17 +152,17 @@ async createRecurringSlots(
   startDate: string,
   endDate: string,
   days: number[],
-  startTime: string,  // UTC time (e.g., "2025-03-22T13:30:00.000Z")
-  endTime: string,    // UTC time (e.g., "2025-03-22T14:30:00.000Z")
+  startTime: string,  // Local time with offset (e.g., "2025-03-22T19:00:00+06:30")
+  endTime: string,    // Local time with offset (e.g., "2025-03-22T20:00:00+06:30")
   price: number,
-  timezone: string    // Timezone offset (e.g., "+05:30")
+  timezone: string    // Timezone offset (e.g., "+06:30")
 ): Promise<ISlot[]> {
   try {
     console.log("Processing slots with:", { 
       instructorId, startDate, endDate, days, startTime, endTime, price, timezone 
     });
 
-    // Parse the incoming UTC times
+    // Parse the incoming local times with timezone
     const startTimeObj = new Date(startTime);
     const endTimeObj = new Date(endTime);
 
@@ -171,6 +171,10 @@ async createRecurringSlots(
       console.error("Invalid date objects:", { startTimeObj, endTimeObj });
       throw new Error("Invalid start or end time provided");
     }
+
+    // Add 1 hour to the times
+    startTimeObj.setHours(startTimeObj.getHours() + 1);
+    endTimeObj.setHours(endTimeObj.getHours() + 1);
 
     // Generate recurring dates using rrule
     const rule = new RRule({
@@ -189,9 +193,9 @@ async createRecurringSlots(
     const slots = slotDates.map((date) => {
       const dateString = date.toISOString().split('T')[0]; // Extract date part (YYYY-MM-DD)
 
-      // Create full datetime objects in UTC
-      const startDateTime = new Date(`${dateString}T${startTime.split('T')[1]}`);
-      const endDateTime = new Date(`${dateString}T${endTime.split('T')[1]}`);
+      // Create full datetime objects with the adjusted times
+      const startDateTime = new Date(`${dateString}T${startTimeObj.toISOString().split('T')[1]}`);
+      const endDateTime = new Date(`${dateString}T${endTimeObj.toISOString().split('T')[1]}`);
 
       // Validate the datetime objects
       if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
@@ -203,8 +207,8 @@ async createRecurringSlots(
 
       return {
         instructorId,
-        startTime: startDateTime, // Store UTC time
-        endTime: endDateTime,     // Store UTC time
+        startTime: startDateTime,
+        endTime: endDateTime,
         price,
         timezone, // Store the timezone offset
       };
@@ -223,7 +227,6 @@ async createRecurringSlots(
     throw error;
   }
 }
-
   async getInstructorSlots(instructorId: string): Promise<ISlot[]> {
     try {
       return await this.slotRepository.findAll({ instructorId });
