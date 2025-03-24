@@ -20,19 +20,30 @@ if (process.env.NODE_ENV === "production") {
 const app: Application = express();
 const httpServer = createServer(app);
 const PORT: number = Number(process.env.PORT) || 5007;
-
+console.log(process.env.Frontend_URL, "frontend url");
+// const io = new Server(httpServer, {
+//   path: '/api/chat', // Match the client path
+//   cors: {
+//     origin: String(process.env.FRONTEND_URL),
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true,
+//   },
+//   // transports: ["websocket", "polling"], // Add explicit transport options
+//   pingTimeout: 60000, // Increase ping timeout to handle slower connections
+//   pingInterval: 25000, // Adjust ping interval
+//   connectTimeout: 5000, // Connection timeout
+//   // Add error handling for connection issues
+//   // allowEIO3: true, // Enable compatibility mode if needed
+// });
 const io = new Server(httpServer, {
+  path: '/socket.io', // Use the default Socket.IO path
   cors: {
     origin: String(process.env.FRONTEND_URL),
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
-  transports: ["websocket", "polling"], // Add explicit transport options
-  pingTimeout: 60000, // Increase ping timeout to handle slower connections
-  pingInterval: 25000, // Adjust ping interval
-  connectTimeout: 5000, // Connection timeout
-  // Add error handling for connection issues
-  allowEIO3: true, // Enable compatibility mode if needed
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 // Enhanced CORS configuration
