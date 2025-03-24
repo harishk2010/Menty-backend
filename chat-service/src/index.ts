@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "production") {
 const app: Application = express();
 const httpServer = createServer(app);
 const PORT: number = Number(process.env.PORT) || 5007;
-console.log(process.env.Frontend_URL, "frontend url");
+console.log(process.env.FRONTEND_URL, "frontend url FRONTEND_URL");
 // const io = new Server(httpServer, {
 //   path: '/api/chat', // Match the client path
 //   cors: {
