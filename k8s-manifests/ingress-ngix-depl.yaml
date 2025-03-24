@@ -7,15 +7,16 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://menty.live"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"  # Allowed HTTP methods
-    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type"  # Allowed headers
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/upgrade: "websocket"
     nginx.ingress.kubernetes.io/connection: "Upgrade"
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
-    nginx.ingress.kubernetes.io/proxy-set-header: "Upgrade $http_upgrade"
-    nginx.ingress.kubernetes.io/proxy-set-header: "Connection upgrade"
+    nginx.ingress.kubernetes.io/proxy-set-headers: |
+      Upgrade $http_upgrade
+      Connection upgrade
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: "nginx"
@@ -23,7 +24,6 @@ spec:
     - host: menty.live
       http:
         paths:
-          # Frontend service handles the root path (/)
           - path: /
             pathType: Prefix
             backend:
@@ -31,7 +31,6 @@ spec:
                 name: frontend-srv
                 port:
                   number: 3000
-          # API Gateway handles requests under /api
           - path: /api
             pathType: Prefix
             backend:

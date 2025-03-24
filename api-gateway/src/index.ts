@@ -109,7 +109,7 @@
 // });
 import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { createProxyMiddleware,Options  } from "http-proxy-middleware";
 import cors from "cors";
 import morgan from "morgan";
 import logger from './logger/logger';
@@ -127,17 +127,17 @@ if (process.env.NODE_ENV === 'production') {
 
 const app: Application = express();
 
-const { 
-    PORT, 
-    FRONTEND_URL, 
-    AUTH_URL, 
-    USER_URL, 
-    ADMIN_URL, 
-    NOTIFICATION_URL, 
-    COURSE_URL, 
-    BOOKING_URL, 
-    CHAT_URL, 
-    NODE_ENV 
+const {
+    PORT,
+    FRONTEND_URL,
+    AUTH_URL,
+    USER_URL,
+    ADMIN_URL,
+    NOTIFICATION_URL,
+    COURSE_URL,
+    BOOKING_URL,
+    CHAT_URL,
+    NODE_ENV
 } = process.env;
 
 console.log(PORT, FRONTEND_URL, AUTH_URL, USER_URL, ADMIN_URL, NOTIFICATION_URL, COURSE_URL, BOOKING_URL, CHAT_URL, NODE_ENV);
@@ -158,14 +158,36 @@ app.use(
         },
     })
 );
-console.log(CHAT_URL, "chat url")
-// Special handling for chat service with WebSockets
-app.use('/api/chat', createProxyMiddleware({
+
+// Create server instance to handle both HTTP and WebSocket
+const server = require('http').createServer(app);
+
+// WebSocket handling for socket.io
+interface ExtendedProxyOptions extends Options {
+    ws?: boolean;
+    // Add any other properties that TypeScript complains about
+    onProxyReq?: (proxyReq: any, req: any, res: any) => void;
+}
+console.log("chat chat url", CHAT_URL)
+
+app.use('/socket.io', createProxyMiddleware({
     target: CHAT_URL,
     changeOrigin: true,
-    ws: true,
-    // pathRewrite: { '^/api/chat': '' }, // This rewrite might be causing issues
-  }));
+    ws: true,  // WebSocket support
+    onProxyReq: (proxyReq, req, res) => {
+        // Ensuring that the connection remains WebSocket
+        proxyReq.setHeader('Connection', 'Upgrade');
+        proxyReq.setHeader('Upgrade', 'websocket');
+    },
+}as ExtendedProxyOptions));
+
+// Handle chat API requests
+// app.use('/api/chat', createProxyMiddleware({
+//     target: CHAT_URL,
+//     changeOrigin: true,
+//     ws: true,
+//     pathRewrite: { '^/api/chat': '/api/chat' }, // Keep original path
+// }));
 
 // Define other services
 const services = [
@@ -192,6 +214,10 @@ const services = [
     {
         path: BOOKING_URL,
         context: "/api/booking",
+    },
+    {
+        path: CHAT_URL,
+        context: "/api/chat",
     },
     // Chat service is handled separately above
 ];
@@ -223,9 +249,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         });
 });
 
-// Create server instance to handle both HTTP and WebSocket
-const server = require('http').createServer(app);
-
+// Start server
 server.listen(PORT, () => {
     console.log(`API Gateway running at http://localhost:${PORT}`);
 });
