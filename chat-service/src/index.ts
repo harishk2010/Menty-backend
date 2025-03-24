@@ -38,7 +38,7 @@ console.log(process.env.Frontend_URL, "frontend url");
 const io = new Server(httpServer, {
   path: '/socket.io', // Use the default Socket.IO path
   cors: {
-    origin: String(process.env.FRONTEND_URL),
+    origin: String(process.env.FRONTEND_URL) || "https://menty.live",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
