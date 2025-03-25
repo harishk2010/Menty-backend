@@ -104,6 +104,9 @@ export class CourseService implements ICourseService {
       price
     );
   }
+  async isBoughtCourse(userId: string, courseId: string): Promise<IPurchasedCourse | null> {
+    return await this.courseRepository.isBoughtCourse(userId, courseId);
+  }
 
   async getBoughtCourses(
     userId: string,

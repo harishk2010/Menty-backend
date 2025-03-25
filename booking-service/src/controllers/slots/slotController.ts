@@ -10,54 +10,23 @@ export default class SlotController implements ISlotController {
     this.slotService = slotService;
   }
 
-  // async createSlots(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  //     const slots = await this.slotService.createRecurringSlots(
-  //       req.body.instructorId,
-  //       req.body.startDate,
-  //       req.body.endDate,
-  //       req.body.days,
-  //       req.body.startTime,
-  //       req.body.endTime,
-  //       req.body.price
-  //     );
-  //     res
-  //       .status(StatusCode.CREATED)
-  //       .json({ success: true, message: SlotSuccessMessages.SLOTS_CREATED, data: slots });
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
  
   async createSlots(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Extract data from the request body
+      
       const {
         instructorId,
         startDate,
         endDate,
         days,
-        startTime, // Local time with offset (e.g., "2025-03-22T15:51:00+05:30")
-        endTime,   // Local time with offset (e.g., "2025-03-22T15:52:00+05:30")
+        startTime,
+        endTime,   
         price,
         timezone,  // Timezone offset (e.g., "+05:30")
       } = req.body;
   
-      // Log the received data for debugging
-      console.log('Received data in controller:', {
-        instructorId,
-        startDate,
-        endDate,
-        days,
-        startTime,
-        endTime,
-        price,
-        timezone,
-      });
+    
+    
   
       // Validate required fields
       if (!instructorId || !startDate || !endDate || !days || !startTime || !endTime || !price || !timezone) {

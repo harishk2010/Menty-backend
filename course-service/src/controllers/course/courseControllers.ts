@@ -300,7 +300,7 @@ export class CourseContoller implements ICourseControllers {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { courseId, txnid, amount, courseName } = req.body;
+      const {userId, courseId, txnid, amount, courseName } = req.body;
       const isCourseExist = await this.courseService.getCourseById(
         String(courseId)
       );
@@ -319,7 +319,7 @@ export class CourseContoller implements ICourseControllers {
         chapterId: chapter._id,
         isCompleted: false,
       }));
-      const userId = await getId("accessToken", req);
+      // const userId = await getId("accessToken", req);
       const quizId = isCourseExist.quizId;
       const price = amount;
       const response = await this.courseService.buyCourse(
@@ -356,6 +356,34 @@ export class CourseContoller implements ICourseControllers {
       }
     } catch (error) {
       next(error);
+    }
+  }
+   public async isBoughtCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const {userId} = req.body
+      const { courseId } = req.params;
+ 
+      const response = await this.courseService.isBoughtCourse(
+        String(userId),
+        courseId
+      );
+      console.log(response, "response");
+      if(response){
+      res.status(StatusCode.OK).json({
+        success: true,
+        message: CourseSuccessMessages.COURSE_ALREADY_PURCHASED,
+        data: response,
+      })
+
+    }else{
+      res.json({
+        success: false,
+      })
+    }
+      
+    } catch (error) {
+      throw error
+      
     }
   }
   public async getInstructorCourses(

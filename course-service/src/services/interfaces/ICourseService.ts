@@ -28,6 +28,7 @@ export interface ICourseService {
   ): Promise<CoursesResult | null>;
   getCourseById(id: string): Promise<ICourse | null>;
   getChaptersById(id: string): Promise<IChapter[] | null>;
+  isBoughtCourse(userId:string,courseId: string): Promise<IPurchasedCourse | null>;
   buyCourse(
     userId: string,
     quizId: string,

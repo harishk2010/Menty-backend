@@ -29,6 +29,7 @@ export interface ICourseControllers {
     next: NextFunction
   ): Promise<void>;
   coursePlay(req: Request, res: Response, next: NextFunction): Promise<void>;
+  isBoughtCourse(req: Request, res: Response, next: NextFunction): Promise<void>;
   chapterVideoEnd(
     req: Request,
     res: Response,

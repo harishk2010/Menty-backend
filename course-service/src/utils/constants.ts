@@ -70,6 +70,7 @@ export const CourseErrorMessages = {
 export const CourseSuccessMessages = {
   COURSE_CREATED: "Course created successfully.",
   COURSE_UPDATED: "Course updated successfully.",
+  COURSE_ALREADY_PURCHASED: "Course already purchased!",
   COURSE_PUBLISHED: "Course Published",
   COURSE_UNPUBLISHED: "Course UnPublished",
   COURSE_LISTED: "Course Listed",

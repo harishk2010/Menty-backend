@@ -86,6 +86,9 @@ router
     courseController.publishCourse.bind(courseController)
   );
 router
+.route("/isBoughtCourse/:courseId")
+.post(authenticateToken,courseController.isBoughtCourse.bind(courseController));
+router
   .route("/listCourse/:courseId")
   .put(
     authenticateToken,

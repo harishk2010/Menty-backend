@@ -7,6 +7,8 @@ import { CoursesResult, Paginatedcourses } from "../../Types/updateRequestType";
 export interface ICourseRepository extends IGenericRepository<ICourse> {
   getChapterById(id: string): Promise<IChapter[] | null>;
   getInstructorCourses(instructorId: string): Promise<ICourse[]>;
+  isBoughtCourse(userId:string,courseId: string): Promise<IPurchasedCourse | null>;
+
   buyCourse(
     userId: string,
     quizId: string,

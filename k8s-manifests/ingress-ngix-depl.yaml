@@ -7,16 +7,17 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://menty.live"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    # WebSocket support configurations
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/upgrade: "websocket"
-    nginx.ingress.kubernetes.io/connection: "Upgrade"
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
     nginx.ingress.kubernetes.io/proxy-set-headers: |
-      Upgrade $http_upgrade
-      Connection upgrade
+      Connection $http_connection;
+      Upgrade $http_upgrade;
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: "nginx"
@@ -24,13 +25,13 @@ spec:
     - host: menty.live
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /socket.io
+            pathType: ImplementationSpecific
             backend:
               service:
-                name: frontend-srv
+                name: api-gateway-srv
                 port:
-                  number: 3000
+                  number: 5000
           - path: /api
             pathType: Prefix
             backend:
@@ -38,6 +39,13 @@ spec:
                 name: api-gateway-srv
                 port:
                   number: 5000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-srv
+                port:
+                  number: 3000
   tls:
     - hosts:
         - menty.live

@@ -81,6 +81,16 @@ export class CourseRepository
       throw error;
     }
   }
+  async isBoughtCourse(userId: string, courseId: string): Promise<IPurchasedCourse | null> {
+    try {
+      const course = await PurchasedCourseModel.findOne({ userId, courseId });
+      return course;
+      
+    } catch (error) {
+      throw error;
+      
+    }
+  }
   async getPaginatedCourses(
     page: number,
     limit: number,
@@ -201,9 +211,9 @@ export class CourseRepository
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("courseId", "courseName level thumbnailUrl quizId")
+        .populate("courseId", "courseId courseName level thumbnailUrl quizId _id")
         .exec();
-
+      console.log(response, "response");
       const totalCourses = await PurchasedCourseModel.countDocuments({
         userId,
       });
