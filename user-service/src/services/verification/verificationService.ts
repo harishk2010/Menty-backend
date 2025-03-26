@@ -31,9 +31,10 @@ export class VerificationService implements IVerificationService {
 
   async approveRequest(
     email: string,
-    status: string
+    status: string,
+    comment: string,
   ): Promise<IVerificationModel | null> {
-    return await this.verificationRepository.approveRequest(email, status);
+    return await this.verificationRepository.approveRequest(email, status,comment);
   }
 
   async getAllRequests(): Promise<IVerificationModel[] | null> {

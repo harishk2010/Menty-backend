@@ -26,8 +26,8 @@ const corsOptions = {
   origin: String(process.env.FRONTEND_URL),
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
-app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -12,7 +12,8 @@ export interface IVerificationRepository
   ): Promise<IVerificationModel>;
   approveRequest(
     email: string,
-    status: string
+    status: string,
+    comment: string
   ): Promise<IVerificationModel | null>;
   updateRequest(
     email: string,

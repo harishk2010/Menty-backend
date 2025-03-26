@@ -34,7 +34,8 @@ export class VerificationRepository
 
   async approveRequest(
     email: string,
-    status: string
+    status: string,
+    comment: string,
   ): Promise<IVerificationModel | null> {
     try {
       const user = await this.findOne({ email });
@@ -43,7 +44,7 @@ export class VerificationRepository
         throw new Error(InstructorErrorMessages.INSTRUCTOR_NOT_FOUND);
       }
       const userId = user._id as unknown as string;
-      const response = await this.update(userId, { status });
+      const response = await this.update(userId, { status,comments: comment });
       return response;
     } catch (error) {
       throw error

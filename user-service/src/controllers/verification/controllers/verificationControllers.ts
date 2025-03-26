@@ -160,11 +160,12 @@ export class VerificationContoller implements IVerificationControllers {
 
   async approveRequest(req: Request, res: Response): Promise<void> {
     try {
-      const { email, status } = req.body;
+      const { email, status ,comment } = req.body;
 
       const approvedRequest = await this.verificationService.approveRequest(
         email,
-        status
+        status,
+        comment
       );
       if (approvedRequest) {
         await instructorController.approveRequest({

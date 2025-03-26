@@ -11,7 +11,8 @@ export interface IVerificationService {
   getRequestData(email: string): Promise<IVerificationModel | null>;
   approveRequest(
     email: string,
-    status: string
+    status: string,
+    comment: string,
   ): Promise<IVerificationModel | null>;
   getAllRequests(): Promise<IVerificationModel[] | null>;
   updateRequest(
