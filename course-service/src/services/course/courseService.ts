@@ -116,8 +116,8 @@ export class CourseService implements ICourseService {
     return await this.courseRepository.getBoughtCourses(userId, page, limit);
   }
 
-  async chapterVideoEnd(chapterId: string): Promise<any> {
-    return await this.courseRepository.chapterVideoEnd(chapterId);
+  async chapterVideoEnd(courseId:string,chapterId: string): Promise<any> {
+    return await this.courseRepository.chapterVideoEnd(courseId,chapterId);
   }
   async deleteCourseById(courseId: string): Promise<any> {
     return await this.courseRepository.deleteCourseById(courseId);

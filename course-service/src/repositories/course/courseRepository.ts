@@ -229,25 +229,37 @@ export class CourseRepository
     }
   }
 
-  async chapterVideoEnd(chapterId: string): Promise<any> {
+  async chapterVideoEnd(courseId:string,chapterId: string): Promise<any> {
     try {
+      // Find the purchased course that contains this specific chapter
       const findChapter = await PurchasedCourseModel.findOne({
         "completedChapters.chapterId": chapterId,
+        "_id": courseId // Add this to ensure we're looking in the right course
       });
-
+  
       if (!findChapter) throw new Error("Purchased Course not Found");
-
-      const chapterIndex = findChapter.completedChapters.findIndex(
-        (chapter) => chapter.chapterId.toString() === chapterId
+  
+      // Update the specific chapter's completion status
+      const updateResult = await PurchasedCourseModel.findOneAndUpdate(
+        { 
+          _id: findChapter._id, 
+          "completedChapters.chapterId": chapterId 
+        },
+        { 
+          $set: { 
+            "completedChapters.$.isCompleted": true 
+          } 
+        },
+        { 
+          new: true  // Return the updated document
+        }
       );
-
-      if (chapterIndex === -1) throw new Error(CourseErrorMessages.CHAPTERS_NOT_FOUND);
-
-      findChapter.completedChapters[chapterIndex].isCompleted = true;
-      const updatedChapters = await findChapter.save();
-
-      return updatedChapters;
+  
+      if (!updateResult) throw new Error(CourseErrorMessages.CHAPTERS_NOT_FOUND);
+  
+      return updateResult;
     } catch (error) {
+      console.error('Chapter completion error:', error);
       throw error;
     }
   }

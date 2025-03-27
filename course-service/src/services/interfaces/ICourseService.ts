@@ -38,7 +38,7 @@ export interface ICourseService {
     price: Number
   ): Promise<IPurchasedCourse | null>;
   getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
-  chapterVideoEnd(chapterId: string): Promise<any>;
+  chapterVideoEnd(courseId:string,chapterId: string): Promise<any>;
   deleteCourseById(courseId: string): Promise<any>;
   createStudent(payload: IUser): Promise<any>;
 }

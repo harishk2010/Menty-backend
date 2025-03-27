@@ -35,7 +35,7 @@ export interface ICourseRepository extends IGenericRepository<ICourse> {
   ): Promise<CoursesResult | null>;
 
   getBoughtCourses(userId: string, page: number, limit: number): Promise<any>;
-  chapterVideoEnd(chapterId: string): Promise<any>;
+  chapterVideoEnd(courseId:string,chapterId: string): Promise<any>;
   getBoughtCourseById(courseId: string): Promise<IPurchasedCourse | null>;
   deleteCourseById(courseId: string): Promise<ICourse | null>;
 }

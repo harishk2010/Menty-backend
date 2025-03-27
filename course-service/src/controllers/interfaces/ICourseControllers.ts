@@ -23,6 +23,11 @@ export interface ICourseControllers {
     res: Response,
     next: NextFunction
   ): Promise<void>;
+  completedCourses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
   getBoughtCourseById(
     req: Request,
     res: Response,

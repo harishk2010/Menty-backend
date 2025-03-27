@@ -367,7 +367,6 @@ export class CourseContoller implements ICourseControllers {
         String(userId),
         courseId
       );
-      console.log(response, "response");
       if(response){
       res.status(StatusCode.OK).json({
         success: true,
@@ -526,6 +525,54 @@ export class CourseContoller implements ICourseControllers {
       next(error);
     }
   }
+  public async completedCourses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { page = 1, limit = 4 } = req.query;
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+
+      if (pageNumber < 1 || limitNumber < 1) {
+        res
+          .status(StatusCode.BAD_REQUEST)
+          .send({ message: CourseErrorMessages.INVALID_PAGE_OR_LIMIT, success: false });
+        return;
+      }
+
+      const userId = await getId("accessToken", req);
+      const response = await this.courseService.getBoughtCourses(
+        String(userId),
+        pageNumber,
+        limitNumber
+      );
+
+      response.courses = response.courses.map((course: IBoughtCourses) => ({
+        _id: course._id,
+        courseDetails: {
+          courseName: course?.courseId.courseName,
+          level: course.courseId.level,
+          thumbnailUrl: course.courseId.thumbnailUrl,
+          quizId: course.courseId.quizId,
+        },
+        completedChapters: course.completedChapters,
+        isCourseCompleted: course.isCourseCompleted,
+        purchasedAt: course.purchasedAt,
+      })).filter((course: IBoughtCourses) => course.isCourseCompleted);
+
+      res
+        .status(StatusCode.OK)
+        .send({
+          message:CourseSuccessMessages.BOUGHT_COURSES_FETCHED,
+          success: true,
+          data: response,
+        });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   public async coursePlay(
     req: Request,
@@ -609,6 +656,7 @@ export class CourseContoller implements ICourseControllers {
   ): Promise<void> {
     try {
       const { chapterId } = req.params;
+      const { courseId } = req.params;
       if (!chapterId) {
         res
           .status(StatusCode.BAD_REQUEST)
@@ -620,6 +668,7 @@ export class CourseContoller implements ICourseControllers {
       }
 
       const response = await this.courseService.chapterVideoEnd(
+        String(courseId),
         String(chapterId)
       );
       res

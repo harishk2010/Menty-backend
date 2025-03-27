@@ -71,6 +71,12 @@ router
     courseController.getBoughtCourses.bind(courseController)
   );
 router
+  .route("/completedCourses/:userId")
+  .get(
+    authenticateToken,
+    courseController.completedCourses.bind(courseController)
+  );
+router
   .route("/boughtCourse/:id")
   .get(
     authenticateToken,
@@ -95,8 +101,8 @@ router
     courseController.listOrUnlistCourse.bind(courseController)
   );
 router
-  .route("/chapterCompleted/:chapterId")
-  .put(
+  .route("/chapterCompleted/:chapterId/course/:courseId")
+  .post(
     authenticateToken,
     courseController.chapterVideoEnd.bind(courseController)
   );
