@@ -5,7 +5,10 @@ import { CourseModel } from "../../models/courseModel";
 import { Types } from "mongoose";
 import { generateSignedUrl } from "../../utils/signedUrlGenerator";
 import getId from "../../utils/getId";
-import { ChapterErrorMessages, ChapterSuccessMessages } from "../../utils/constants";
+import {
+  ChapterErrorMessages,
+  ChapterSuccessMessages,
+} from "../../utils/constants";
 import { StatusCode } from "../../utils/enums";
 
 export class ChapterController implements IChapterControllers {
@@ -29,12 +32,16 @@ export class ChapterController implements IChapterControllers {
         captionsFile?: Express.MulterS3.File[];
       };
       if (!courseId || !chapterData.title || !chapterData.description) {
-        res.status(StatusCode.BAD_REQUEST).json({ message: ChapterErrorMessages.MISSING_REQUIRED_FIELDS });
+        res
+          .status(StatusCode.BAD_REQUEST)
+          .json({ message: ChapterErrorMessages.MISSING_REQUIRED_FIELDS });
         return;
       }
 
       if (!files?.chapterVideo) {
-        res.status(StatusCode.BAD_REQUEST).json({ message: ChapterErrorMessages.MISSING_VIDEO_FILE });
+        res
+          .status(StatusCode.BAD_REQUEST)
+          .json({ message: ChapterErrorMessages.MISSING_VIDEO_FILE });
         return;
       }
 
@@ -55,13 +62,11 @@ export class ChapterController implements IChapterControllers {
         { new: true }
       );
 
-      res
-        .status(StatusCode.CREATED)
-        .json({
-          success: true,
-          message: ChapterSuccessMessages.CHAPTER_ADDED,
-          data: newChapter,
-        });
+      res.status(StatusCode.CREATED).json({
+        success: true,
+        message: ChapterSuccessMessages.CHAPTER_ADDED,
+        data: newChapter,
+      });
     } catch (error) {
       next(error);
     }
@@ -84,7 +89,10 @@ export class ChapterController implements IChapterControllers {
       if (!chapterId || !title || !description) {
         res
           .status(StatusCode.BAD_REQUEST)
-          .json({ message: ChapterErrorMessages.MISSING_REQUIRED_FIELDS, success: false });
+          .json({
+            message: ChapterErrorMessages.MISSING_REQUIRED_FIELDS,
+            success: false,
+          });
         return;
       }
 
@@ -108,17 +116,20 @@ export class ChapterController implements IChapterControllers {
       );
 
       if (!updatedChapter) {
-        res.status(StatusCode.NOT_FOUND).json({ message: ChapterErrorMessages.CHAPTER_NOT_FOUND, success: false });
+        res
+          .status(StatusCode.NOT_FOUND)
+          .json({
+            message: ChapterErrorMessages.CHAPTER_NOT_FOUND,
+            success: false,
+          });
         return;
       }
 
-      res
-        .status(StatusCode.OK)
-        .json({
-          message: ChapterSuccessMessages.CHAPTER_UPDATED,
-          success: true,
-          data: updatedChapter,
-        });
+      res.status(StatusCode.OK).json({
+        message: ChapterSuccessMessages.CHAPTER_UPDATED,
+        success: true,
+        data: updatedChapter,
+      });
     } catch (error) {
       next(error);
     }
@@ -135,7 +146,10 @@ export class ChapterController implements IChapterControllers {
       if (!courseId) {
         res
           .status(StatusCode.BAD_REQUEST)
-          .json({ message: ChapterErrorMessages.COURSE_ID_REQUIRED, success: false });
+          .json({
+            message: ChapterErrorMessages.COURSE_ID_REQUIRED,
+            success: false,
+          });
         return;
       }
 
@@ -152,13 +166,50 @@ export class ChapterController implements IChapterControllers {
         })
       );
 
-      res
-        .status(StatusCode.OK)
-        .json({
-          message: ChapterSuccessMessages.CHAPTERS_FETCHED,
-          success: true,
-          data: signedChapters,
-        });
+      res.status(StatusCode.OK).json({
+        message: ChapterSuccessMessages.CHAPTERS_FETCHED,
+        success: true,
+        data: signedChapters,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getAllChaptersDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { courseId } = req.params;
+
+      if (!courseId) {
+        res
+          .status(StatusCode.BAD_REQUEST)
+          .json({
+            message: ChapterErrorMessages.COURSE_ID_REQUIRED,
+            success: false,
+          });
+        return;
+      }
+
+      const chapters = await this.chapterService.getAllChapters(courseId);
+
+      const modifiedChapters =  chapters.map( (chapter) => {
+        const chapterObj = chapter.toObject();
+
+        return {
+          _id: chapterObj._id,
+          description: chapterObj.description,
+          chapterTitle: chapterObj.chapterTitle,
+        };
+      });
+
+      res.status(StatusCode.OK).json({
+        message: ChapterSuccessMessages.CHAPTERS_FETCHED,
+        success: true,
+        data: modifiedChapters,
+      });
     } catch (error) {
       next(error);
     }
@@ -175,24 +226,30 @@ export class ChapterController implements IChapterControllers {
       if (!id) {
         res
           .status(StatusCode.BAD_REQUEST)
-          .json({ message: ChapterErrorMessages.CHAPTER_ID_REQUIRED, success: false });
+          .json({
+            message: ChapterErrorMessages.CHAPTER_ID_REQUIRED,
+            success: false,
+          });
         return;
       }
 
       const chapter = await this.chapterService.getChapterById(id);
 
       if (!chapter) {
-        res.status(StatusCode.NOT_FOUND).json({ message: ChapterErrorMessages.CHAPTER_NOT_FOUND, success: false });
+        res
+          .status(StatusCode.NOT_FOUND)
+          .json({
+            message: ChapterErrorMessages.CHAPTER_NOT_FOUND,
+            success: false,
+          });
         return;
       }
 
-      res
-        .status(StatusCode.OK)
-        .json({
-          message: ChapterSuccessMessages.CHAPTER_FETCHED,
-          success: true,
-          data: chapter,
-        });
+      res.status(StatusCode.OK).json({
+        message: ChapterSuccessMessages.CHAPTER_FETCHED,
+        success: true,
+        data: chapter,
+      });
     } catch (error) {
       next(error);
     }

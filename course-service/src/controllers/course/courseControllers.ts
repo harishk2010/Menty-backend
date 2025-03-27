@@ -70,14 +70,14 @@ export class CourseContoller implements ICourseControllers {
         demoVideos?: Express.MulterS3.File[];
         thumbnail?: Express.MulterS3.File[];
       };
-
-      if (files?.thumbnail) courseData.thumbnail = files.thumbnail[0].location;
+    
+      if (files?.thumbnail) courseData.thumbnailUrl = files.thumbnail[0].location;
       if (files?.demoVideos)
         courseData.demoVideo = {
           type: "video",
           url: files.demoVideos[0].location,
         };
-
+    
       const updatedCourse = await this.courseService.updateCourse(
         courseId,
         courseData
@@ -372,12 +372,17 @@ export class CourseContoller implements ICourseControllers {
       res.status(StatusCode.OK).json({
         success: true,
         message: CourseSuccessMessages.COURSE_ALREADY_PURCHASED,
-        data: response,
+        data: {
+          isBought:true
+        },
       })
 
     }else{
       res.json({
         success: false,
+        data: {
+          isBought:false
+        },
       })
     }
       

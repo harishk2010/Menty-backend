@@ -30,6 +30,12 @@ router
     authenticateToken,
     chapterController.getAllChapters.bind(chapterController)
   );
+router
+  .route("/chapterDetails/:courseId")
+  .get(
+    authenticateToken,
+    chapterController.getAllChaptersDetails.bind(chapterController)
+  );
 
 router
   .route("/chapter/:id")

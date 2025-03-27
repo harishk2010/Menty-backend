@@ -8,6 +8,11 @@ export interface IChapterControllers {
     res: Response,
     next: NextFunction
   ): Promise<void>;
+  getAllChaptersDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
   getChapterById(
     req: Request,
     res: Response,
